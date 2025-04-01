@@ -1,4 +1,4 @@
-import { shadeColor } from '@app/utils/utils';
+﻿import { shadeColor } from '@app/utils/utils';
 import { graphic } from 'echarts';
 import { BASE_COLORS } from '../constants';
 import { ITheme } from '../types';
@@ -48,7 +48,7 @@ const chartColors = {
 };
 
 export const lightColorsTheme: ITheme = {
-  primary: '#01509A',
+  primary: '#038b94',
   primary1: '#f5f5f5',
   primaryGradient: 'linear-gradient(211.49deg, #006CCF 15.89%, #00509A 48.97%)',
   light: '#C5D3E0',
@@ -95,7 +95,7 @@ export const lightColorsTheme: ITheme = {
   disabledBg: '#c5d3e0',
   layoutBodyBg: '#f8fbff',
   layoutHeaderBg: 'transparent',
-  layoutSiderBg: 'linear-gradient(261.31deg, #006ccf -29.57%, #00509a 121.11%)',
+    layoutSiderBg: 'linear-gradient(135deg, #038b94  0%, #03666f  100%)',
   inputPlaceholder: '#404040',
   itemHoverBg: '#f5f5f5',
   backgroundColorBase: '#F5F5F5',

@@ -12,7 +12,7 @@ export const Sider = styled(BaseLayout.Sider)`
   z-index: 5;
   min-height: 100vh;
   max-height: 100vh;
-
+  background-color:black;
   color: var(--text-secondary-color);
 
   @media only screen and ${media.md} {
@@ -21,8 +21,10 @@ export const Sider = styled(BaseLayout.Sider)`
   }
 
   @media only screen and ${media.xl} {
-    position: unset;
+    position: fixed;
+  
   }
+
 `;
 
 export const CollapseButton = styled(BaseButton)<{ $isCollapsed: boolean }>`
@@ -56,7 +58,7 @@ export const CollapseButton = styled(BaseButton)<{ $isCollapsed: boolean }>`
 
 export const SiderContent = styled.div`
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: hidden; 
   max-height: calc(100vh - ${LAYOUT.mobile.headerHeight});
 
   @media only screen and ${media.md} {
@@ -69,6 +71,7 @@ export const SiderLogoLink = styled(Link)`
   align-items: center;
   overflow: hidden;
   position: relative;
+ 
 `;
 
 export const SiderLogoDiv = styled.div`
@@ -77,7 +80,7 @@ export const SiderLogoDiv = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-
+ 
   @media only screen and ${media.md} {
     height: ${LAYOUT.desktop.headerHeight};
     padding-top: ${LAYOUT.desktop.paddingVertical};

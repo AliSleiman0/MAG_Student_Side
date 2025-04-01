@@ -21,6 +21,6 @@ export const Input = styled(AntInput)`
   }
 
   .ant-select-arrow {
-    color: var(--disabled-color);
+    color: linear-gradient(135deg, #038b94  0%, #03666f  100%);
   }
 `;
