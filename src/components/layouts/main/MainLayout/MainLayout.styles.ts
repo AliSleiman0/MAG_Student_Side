@@ -11,7 +11,5 @@ export const LayoutMain = styled(BaseLayout)`
     margin-left: 80px;
   }
 
-  @media only screen and ${media.xl} {
-    margin-left: unset;
-  }
+ 
 `;

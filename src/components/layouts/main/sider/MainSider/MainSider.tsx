@@ -11,28 +11,31 @@ interface MainSiderProps {
 }
 
 const MainSider: React.FC<MainSiderProps> = ({ isCollapsed, setCollapsed, ...props }) => {
-  const { isDesktop, mobileOnly, tabletOnly } = useResponsive();
+    const { isDesktop, desktopOnly, isTablet, mobileOnly, tabletOnly } = useResponsive();
 
-  const isCollapsible = useMemo(() => mobileOnly && tabletOnly, [mobileOnly, tabletOnly]);
+    const isCollapsible = useMemo(() => !isDesktop, [isDesktop]);
 
-  const toggleSider = () => setCollapsed(!isCollapsed);
+    const toggleSider = () => setCollapsed(!isCollapsed);
 
-  return (
-    <>
-      <S.Sider
-        trigger={null}
-        collapsed={!isDesktop && isCollapsed}
-        collapsedWidth={tabletOnly ? 80 : 0}
-        collapsible={isCollapsible}
-        width={260}
-        {...props}
-      >
-        <SiderLogo isSiderCollapsed={isCollapsed} toggleSider={toggleSider} />
-        <S.SiderContent>
-          <SiderMenu setCollapsed={setCollapsed} />
-        </S.SiderContent>
-      </S.Sider>
-      {mobileOnly && <Overlay onClick={toggleSider} show={!isCollapsed} />}
+    return (
+        <>
+          
+                <S.Sider
+                    trigger={null}
+                    collapsed={isCollapsed}
+                    collapsedWidth={mobileOnly ? 0 : 80}
+                    collapsible={isCollapsible}
+                    width={260}
+                    {...props}
+                >
+                    <SiderLogo isSiderCollapsed={isCollapsed} toggleSider={toggleSider} />
+                    <S.SiderContent>
+                        <SiderMenu setCollapsed={setCollapsed} />
+                    </S.SiderContent>
+                </S.Sider>
+             
+            {mobileOnly && <Overlay onClick={toggleSider} show={!isCollapsed} />}
+           
     </>
   );
 };

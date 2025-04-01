@@ -100,6 +100,7 @@ export const BaseFormItem = styled(Form.Item)<InternalFormItemProps>`
     width: unset;
     height: unset;
     top: 50%;
+    color: linear-gradient(135deg, #038b94  0%, #03666f  100%);
   }
 
   &.ant-form-item-has-error .ant-input,

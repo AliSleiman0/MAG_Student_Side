@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.6.2",
+    "@antv/g2plot": "2.4.32",
     "@craco/craco": "^6.1.2",
     "@lit-labs/react": "^1.0.2",
     "@react-google-maps/api": "^2.18.1",
@@ -86,6 +87,7 @@
   "devDependencies": {
     "@types/country-list": "^2.1.0",
     "@types/leaflet": "^1.7.9",
+    "@types/node": "^22.13.17",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@types/react-helmet": "^6.1.5",
