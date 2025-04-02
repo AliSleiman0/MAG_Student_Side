@@ -22,17 +22,9 @@ export const SettingsOverlay: React.FC = ({ ...props }) => {
         <DropdownCollapse.Panel header={t('header.changeTheme')} key="themePicker">
           <ThemePicker />
         </DropdownCollapse.Panel>
-        <DropdownCollapse.Panel header={t('header.nightMode.title')} key="nightMode">
-          <NightModeSettings />
-        </DropdownCollapse.Panel>
+       
       </DropdownCollapse>
-      {isPWASupported && (
-        <S.PwaInstallWrapper>
-          <BaseButton block type="primary" onClick={() => event && (event as BeforeInstallPromptEvent).prompt()}>
-            {t('common.pwa')}
-          </BaseButton>
-        </S.PwaInstallWrapper>
-      )}
+      
     </S.SettingsOverlayMenu>
   );
 };

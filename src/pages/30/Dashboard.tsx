@@ -8,11 +8,12 @@ import { Divider, Space, Typography } from 'antd';
 import Card from 'antd/lib/card/Card';
 import DonutChart from '../../components/antvDonutChart';
 import CoursesList from '../../components/CoursesList';
+import BarChart from '../../components/antvBarChart';
 
-const {  } = Typography;
+const { } = Typography;
 
 const Dashboard: React.FC = () => {
-   
+    //$env: NODE_OPTIONS = "--openssl-legacy-provider"; yarn start
     const { t } = useTranslation();
     const bannerStyles = {
         banner: {
@@ -36,9 +37,16 @@ const Dashboard: React.FC = () => {
         }
     };
     const stats = [
-        { title: 'Courses Completed to Graduate', completed: 8, total: 12, key:"something" },
-        { title: 'Courses Passed/Courses Taken', completed: 5, total: 50, key:"percentage"},
+        { title: 'Completed vs. Required Courses', completed: 8, total: 12, key: "something" },
+        { title: '% of Passed/Taken Courses', completed: 5, total: 50, key: "percentage" },
         { title: 'Credits Completed', completed: 5, total: 7, key: "something" }
+    ];
+    const data = [
+        { grade: 'A', count: 8 },
+        { grade: 'B', count: 5 },
+        { grade: 'C', count: 5 },
+        { grade: 'D', count: 8 },
+        { grade: 'F', count: 8 },
     ];
     return (
         <>
@@ -76,11 +84,11 @@ const Dashboard: React.FC = () => {
                         md={24}    // 2 per row on tablets
                         lg={7}     // 3 per row on desktops
                         xl={7}
-                        style={{ display: 'flex' }} 
+                        style={{ display: 'flex' }}
                     >
                         <Card
                             title={stat.title}
-                            
+
                             style={{
                                 width: '100%',
                                 minHeight: '400px', // Consistent card height
@@ -97,7 +105,36 @@ const Dashboard: React.FC = () => {
                     </Col>
                 ))}
             </Row>
-            <br/><br/>
+            <br />
+            <Row >
+
+                <Col
+
+                    xs={24}    // Full width on mobile
+                    sm={24}    // Full width on small tablets
+                    md={24}    // 2 per row on tablets
+                    lg={24}     // 3 per row on desktops
+                    xl={24}
+                    style={{ display: 'flex' }}
+                >
+                    <Card
+                        title={"My Grades Distribution"}
+
+                        style={{
+                            width: '100%',
+                            padding:"20px",
+                            minHeight: '400px', // Consistent card height
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.09)'
+                        }}
+                    >
+                        <BarChart
+                            data={data}
+                        />
+                    </Card>
+                </Col>
+
+            </Row>
+            <br /><br />
             <Divider style={{ borderColor: '#038b94' }}>My Courses</Divider>
             <br />
             <Row>
