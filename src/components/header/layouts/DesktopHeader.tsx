@@ -14,29 +14,20 @@ interface DesktopHeaderProps {
 
 export const DesktopHeader: React.FC<DesktopHeaderProps> = ({ isTwoColumnsLayout }) => {
   const leftSide = isTwoColumnsLayout ? (
-    <S.SearchColumn xl={16} xxl={17}>
-      <BaseRow justify="space-between">
-        <BaseCol xl={15} xxl={12}>
-          <HeaderSearch />
-        </BaseCol>
-        <BaseCol>
-          <S.GHButton />
-        </BaseCol>
-      </BaseRow>
-    </S.SearchColumn>
+ <></>
   ) : (
     <>
       <BaseCol lg={10} xxl={8}>
-        <HeaderSearch />
+     
       </BaseCol>
       <BaseCol>
-        <S.GHButton />
+      
       </BaseCol>
     </>
   );
 
   return (
-    <BaseRow justify="space-between" align="middle">
+      <BaseRow justify="space-between" align="middle" style={{ borderBottom:"1px solid #bff5f2",paddingBottom:"5px"} }>
       {leftSide}
 
       <S.ProfileColumn xl={8} xxl={7} $isTwoColumnsLayout={isTwoColumnsLayout}>
