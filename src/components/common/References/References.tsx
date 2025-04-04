@@ -4,7 +4,7 @@ import { FacebookOutlined, GithubOutlined, LinkedinOutlined, TwitterOutlined } f
 
 export const References: React.FC = () => {
     return (
-        <S.ReferencesWrapper>
+        <S.ReferencesWrapper style={{ borderTop: "1px solid #d3f5f1" }}>
             <S.Text>
                 Made by{' '}
                 <a href="https://github.com/AliSleiman0" target="_blank" rel="noreferrer">

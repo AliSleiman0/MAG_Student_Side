@@ -55,9 +55,7 @@ export const SecurityCodeForm: React.FC<SecurityCodeFormProps> = ({ onBack, onFi
           <Auth.FormTitle>{t('securityCodeForm.title')}</Auth.FormTitle>
           <S.VerifyEmailDescription>{t('common.verifCodeSent')}</S.VerifyEmailDescription>
           {isLoading ? <BaseSpin /> : <VerificationCodeInput autoFocus onChange={setSecurityCode} />}
-          <Link to="/" target="_blank">
-            <S.NoCodeText>{t('securityCodeForm.noCode')}</S.NoCodeText>
-          </Link>
+         
         </S.ContentWrapper>
       </BaseForm>
     </Auth.FormWrapper>

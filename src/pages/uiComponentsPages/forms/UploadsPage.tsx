@@ -24,51 +24,51 @@ const DraggerDescription = styled.div`
 `;
 
 const UploadsPage: React.FC = () => {
-  const { t } = useTranslation();
+    const { t } = useTranslation();
 
-  const uploadProps = {
-    name: 'file',
-    multiple: true,
-    action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-    onChange: (info: any) => {
-      const { status } = info.file;
-      if (status !== 'uploading') {
-        console.log(info.file, info.fileList);
-      }
-      if (status === 'done') {
-        notificationController.success({ message: t('uploads.successUpload', { name: info.file.name }) });
-      } else if (status === 'error') {
-        notificationController.error({ message: t('uploads.failedUpload', { name: info.file.name }) });
-      }
-    },
-  };
+    const uploadProps = {
+        name: 'file',
+        multiple: true,
+        action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+        onChange: (info: any) => {
+            const { status } = info.file;
+            if (status !== 'uploading') {
+                console.log(info.file, info.fileList);
+            }
+            if (status === 'done') {
+                notificationController.success({ message: t('uploads.successUpload', { name: info.file.name }) });
+            } else if (status === 'error') {
+                notificationController.error({ message: t('uploads.failedUpload', { name: info.file.name }) });
+            }
+        },
+    };
 
-  return (
-    <>
-      <PageTitle>{t('common.upload')}</PageTitle>
-      <BaseCol>
-        <S.Card title={t('uploads.basic')}>
-          <BaseUpload {...uploadProps}>
-            <BaseButton icon={<UploadOutlined />}>{t('uploads.clickToUpload')}</BaseButton>
-          </BaseUpload>
-        </S.Card>
-        <S.Card title={t('uploads.directory')}>
-          <BaseUpload action="https://www.mocky.io/v2/5cc8019d300000980a055e76" directory>
-            <BaseButton icon={<UploadOutlined />}>{t('uploads.directory')}</BaseButton>
-          </BaseUpload>
-        </S.Card>
-        <S.Card title={t('uploads.dragger')}>
-          <BaseUpload.Dragger {...uploadProps}>
-            <DraggerIconWrapper>
-              <InboxOutlined />
-            </DraggerIconWrapper>
-            <DraggerTitle>{t('uploads.dragUpload')}</DraggerTitle>
-            <DraggerDescription>{t('uploads.bulkUpload')}</DraggerDescription>
-          </BaseUpload.Dragger>
-        </S.Card>
-      </BaseCol>
-    </>
-  );
+    return (
+        <>
+            <PageTitle>{t('common.upload')}</PageTitle>
+            <BaseCol>
+                <S.Card title={t('uploads.basic')}>
+                    <BaseUpload {...uploadProps}>
+                        <BaseButton icon={<UploadOutlined />}>{t('uploads.clickToUpload')}</BaseButton>
+                    </BaseUpload>
+                </S.Card>
+                <S.Card title={t('uploads.directory')}>
+                    <BaseUpload action="https://www.mocky.io/v2/5cc8019d300000980a055e76" directory>
+                        <BaseButton icon={<UploadOutlined />}>{t('uploads.directory')}</BaseButton>
+                    </BaseUpload>
+                </S.Card>
+                <S.Card title={t('uploads.dragger')}>
+                    <BaseUpload.Dragger {...uploadProps}>
+                        <DraggerIconWrapper>
+                            <InboxOutlined />
+                        </DraggerIconWrapper>
+                        <DraggerTitle>{t('uploads.dragUpload')}</DraggerTitle>
+                        <DraggerDescription>{t('uploads.bulkUpload')}</DraggerDescription>
+                    </BaseUpload.Dragger>
+                </S.Card>
+            </BaseCol>
+        </>
+    );
 };
 
 export default UploadsPage;

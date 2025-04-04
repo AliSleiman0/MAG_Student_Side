@@ -2,6 +2,7 @@
 import { Row, Col, Tag, Typography, Collapse, Divider } from 'antd';
 import { BookOutlined, CalendarOutlined, CheckCircleOutlined, ExclamationCircleOutlined, FormOutlined, MinusCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import CourseCard from './CourseCard';
+import styled from 'styled-components';
 
 const { Panel } = Collapse;
 const { Text } = Typography;
@@ -14,6 +15,7 @@ const CourseLists: React.FC = () => {
         <Row gutter={[16, 16]} justify="center" style={{ width: "100%" }}>
             {/* Completed Courses */}
             <Col xs={24} sm={24} md={24} lg={8} xl={8}>
+                <HoverableDiv>
                 <Collapse style={{ backgroundColor: "#e3faf8" }} expandIconPosition="end">
                     <Panel style={{ paddingTop: "7px", paddingBottom: "7px" } }
                         key="completed"
@@ -78,12 +80,15 @@ const CourseLists: React.FC = () => {
                             />
                         </div>
                     </Panel>
-                </Collapse>
+                    </Collapse>
+                    </HoverableDiv>
             </Col>
 
             {/* Registered Courses */}
             <Col xs={24} sm={24} md={24} lg={8} xl={8}>
+            <HoverableDiv>
                 <Collapse style={{ backgroundColor: "#e3faf8" }} expandIconPosition="end">
+                 
                     <Panel style={{ paddingTop: "7px", paddingBottom: "7px" }}
                         key="registered"
                         header={
@@ -156,12 +161,13 @@ const CourseLists: React.FC = () => {
 
                             />
                         </div>
-                    </Panel>
-                </Collapse>
+                        </Panel>
+            </Collapse></HoverableDiv>
             </Col>
 
             {/* Remaining Courses */}
             <Col xs={24} sm={24} md={24} lg={8} xl={8}>
+                <HoverableDiv>
                 <Collapse style={{ backgroundColor: "#e3faf8" }} expandIconPosition="end">
                     <Panel style={{ paddingTop: "7px", paddingBottom: "7px" }}
                         key="remaining"
@@ -251,10 +257,21 @@ const CourseLists: React.FC = () => {
                         </div>
                     </Panel>
 
-                </Collapse>
+                    </Collapse>
+                    </HoverableDiv>
             </Col>
         </Row>
     );
 };
-
+const HoverableDiv = styled.div`
+  transition: all 0.3s ease;
+  border-radius:20%;
+  transform: scale(1);
+  box-shadow: none;
+      width: 100%;
+  &:hover {
+   
+   box-shadow: 0 5px 10px rgba(3, 139, 148, 0.3);
+  }
+`;
 export default CourseLists;

@@ -840,7 +840,7 @@
   },
   "uploads": {
     "basic": "Basic upload",
-    "bulkUpload": "Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files",
+    "bulkUpload": "You can update your profile photo here just by dragging a new profile",
     "clickToUpload": "Click to upload",
     "directory": "Upload directory",
     "dragger": "Dragger upload",
