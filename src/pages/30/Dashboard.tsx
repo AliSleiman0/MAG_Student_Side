@@ -9,6 +9,7 @@ import Card from 'antd/lib/card/Card';
 import DonutChart from '../../components/antvDonutChart';
 import CoursesList from '../../components/CoursesList';
 import BarChart from '../../components/antvBarChart';
+import styled from 'styled-components';
 
 const { } = Typography;
 
@@ -86,22 +87,24 @@ const Dashboard: React.FC = () => {
                         xl={7}
                         style={{ display: 'flex' }}
                     >
-                        <Card
-                            title={stat.title}
+                        <HoverableDiv>
+                            <Card
+                                title={stat.title}
 
-                            style={{
-                                width: '100%',
-                                minHeight: '400px', // Consistent card height
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.09)'
-                            }}
-                        >
-                            <DonutChart
-                                completed={stat.completed}
-                                total={stat.total}
-                                height={300} // Fixed chart height
-                                kkey={stat.key}
-                            />
-                        </Card>
+                                style={{
+                                    width: '100%',
+                                    minHeight: '400px', // Consistent card height
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.09)'
+                                }}
+                            >
+                                <DonutChart
+                                    completed={stat.completed}
+                                    total={stat.total}
+                                    height={300} // Fixed chart height
+                                    kkey={stat.key}
+                                />
+                            </Card>
+                        </HoverableDiv>
                     </Col>
                 ))}
             </Row>
@@ -117,20 +120,22 @@ const Dashboard: React.FC = () => {
                     xl={24}
                     style={{ display: 'flex' }}
                 >
-                    <Card
-                        title={"My Grades Distribution"}
+                    <HoverableDiv2>
+                        <Card
+                            title={"My Grades Distribution"}
 
-                        style={{
-                            width: '100%',
-                            padding:"20px",
-                            minHeight: '400px', // Consistent card height
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.09)'
-                        }}
-                    >
-                        <BarChart
-                            data={data}
-                        />
-                    </Card>
+                            style={{
+                                width: '100%',
+                                padding: "20px",
+                                minHeight: '400px', // Consistent card height
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.09)'
+                            }}
+                        >
+                            <BarChart
+                                data={data}
+                            />
+                        </Card>
+                    </HoverableDiv2>
                 </Col>
 
             </Row>
@@ -138,10 +143,30 @@ const Dashboard: React.FC = () => {
             <Divider style={{ borderColor: '#038b94' }}>My Courses</Divider>
             <br />
             <Row>
+
                 <CoursesList />
             </Row>
         </>
     );
 };
-
+const HoverableDiv = styled.div`
+  transition: all 0.3s ease;
+  transform: scale(1);
+  box-shadow: none;
+      width: 100%;
+  &:hover {
+    transform: scale(1.01);
+    box-shadow: 0 10px 20px rgba(3, 139, 148, 0.3);
+  }
+`;
+const HoverableDiv2 = styled.div`
+  transition: all 0.3s ease;
+  transform: scale(1);
+  box-shadow: none;
+      width: 100%;
+  &:hover {
+   
+    box-shadow: 0 10px 20px rgba(3, 139, 148, 0.3);
+  }
+`;
 export default Dashboard;

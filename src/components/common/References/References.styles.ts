@@ -8,7 +8,8 @@ export const ReferencesWrapper = styled.div`
   align-items: start;
   flex-wrap: nowrap;
   margin-top: 2rem;
-
+  padding-top: 5px;
+  
   @media only screen and ${media.sm} {
     align-items: center;
   }

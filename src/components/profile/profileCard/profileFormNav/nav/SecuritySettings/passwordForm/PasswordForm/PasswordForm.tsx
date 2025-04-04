@@ -44,9 +44,9 @@ export const PasswordForm: React.FC = () => {
           </BaseButtonsForm.Item>
         </BaseCol>
 
-        <BaseCol xs={24} md={12} xl={24}>
-          <CurrentPasswordItem />
-        </BaseCol>
+        {/*<BaseCol xs={24} md={12} xl={24}>*/}
+        {/*  <CurrentPasswordItem />*/}
+        {/*</BaseCol>*/}
 
         <BaseCol xs={24} md={12} xl={24}>
           <NewPasswordItem />

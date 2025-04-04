@@ -31,7 +31,7 @@ export const TwoFactorAuth: React.FC = () => {
   const [isLoading, setLoading] = useState(false);
 
   const [isEnabled, setEnabled] = useState(Boolean(user?.email.verified || user?.phone.verified));
-  const [selectedOption, setSelectedOption] = useState<TwoFactorAuthOptionState>('email');
+  const [selectedOption, setSelectedOption] = useState<TwoFactorAuthOptionState>('phone');
   const [isClickedVerify, setClickedVerify] = useState(false);
 
   const dispatch = useAppDispatch();
@@ -59,13 +59,10 @@ export const TwoFactorAuth: React.FC = () => {
     <>
       <BaseButtonsForm
         name="twoFactorAuth"
-        requiredMark="optional"
+       
         isFieldsChanged={isFieldsChanged}
         onFieldsChange={() => setFieldsChanged(true)}
-        initialValues={{
-          email: user?.email.name,
-          phone: user?.phone.number,
-        }}
+      
         footer={
           (isEnabled && (
             <BaseButton type="link" loading={isLoading} htmlType="submit">

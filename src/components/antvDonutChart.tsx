@@ -78,5 +78,6 @@ const DonutChart: React.FC<DonutChartProps> = ({
 
     return <div id={containerId} style={{ height: `${height}px`, width: '100%' }} />;
 };
+
 export default DonutChart;
 // Usage example in a dashboard

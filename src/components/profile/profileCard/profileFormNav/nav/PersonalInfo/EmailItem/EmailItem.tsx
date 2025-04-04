@@ -15,7 +15,7 @@ export const EmailItem: React.FC<EmailItemProps> = ({ required, onClick, verifie
   return (
     <BaseButtonsForm.Item
       name="email"
-      $isSuccess={verified}
+      $isSuccess={false}
       $successText={t('profile.nav.personalInfo.verified')}
       label={t('common.email')}
       rules={[
@@ -27,7 +27,7 @@ export const EmailItem: React.FC<EmailItemProps> = ({ required, onClick, verifie
       ]}
       {...props}
     >
-      <BaseInput disabled={verified} onClick={onClick} />
+      <BaseInput disabled={false} onClick={onClick} />
     </BaseButtonsForm.Item>
   );
 };
