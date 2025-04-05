@@ -18,6 +18,7 @@ import NftDashboardPage from '@app/pages/DashboardPages/NftDashboardPage';
 import MedicalDashboardPage from '@app/pages/DashboardPages/MedicalDashboardPage';
 
 import Dashboard from '../../pages/30/Dashboard';
+import GraphComponent from '../../pages/30/POS';
 
 
 
@@ -132,10 +133,12 @@ export const AppRouter: React.FC = () => {
     return (
         <BrowserRouter>
             <Routes>
+
                 <Route path={NFT_DASHBOARD_PATH} element={protectedLayout}>
                     <Route index element={<NftDashboard />} />
                     <Route path={MEDICAL_DASHBOARD_PATH} element={<MedicalDashboard />} />
                     <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="/POS" element={<GraphComponent />} />
                     <Route path="apps">
                         <Route path="feed" element={<NewsFeed />} />
                     </Route>
@@ -204,6 +207,7 @@ export const AppRouter: React.FC = () => {
                     <Route path="new-password" element={<NewPasswordPage />} />
                 </Route>
                 <Route path="/logout" element={<LogoutFallback />} />
+
             </Routes>
         </BrowserRouter>
     );

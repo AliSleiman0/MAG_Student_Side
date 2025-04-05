@@ -13,6 +13,10 @@
   "dependencies": {
     "@ant-design/icons": "^4.6.2",
     "@antv/g2plot": "2.4.32",
+    "@antv/layout": "^1.2.14-beta.8",
+    "@antv/x6": "^2.18.1",
+    "@antv/x6-plugin-snapline": "^2.1.7",
+    "@antv/x6-react-shape": "^2.2.3",
     "@craco/craco": "^6.1.2",
     "@lit-labs/react": "^1.0.2",
     "@react-google-maps/api": "^2.18.1",
