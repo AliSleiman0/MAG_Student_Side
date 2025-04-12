@@ -10,11 +10,13 @@ import DonutChart from '../../components/antvDonutChart';
 import CoursesList from '../../components/CoursesList';
 import BarChart from '../../components/antvBarChart';
 import styled from 'styled-components';
-
+import { useResponsive } from '../../hooks/useResponsive';
+//$env:NODE_OPTIONS = "--openssl-legacy-provider"; yarn start
 const { } = Typography;
 
 const Dashboard: React.FC = () => {
     //$env: NODE_OPTIONS = "--openssl-legacy-provider"; yarn start
+    const { isDesktop } = useResponsive();
     const { t } = useTranslation();
     const bannerStyles = {
         banner: {
@@ -52,6 +54,7 @@ const Dashboard: React.FC = () => {
     return (
         <>
             <PageTitle>{t('common.dashboard')}</PageTitle>
+
             <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
                 <Col span={24}>
                     <div style={bannerStyles.banner}>
@@ -146,6 +149,7 @@ const Dashboard: React.FC = () => {
 
                 <CoursesList />
             </Row>
+          
         </>
     );
 };
