@@ -135,7 +135,7 @@ export const AppRouter: React.FC = () => {
             <Routes>
 
                 <Route path={NFT_DASHBOARD_PATH} element={protectedLayout}>
-                    <Route index element={<NftDashboard />} />
+                    <Route index element={<Dashboard />} />
                     <Route path={MEDICAL_DASHBOARD_PATH} element={<MedicalDashboard />} />
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="/POS" element={<GraphComponent />} />

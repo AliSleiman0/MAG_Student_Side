@@ -59,9 +59,10 @@ const ProfileLayout: React.FC = () => {
                 )}
 
                 {isMenuShown && (
-                    <BaseCol xs={24} md={24} xl={16}>
+                    <BaseCol  xs={24} md={24} xl={16}>
                         <HoverableDiv>
-                            <Outlet /></HoverableDiv>
+                            <Outlet  />
+                        </HoverableDiv>
                     </BaseCol>
                 )}
             </BaseRow>
@@ -73,7 +74,7 @@ const HoverableDiv = styled.div`
   transition: all 0.3s ease;
   transform: scale(1);
   box-shadow: none;
-  
+
   &:hover {
    
     box-shadow: 0 5px 10px rgba(3, 139, 148, 0.3);

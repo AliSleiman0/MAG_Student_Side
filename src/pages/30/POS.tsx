@@ -6,7 +6,7 @@ import { connect } from 'http2';
 import { Space, Switch } from 'antd';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 const FlowchartContext = React.createContext({
-    showCorequisites: true,
+    showCorequisites: false,
     showCourseStatus: false,
 });
 // Styled components
@@ -190,9 +190,17 @@ register({
 const Flowchart = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [showPrerequisites, setShowPrerequisites] = useState(true);
-    const [showCorequisites, setShowCorequisites] = useState(true);
+    const [showCorequisites, setShowCorequisites] = useState(false);
     const [showCourseStatus, setShowCourseStatus] = useState(false);
-
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const [activeTooltip, setActiveTooltip] = useState<any>(null);
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            setMousePosition({ x: e.pageX + 10, y: e.pageY + 10 });
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
     const graphRef = useRef<Graph | null>(null);
     useEffect(() => {
         if (!graphRef.current) return;
@@ -216,6 +224,7 @@ const Flowchart = () => {
         x: number;
         y: number;
     }>({ visible: false, content: null, x: 0, y: 0 });
+
     useEffect(() => {
         showPrereqRef.current = showPrerequisites;
         showCoreqRef.current = showCorequisites;
@@ -256,7 +265,7 @@ const Flowchart = () => {
 
         const courseLevels = Array.from(new Set(validatedCourses.map(c => c.level))).sort((a, b) => a - b);//new Set(validatedCourses.map(c => c.level)) extract levels and removes duplicates then switch back the set to array using Array.from
         const levelSpacing = 250;
-        const nodeSpacing = 100;
+        const nodeSpacing = 150;
 
         validatedCourses.forEach((course) => {
             const levelIndex = courseLevels.indexOf(course.level);
@@ -401,11 +410,11 @@ const Flowchart = () => {
             console.log("connected Links ", connectedEdges);
             edgeCache.set(node.id, connectedEdges);
         });
-
+       
         // Optimized hover handler
-        graph.on('node:mouseenter', ({ node: hoveredNode }) => {
+        graph.on('node:mouseenter', ({ node: hoveredNode, e }) => {
             const course = hoveredNode.data?.course;
-
+            setActiveTooltip(course);
             if (!course) return;
 
             // Get cached edges
@@ -451,12 +460,20 @@ const Flowchart = () => {
             setTooltip({
                 visible: true,
                 content: course,
-                x: bbox.x + containerRect.left + scrollX,
-                y: bbox.y + containerRect.top + scrollY - 40
+                x: e.clientX + 10,  // Add slight offset
+                y: e.clientY + 10
             });
+        });
+        graph.on('node:mousemove', ({ e }) => {
+            setTooltip(prev => ({
+                ...prev,
+                x: e.clientX + 10,
+                y: e.clientY + 10
+            }));
         });
 
         graph.on('node:mouseleave', () => {
+            setActiveTooltip(null);
             graph.getEdges().forEach(edge => {
 
                 const type = edge.getData()?.type;
@@ -571,12 +588,12 @@ const Flowchart = () => {
 
                 </Space>
                 <FlowchartContainer ref={containerRef} />
-                {tooltip.visible && (
+                {activeTooltip && (
                     <div className="tooltip-container"
                         style={{
                             position: 'fixed',
-                            left: tooltip.x,
-                            top: tooltip.y,
+                            left: mousePosition.x,
+                            top: mousePosition.y,
                             background: '#038b94',
                             color: 'white',
                             padding: 12,
@@ -585,13 +602,13 @@ const Flowchart = () => {
                             zIndex: 100,
                             minWidth: 150,
                             pointerEvents: 'none',
-                            fontSize: "1rem"
+                            transition: 'transform 0.1s ease-out'
                         }}
                     >
-                        <h4 style={{ margin: 0, color: 'white', fontSize: "0.9rem" }}>
+                        <h4 style={{ margin: 0, color: 'white', fontSize: "0.8rem" }}>
                             {tooltip.content.name}
                         </h4>
-                        <div style={{ marginTop: 8, fontSize: "0.9rem" }}>
+                        <div style={{ marginTop: 8, fontSize: "0.8rem" }}>
                             <div>Prerequisites: {(tooltip.content.prerequisites || []).join(', ') || 'None'}</div>
                             <div>Corequisites: {(tooltip.content.corequisites || []).join(', ') || 'None'}</div>
                         </div>

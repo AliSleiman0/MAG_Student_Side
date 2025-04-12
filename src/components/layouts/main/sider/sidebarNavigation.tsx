@@ -1,4 +1,5 @@
 import React from 'react';
+
 import {
     CompassOutlined,
 
@@ -10,6 +11,8 @@ import {
     TableOutlined,
     UserOutlined,
     BlockOutlined,
+    PartitionOutlined,
+    GoldOutlined,
 } from '@ant-design/icons';
 import { ReactComponent as NftIcon } from '@app/assets/icons/nft-icon.svg';
 
@@ -26,21 +29,21 @@ export const sidebarNavigation: SidebarNavigationItem[] = [
         title: 'common.dashboard',
         key: 'dashboard',
         // TODO use path variable
-        url: '/dashboard',
+        url: '/',
         icon: <HomeOutlined />,
     },
     {
-        title: 'common.nft-dashboard',
-        key: 'nft-dashboard',
+        title: 'POS',
+        key: 'pos',
         // TODO use path variable
-        url: '/',
-        icon: <NftIcon />,
+        url: '/POS',
+        icon: < PartitionOutlined />,
     },
     {
-        title: 'common.medical-dashboard',
+        title: 'Automated POS',
         key: 'medical-dashboard',
         url: '/medical-dashboard',
-        icon: <DashboardOutlined />,
+        icon: <GoldOutlined />,
     },
     {
         title: 'common.apps',
