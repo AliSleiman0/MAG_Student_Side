@@ -94,4 +94,5 @@ export const BrandSpan = styled.span`
   font-weight: 700;
   font-size: 1.125rem;
   color: var(--white);
+    letter-spacing: 0.09em;
 `;

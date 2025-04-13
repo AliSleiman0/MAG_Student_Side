@@ -1,101 +1,184 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import { PageTitle } from '@app/components/common/PageTitle/PageTitle';
-import { Col, Row } from 'antd/lib/grid';
-import { BookOutlined, CalendarOutlined, CreditCardOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { Collapse, Divider, List, Space, Typography } from 'antd';
-import Card from 'antd/lib/card/Card';
-import DonutChart from '../../components/antvDonutChart';
-import CoursesList from '../../components/CoursesList';
-import BarChart from '../../components/antvBarChart';
+import { Graph } from '@antv/x6';
+import { register } from '@antv/x6-react-shape';
 import styled from 'styled-components';
-import { useResponsive } from '../../hooks/useResponsive';
-//$env:NODE_OPTIONS = "--openssl-legacy-provider"; yarn start
-const { } = Typography;
+import { PageTitle } from '@app/components/common/PageTitle/PageTitle';
+import { CourseNode } from '../../components/CourseNode';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Row, Col, Space, Typography } from 'antd';
+const sampleCourses: {
+    courseCode: string;
+    title: string;
+    credits: number;
+    prerequisites: string[];
+    courseType: string;
+}[] = [
+        {
+            courseCode: "CENG400",
+            title: "Micro Controllers & Micro Processors",
+            credits: 4,
+            prerequisites: ["CENG380", "CENG350"],
+            courseType: "Major"
+        },
+        {
+            courseCode: "MATH201",
+            title: "Advanced Calculus",
+            credits: 3,
+            prerequisites: ["MATH101"],
+            courseType: "Core"
+        },
+        {
+            courseCode: "CENG450",
+            title: "Embedded Systems Design",
+            credits: 5,
+            prerequisites: ["CENG400"],
+            courseType: "Major"
+        },
+        {
+            courseCode: "ARTS110",
+            title: "Digital Photography",
+            credits: 4,
+            prerequisites: [],
+            courseType: "Elective"
+        },
+        {
+            courseCode: "GEN199",
+            title: "Critical Thinking",
+            credits: 4,
+            prerequisites: ["CENG340", "EENG250"],
+            courseType: "General"
+        }
+    ]; // Total credits: 4 + 3 + 5 + 4 + 4 = 20
+// 1. Move styled components outside the component
+const FlowchartContainer = styled.div`
+  width: 85vw!important;  
+  height:  80vh!important;
+  border: 2px solid #038b94;
+ 
+  border-radius: 8px;
+  background-color: white;
+  position: relative;
+`;
+const PageContainer = styled.div`
+  width: 100%;
+  min-height: auto;
+  
+ 
+  box-sizing: border-box;
+`;
+const bannerStyles = {
+    banner: {
+        backgroundColor: '#e3faf8', // Subtle grey matching Ant Design's palette
+        padding: '16px 24px',
+        borderRadius: '8px',
+        width: '100%',
+    },
+    icon: {
+        fontSize: '20px',
+        color: '#038b94', // Medium grey for contrast
+    },
+    text: {
+        fontSize: '16px',
+        color: '#262626', // Dark grey for readability
+    },
+    responsiveText: {
+        '@media (max-width: 768px)': {
+            fontSize: '10px',
+        }
+    }
+};
+// 2. Register custom node shape ONCE (outside component)
+register({
+    shape: 'sem-node',
+    width: 1500,
+    height: 120,
+    component: CourseNode,  // Fixed component reference
+});
 
 const AutoPOS: React.FC = () => {
-    //$env: NODE_OPTIONS = "--openssl-legacy-provider"; yarn start
-
     const { t } = useTranslation();
+    const containerRef = useRef<HTMLDivElement>(null);
+    const graphRef = useRef<Graph | null>(null);
 
+    // 3. Initialize graph in useEffect for proper lifecycle management
+    useEffect(() => {
+        if (!containerRef.current) return;
 
-    const data = [
-        'Racing car sprays burning fuel into crowd.',
-        'Japanese princess to wed commoner.',
-        'Australian walks 100km after outback crash.',
-        'Man charged over missing wedding girl.',
-        'Los Angeles battles huge wildfires.',
-    ];
+        // Create graph instance
+        const graph = new Graph({
+            container: containerRef.current,
+            grid: { visible: true, size: 15 },
+            background: { color: '#f8f9fa' },
+            panning: true,
+            mousewheel: true,
+            
+            connecting: {
+                router: {
+                    name: 'manhattan',
+                    args: {
+                        excludeShapes: ['course-node'],
+                        maximumLoops: 100,
+                        startDirections: ['right'],
+                        endDirections: ['left']
+                    }
+                }
+            }
+        });
+
+        const nodePositions = [
+            { x: 0, y: 0 },             // sem1 (top)
+            { x: 350, y: 800 },        // sem2
+            { x: 1000, y: 0 },          // sem3
+            { x: 1350, y: 800 },       // sem4
+            { x: 2000, y: 0 },          // sem5
+            { x: 2350, y: 800 }        // sem6   // sem6 (right)
+        ];
+  
+        // Add 6 nodes with alternating positions
+        Array.from({ length: 6 }).forEach((_, index) => {
+            const semesterNumber = index + 1;
+            const position = nodePositions[index];
+
+            graph.addNode({
+                id: `sem${semesterNumber}`,
+                shape: 'sem-node',
+                x: position.x,
+                y: position.y,
+                data: {
+                    title: `Semester ${semesterNumber}`,
+                    credits: 20 - index * 2,  // Varying credits for demo
+                    courses: 5 - Math.floor(index / 2),
+                    courseList: sampleCourses,
+                    Upcoming: semesterNumber === 1 ? "Upcoming" : undefined
+                }
+            });
+        });
+        //const scroller = new Scroller({
+        //    enabled: true,
+        //    padding: 50,
+        //    pageVisible: true,
+        //    pageBreak: false,
+        //});
+        //graph.use(scroller); 
+        
+        // Add this after adding nodes to ensure proper view
+        //graph.zoomToFit({ padding: 50 });
+
+        // 5. Cleanup on unmount
+        return () => {
+            graph.dispose();
+        };
+    }, []);
 
     return (
         <>
             <PageTitle>{t('Automated POS')}</PageTitle>
-
-            <Collapse
-                activeKey={[1]}
-                expandIcon={() => null}
-                style={{ backgroundColor: "#e3faf8", borderLeft: "4px solid #038b94" }}
-            >
-                <Collapse.Panel
-                    key="1"
-                    header={
-                        <Row justify="space-between" >
-                            <Col>
-                                <Row  style={{ marginBottom:"10px" }}>
-                                  
-                                    <Col>Spring 2004</Col>
-                                </Row>
-                                <Row>
-
-                                    <Space size="large">
-                                        <Col style={{ backgroundColor: "#cae8e6", borderRadius: 30, padding: "5px", paddingLeft: "12px", paddingRight: "12px" }}  >
-
-                                            <CalendarOutlined style={{ color: '#038b94', fontSize: '18px',marginRight:"5px" }} />
-                                            <span style={{ fontSize: '16px' }}>17 credits</span>
-                                        </Col>
-                                        <Col style={{ backgroundColor: "#cae8e6", borderRadius: 30, padding: "5px", paddingLeft: "12px", paddingRight: "12px", }}  >
-
-                                            <BookOutlined style={{ color: '#038b94', fontSize: '18px', marginRight: "5px" }} />
-                                            <span style={{ fontSize: '16px' }}>17 credits</span>
-                                        </Col>
-                                    </Space>
-
-                                </Row>
-                            </Col>
-                            <Col style={{ borderRadius: 30, padding: "5px", paddingLeft: "12px", paddingRight: "12px", maxHeight: "fit-content" }}  >
-                                <span style={{ fontSize: '16px' }}>Upcoming</span>
-                            </Col>
-                        </Row>}
-
-                >
-                    <Row justify="space-between">
-                        <Col>
-                            <Row gutter={[5, 0]}>
-                                <Col>icon</Col>
-                                <Col>CENG400</Col>
-                            </Row>
-                            <Row>MicroController Course</Row>
-                        </Col>
-                        <Col style={{ paddingTop: "10px" }}>
-                            col
-                        </Col>
-                    </Row>
-
-                </Collapse.Panel>
-            </Collapse>
+            <PageContainer>
+                <FlowchartContainer ref={containerRef} />
+            </PageContainer>
         </>
     );
 };
-const HoverableDiv = styled.div`
-  transition: all 0.3s ease;
-  transform: scale(1);
-  box-shadow: none;
-      width: 100%;
-  &:hover {
-    transform: scale(1.01);
-    box-shadow: 0 10px 20px rgba(3, 139, 148, 0.3);
-  }
-`;
 
 export default AutoPOS;
