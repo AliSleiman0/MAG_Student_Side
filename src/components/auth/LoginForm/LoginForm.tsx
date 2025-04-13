@@ -78,30 +78,8 @@ export const LoginForm: React.FC = () => {
             {t('common.login')}
           </Auth.SubmitButton>
         </BaseForm.Item>
-        <BaseForm.Item noStyle>
-          <Auth.SocialButton type="default" htmlType="submit">
-            <Auth.SocialIconWrapper>
-              <GoogleIcon />
-            </Auth.SocialIconWrapper>
-            {t('login.googleLink')}
-          </Auth.SocialButton>
-        </BaseForm.Item>
-        <BaseForm.Item noStyle>
-          <Auth.SocialButton type="default" htmlType="submit">
-            <Auth.SocialIconWrapper>
-              <FacebookIcon />
-            </Auth.SocialIconWrapper>
-            {t('login.facebookLink')}
-          </Auth.SocialButton>
-        </BaseForm.Item>
-        <Auth.FooterWrapper>
-          <Auth.Text>
-            {t('login.noAccount')}{' '}
-            <Link to="/auth/sign-up">
-              <Auth.LinkText>{t('common.here')}</Auth.LinkText>
-            </Link>
-          </Auth.Text>
-        </Auth.FooterWrapper>
+       
+       
       </BaseForm>
     </Auth.FormWrapper>
   );

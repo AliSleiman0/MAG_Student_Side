@@ -3,12 +3,33 @@ import { Graph, Edge, Node } from '@antv/x6';
 import { register } from '@antv/x6-react-shape';
 import styled from 'styled-components';
 import { connect } from 'http2';
-import { Space, Switch } from 'antd';
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { Col, Row, Space, Switch, Typography } from 'antd';
+import { CheckOutlined, CloseOutlined, InfoCircleOutlined } from '@ant-design/icons';
 const FlowchartContext = React.createContext({
     showCorequisites: false,
     showCourseStatus: false,
 });
+const bannerStyles = {
+    banner: {
+        backgroundColor: '#e3faf8', // Subtle grey matching Ant Design's palette
+        padding: '16px 24px',
+        borderRadius: '8px',
+        width: '100%',
+    },
+    icon: {
+        fontSize: '20px',
+        color: '#038b94', // Medium grey for contrast
+    },
+    text: {
+        fontSize: '16px',
+        color: '#262626', // Dark grey for readability
+    },
+    responsiveText: {
+        '@media (max-width: 768px)': {
+            fontSize: '10px',
+        }
+    }
+};
 // Styled components
 const FlowchartContainer = styled.div`
   width: 100%;
@@ -410,7 +431,7 @@ const Flowchart = () => {
             console.log("connected Links ", connectedEdges);
             edgeCache.set(node.id, connectedEdges);
         });
-       
+
         // Optimized hover handler
         graph.on('node:mouseenter', ({ node: hoveredNode, e }) => {
             const course = hoveredNode.data?.course;
@@ -510,112 +531,131 @@ const Flowchart = () => {
         });
     }, [showPrerequisites, showCorequisites]);
     return (
-        <FlowchartContext.Provider value={{ showCorequisites, showCourseStatus, }}>
-            <LegendContainer>
-                <div style={{ marginBottom: '12px', fontWeight: '600', color: '#038b94' }}>
-                    Legends
-                </div>
+        <>
+            <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+                <Col span={24}>
+                    <div style={bannerStyles.banner}>
+                        <Space align="center">
+                            {/* Info icon */}
+                            <InfoCircleOutlined style={bannerStyles.icon} />
 
-                {/* Node Status */}
-                <div style={{ marginBottom: '16px' }}>
-                    <LegendItem>
-                        <ColorSwatch color="#06c2bf" />
-                        <span>Passed Course</span>
-                    </LegendItem>
-                    <LegendItem>
-                        <ColorSwatch color="#defeff" />
-                        <span>Registered Course</span>
-                    </LegendItem>
-                    <LegendItem>
-                        <ColorSwatch color="#f70f05" />
-                        <span>Failed Course</span>
-                    </LegendItem>
-                </div>
+                            {/* Dynamic content */}
+                            <Typography.Text
+                                style={{ ...bannerStyles.text, ...bannerStyles.responsiveText }}
+                            >
+                                Plan of Study of [Computer and Commmunication Engineering]
 
-                {/* Edge Types */}
-                <div>
-                    <LegendItem>
-                        <SolidLine />
-                        <span>Prerequisites</span>
-                    </LegendItem>
-                    <LegendItem>
-                        <DashedLine />
-                        <span>Corequisites (with markers)</span>
-                    </LegendItem>
-                    <div style={{ fontSize: '0.8em', color: '#666', marginTop: '8px' }}>
-                        <div>● = Source course</div>
-                        <div>◆ = Target course</div>
+                            </Typography.Text>
+                        </Space>
                     </div>
-                </div>
-            </LegendContainer>
-            <div style={{ position: 'relative' }}>
-                <Space style={{
-                    position: 'absolute',
-                    top: 10,
-                    right: 10,
-                    zIndex: 1000,
-                    background: 'white',
-                    padding: 8,
-                    borderRadius: 4,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-                }}>
-                    <Switch
-                        checkedChildren={<CheckOutlined />}
-                        unCheckedChildren={<CloseOutlined />}
-                        checked={showCourseStatus}
-                        onChange={setShowCourseStatus}
-                        style={{ marginRight: 8 }}
-                    />
-                    <span style={{ marginRight: "10px" }}>Show Course Status </span>
-                    <Switch
-                        checkedChildren={<CheckOutlined />}
-                        unCheckedChildren={<CloseOutlined />}
-                        checked={showPrerequisites}
-                        onChange={setShowPrerequisites}
-                        style={{ marginRight: 8 }}
-                    />
-                    <span>Prerequisites</span>
+                </Col>
+            </Row>
+            <FlowchartContext.Provider value={{ showCorequisites, showCourseStatus, }}>
+                <LegendContainer>
+                    <div style={{ marginBottom: '12px', fontWeight: '600', color: '#038b94' }}>
+                        Legends
+                    </div>
 
-                    <Switch
-                        checkedChildren={<CheckOutlined />}
-                        unCheckedChildren={<CloseOutlined />}
-                        checked={showCorequisites}
-                        onChange={setShowCorequisites}
-                        style={{ marginLeft: 16, marginRight: 8 }}
-                    />
-                    <span>Corequisites</span>
+                    {/* Node Status */}
+                    <div style={{ marginBottom: '16px' }}>
+                        <LegendItem>
+                            <ColorSwatch color="#06c2bf" />
+                            <span>Passed Course</span>
+                        </LegendItem>
+                        <LegendItem>
+                            <ColorSwatch color="#defeff" />
+                            <span>Registered Course</span>
+                        </LegendItem>
+                        <LegendItem>
+                            <ColorSwatch color="#f70f05" />
+                            <span>Failed Course</span>
+                        </LegendItem>
+                    </div>
 
-
-                </Space>
-                <FlowchartContainer ref={containerRef} />
-                {activeTooltip && (
-                    <div className="tooltip-container"
-                        style={{
-                            position: 'fixed',
-                            left: mousePosition.x,
-                            top: mousePosition.y,
-                            background: '#038b94',
-                            color: 'white',
-                            padding: 12,
-                            borderRadius: 6,
-                            boxShadow: '0 3px 6px rgba(0,0,0,0.16)',
-                            zIndex: 100,
-                            minWidth: 150,
-                            pointerEvents: 'none',
-                            transition: 'transform 0.1s ease-out'
-                        }}
-                    >
-                        <h4 style={{ margin: 0, color: 'white', fontSize: "0.8rem" }}>
-                            {tooltip.content.name}
-                        </h4>
-                        <div style={{ marginTop: 8, fontSize: "0.8rem" }}>
-                            <div>Prerequisites: {(tooltip.content.prerequisites || []).join(', ') || 'None'}</div>
-                            <div>Corequisites: {(tooltip.content.corequisites || []).join(', ') || 'None'}</div>
+                    {/* Edge Types */}
+                    <div>
+                        <LegendItem>
+                            <SolidLine />
+                            <span>Prerequisites</span>
+                        </LegendItem>
+                        <LegendItem>
+                            <DashedLine />
+                            <span>Corequisites (with markers)</span>
+                        </LegendItem>
+                        <div style={{ fontSize: '0.8em', color: '#666', marginTop: '8px' }}>
+                            <div>● = Source course</div>
+                            <div>◆ = Target course</div>
                         </div>
                     </div>
-                )}
-            </div>
-        </FlowchartContext.Provider>
+                </LegendContainer>
+                <div style={{ position: 'relative' }}>
+                    <Space style={{
+                        position: 'absolute',
+                        top: 10,
+                        right: 10,
+                        zIndex: 1000,
+                        background: 'white',
+                        padding: 8,
+                        borderRadius: 4,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                    }}>
+                        <Switch
+                            checkedChildren={<CheckOutlined />}
+                            unCheckedChildren={<CloseOutlined />}
+                            checked={showCourseStatus}
+                            onChange={setShowCourseStatus}
+                            style={{ marginRight: 8 }}
+                        />
+                        <span style={{ marginRight: "10px" }}>Show Course Status </span>
+                        <Switch
+                            checkedChildren={<CheckOutlined />}
+                            unCheckedChildren={<CloseOutlined />}
+                            checked={showPrerequisites}
+                            onChange={setShowPrerequisites}
+                            style={{ marginRight: 8 }}
+                        />
+                        <span>Prerequisites</span>
+
+                        <Switch
+                            checkedChildren={<CheckOutlined />}
+                            unCheckedChildren={<CloseOutlined />}
+                            checked={showCorequisites}
+                            onChange={setShowCorequisites}
+                            style={{ marginLeft: 16, marginRight: 8 }}
+                        />
+                        <span>Corequisites</span>
+
+
+                    </Space>
+                    <FlowchartContainer ref={containerRef} />
+                    {activeTooltip && (
+                        <div className="tooltip-container"
+                            style={{
+                                position: 'fixed',
+                                left: mousePosition.x,
+                                top: mousePosition.y,
+                                background: '#038b94',
+                                color: 'white',
+                                padding: 12,
+                                borderRadius: 6,
+                                boxShadow: '0 3px 6px rgba(0,0,0,0.16)',
+                                zIndex: 100,
+                                minWidth: 150,
+                                pointerEvents: 'none',
+                                transition: 'transform 0.1s ease-out'
+                            }}
+                        >
+                            <h4 style={{ margin: 0, color: 'white', fontSize: "0.8rem" }}>
+                                {tooltip.content.name}
+                            </h4>
+                            <div style={{ marginTop: 8, fontSize: "0.8rem" }}>
+                                <div>Prerequisites: {(tooltip.content.prerequisites || []).join(', ') || 'None'}</div>
+                                <div>Corequisites: {(tooltip.content.corequisites || []).join(', ') || 'None'}</div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </FlowchartContext.Provider></>
     );
 };
 export default Flowchart;

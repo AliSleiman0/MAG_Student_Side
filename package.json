@@ -1,14 +1,14 @@
 {
-  "name": "lightence-admin",
+  "name": "MAG",
   "version": "1.0.0",
   "license": "MIT",
-  "description": "Free and easy-to-use admin template based on React 17+",
+  "description": "MAG Student Side",
   "repository": {
     "type": "git",
-    "url": "git+github.com:altence/lightence-admin.git"
+    "url": "git+github.com:Asleiman0/MAG_StudentSide"
   },
   "bugs": {
-    "url": "https://github.com/altence/lightence-admin/issues"
+    "url": "https://github.com/AliSleiman"
   },
   "dependencies": {
     "@ant-design/icons": "^4.6.2",

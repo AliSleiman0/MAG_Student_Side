@@ -29,7 +29,8 @@ export const Sider = styled(BaseLayout.Sider)`
 
 export const CollapseButton = styled(BaseButton)<{ $isCollapsed: boolean }>`
   background: var(--collapse-background-color);
-
+  margin-left:40px !important;
+  padding-left:40px;
   border: 1px solid var(--border-color);
   transition: all 0.2s ease;
   position: absolute;
@@ -80,7 +81,7 @@ export const SiderLogoDiv = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
- 
+  
   @media only screen and ${media.md} {
     height: ${LAYOUT.desktop.headerHeight};
     padding-top: ${LAYOUT.desktop.paddingVertical};
@@ -93,4 +94,5 @@ export const BrandSpan = styled.span`
   font-weight: 700;
   font-size: 1.125rem;
   color: var(--white);
+    letter-spacing: 0.09em;
 `;
