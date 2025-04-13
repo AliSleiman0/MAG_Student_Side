@@ -1,33 +1,17 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BaseButtonsForm } from '@app/components/common/forms/BaseButtonsForm/BaseButtonsForm';
 import { BaseCard } from '@app/components/common/BaseCard/BaseCard';
-import { FirstNameItem } from '@app/components/profile/profileCard/profileFormNav/nav/PersonalInfo/FirstNameItem/FirstNameItem';
-import { LastNameItem } from '@app/components/profile/profileCard/profileFormNav/nav/PersonalInfo/LastNameItem/LastNameItem';
-import { NicknameItem } from '@app/components/profile/profileCard/profileFormNav/nav/PersonalInfo/NicknameItem/NicknameItem';
-import { SexItem } from '@app/components/profile/profileCard/profileFormNav/nav/PersonalInfo/SexItem/SexItem';
-import { BirthdayItem } from '@app/components/profile/profileCard/profileFormNav/nav/PersonalInfo/BirthdayItem/BirthdayItem';
-import { LanguageItem } from '@app/components/profile/profileCard/profileFormNav/nav/PersonalInfo/LanguageItem/LanguageItem';
-import { PhoneItem } from '@app/components/profile/profileCard/profileFormNav/nav/PersonalInfo/PhoneItem/PhoneItem';
-import { EmailItem } from '@app/components/profile/profileCard/profileFormNav/nav/PersonalInfo/EmailItem/EmailItem';
-import { CountriesItem } from '@app/components/profile/profileCard/profileFormNav/nav/PersonalInfo/CountriesItem/CountriesItem';
-import { CitiesItem } from '@app/components/profile/profileCard/profileFormNav/nav/PersonalInfo/CitiesItem/CitiesItem';
-import { ZipcodeItem } from '@app/components/profile/profileCard/profileFormNav/nav/PersonalInfo/ZipcodeItem/ZipcodeItem';
-import { AddressItem } from '@app/components/profile/profileCard/profileFormNav/nav/PersonalInfo/AddressItem/AddressItem';
-import { WebsiteItem } from '@app/components/profile/profileCard/profileFormNav/nav/PersonalInfo/WebsiteItem/WebsiteItem';
-import { SocialLinksItem } from '@app/components/profile/profileCard/profileFormNav/nav/PersonalInfo/SocialLinksItem/SocialLinksItem';
+
 import { useAppSelector } from '@app/hooks/reduxHooks';
-import { Dates } from '@app/constants/Dates';
 import { notificationController } from '@app/controllers/notificationController';
 import { PaymentCard } from '@app/interfaces/interfaces';
 import { BaseRow } from '@app/components/common/BaseRow/BaseRow';
-
 import { InputDisplay } from '../../../../../InputDisplay';
 import { BaseUpload } from '../../../../../common/BaseUpload/BaseUpload';
 import styled from 'styled-components';
 import { FONT_SIZE, FONT_WEIGHT } from '../../../../../../styles/themes/constants';
 import { InboxOutlined } from '@ant-design/icons';
-import * as S from '@app/pages/uiComponentsPages//UIComponentsPage.styles';
 import { BaseCol } from '@app/components/common/BaseCol/BaseCol';
 
 
@@ -108,7 +92,7 @@ export const PersonalInfo: React.FC = () => {
 
                     <BaseCol xs={24} md={12}>
                         
-                            <InputDisplay title="Full Name" />
+                            <InputDisplay title="Full Name"  />
                         
                     </BaseCol>
                     <BaseCol xs={24} md={12}>
@@ -121,7 +105,7 @@ export const PersonalInfo: React.FC = () => {
                     <BaseCol xs={24} md={12}>
                           <InputDisplay title="Campus" />
                           </BaseCol>
-                    <BaseCol xs={24} md={24} lg={24} style={{ paddingBottom: "2px" }}>
+                    <BaseCol xs={24} md={24} lg={24} style={{ paddingBottom: "30px" }}>
                         <h4 style={{ color: "#038b94" }}>Update Profile Image</h4>
                         <BaseUpload.Dragger {...uploadProps}>
                             <DraggerIconWrapper>

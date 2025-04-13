@@ -4,10 +4,9 @@ import styled from 'styled-components';
 
 // has wrong prop types
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const InputDisplay = styled(PhoneInput as any)`
+export const InputDisplay = styled.input`
   height: 50px;
   width: 100%;
-
   transition: all 0.3s;
   padding-bottom:10px;
   color: var(--text-main-color);

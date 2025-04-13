@@ -35,7 +35,7 @@ const Dashboard: React.FC = () => {
         },
         responsiveText: {
             '@media (max-width: 768px)': {
-                fontSize: '14px',
+                fontSize: '10px',
             }
         }
     };

@@ -52,7 +52,7 @@ export const lightColorsTheme: ITheme = {
   primary1: '#f5f5f5',
   primaryGradient: 'linear-gradient(211.49deg, #006CCF 15.89%, #00509A 48.97%)',
   light: '#C5D3E0',
-  secondary: '#0085FF',
+    secondary: '#03666f',// hovering buttons color also
   error: '#FF5252',
   warning: '#FFB155',
   success: '#30AF5B',
@@ -95,7 +95,7 @@ export const lightColorsTheme: ITheme = {
   disabledBg: '#c5d3e0',
   layoutBodyBg: '#f8fbff',
   layoutHeaderBg: 'transparent',
-    layoutSiderBg: 'linear-gradient(135deg, #038b94  0%, #03666f  100%)',
+  layoutSiderBg: 'linear-gradient(135deg, #038b94  0%, #03666f  100%)',
   inputPlaceholder: '#404040',
   itemHoverBg: '#f5f5f5',
   backgroundColorBase: '#F5F5F5',

@@ -12,16 +12,17 @@ interface InputDisplayItemsProps {
 
 export const InputDisplay: React.FC<InputDisplayItemsProps> = ({ title }) => {
     const { t } = useTranslation();
-
+    const value = title == "Full Name" ? "Doaa Khashab" : title == "ID" ? "72230341" : title == "Campus" ? "Tyre" : "72230341@student.liu.edu.lb";
     return (
-
+       
         <BaseButtonsForm.Item
             name="email"
             $successText={t('profile.nav.personalInfo.verified')}
             label={title}
-
+          
         >  <HoverableDiv>
-                <S.InputDisplay disabled={true} className="ant-input" /></HoverableDiv >
+                <S.InputDisplay disabled={true} className="ant-input" value={value }  />
+            </HoverableDiv >
         </BaseButtonsForm.Item>
     );
 }; const HoverableDiv = styled.div`

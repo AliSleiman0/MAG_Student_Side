@@ -3,12 +3,33 @@ import { Graph, Edge, Node } from '@antv/x6';
 import { register } from '@antv/x6-react-shape';
 import styled from 'styled-components';
 import { connect } from 'http2';
-import { Space, Switch } from 'antd';
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { Col, Row, Space, Switch, Typography } from 'antd';
+import { CheckOutlined, CloseOutlined, InfoCircleOutlined } from '@ant-design/icons';
 const FlowchartContext = React.createContext({
     showCorequisites: false,
     showCourseStatus: false,
 });
+const bannerStyles = {
+    banner: {
+        backgroundColor: '#e3faf8', // Subtle grey matching Ant Design's palette
+        padding: '16px 24px',
+        borderRadius: '8px',
+        width: '100%',
+    },
+    icon: {
+        fontSize: '20px',
+        color: '#038b94', // Medium grey for contrast
+    },
+    text: {
+        fontSize: '16px',
+        color: '#262626', // Dark grey for readability
+    },
+    responsiveText: {
+        '@media (max-width: 768px)': {
+            fontSize: '10px',
+        }
+    }
+};
 // Styled components
 const FlowchartContainer = styled.div`
   width: 100%;
@@ -510,6 +531,25 @@ const Flowchart = () => {
         });
     }, [showPrerequisites, showCorequisites]);
     return (
+        <>
+            <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+                <Col span={24}>
+                    <div style={bannerStyles.banner}>
+                        <Space align="center">
+                            {/* Info icon */}
+                            <InfoCircleOutlined style={bannerStyles.icon} />
+
+                            {/* Dynamic content */}
+                            <Typography.Text
+                                style={{ ...bannerStyles.text, ...bannerStyles.responsiveText }}
+                            >
+                                Plan of Study of [Computer and Commmunication Engineering]
+                             
+                            </Typography.Text>
+                        </Space>
+                    </div>
+                </Col>
+            </Row>
         <FlowchartContext.Provider value={{ showCorequisites, showCourseStatus, }}>
             <LegendContainer>
                 <div style={{ marginBottom: '12px', fontWeight: '600', color: '#038b94' }}>
@@ -614,8 +654,8 @@ const Flowchart = () => {
                         </div>
                     </div>
                 )}
-            </div>
-        </FlowchartContext.Provider>
+            </div> 
+        </FlowchartContext.Provider></>
     );
 };
 export default Flowchart;
