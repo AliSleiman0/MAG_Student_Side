@@ -1,6 +1,6 @@
 {
   "alerts": {
-    "accept": "Hello",
+    "accept": "Salut",
     "basic": "Basic alert",
     "closable": "Closable alert",
     "customActions": "Alert with custom actions",
