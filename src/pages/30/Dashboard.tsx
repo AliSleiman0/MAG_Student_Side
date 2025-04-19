@@ -54,7 +54,7 @@ const Dashboard: React.FC = () => {
     return (
         <>
             <PageTitle>{t('common.dashboard')}</PageTitle>
-
+            <h1>{t('alerts.accept')}</h1>
             <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
                 <Col span={24}>
                     <div style={bannerStyles.banner}>

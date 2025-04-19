@@ -42,7 +42,7 @@ export const sidebarNavigation: SidebarNavigationItem[] = [
     {
         title: 'Automated POS',
         key: 'auto-pos',
-        url: '/AutoPOS',
+        url: '/DynamicPOS',
         icon: <GoldOutlined />,
     },
     //{
