@@ -5,6 +5,8 @@ import styled from 'styled-components';
 import { connect } from 'http2';
 import { Col, Row, Space, Switch, Typography } from 'antd';
 import { CheckOutlined, CloseOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import { useResponsive } from '../../hooks/useResponsive';
 const FlowchartContext = React.createContext({
     showCorequisites: false,
     showCourseStatus: false,
@@ -65,7 +67,7 @@ const CourseCode = styled.div`
 `;
 const LegendContainer = styled.div`
   position: absolute;
-  bottom: 80px;
+ 
   right: 20px;
   background: white;
   padding: 16px;
@@ -209,6 +211,7 @@ register({
 });
 
 const Flowchart = () => {
+    const { t } = useTranslation();
     const containerRef = useRef<HTMLDivElement>(null);
     const [showPrerequisites, setShowPrerequisites] = useState(true);
     const [showCorequisites, setShowCorequisites] = useState(false);
@@ -255,25 +258,33 @@ const Flowchart = () => {
     useEffect(() => {
         if (!containerRef.current) return;
 
-        const graph = new Graph({
-            container: containerRef.current,
-            grid: { visible: true, size: 15 },
-            background: { color: '#f8f9fa' },
-            interacting: { nodeMovable: false },
-            panning: true,
-            mousewheel: true,
-            connecting: {
-                router: {
-                    name: 'manhattan',
-                    args: {
-                        excludeShapes: ['course-node'],
-                        maximumLoops: 100,
-                        startDirections: ['right'],
-                        endDirections: ['left']
-                    }
-                }
-            }
-        });
+       const graph = new Graph({
+           container: containerRef.current,
+           grid: {
+               visible: true,
+               size: mobileOnly ? 10 : 15 // Optional: Adjust grid density for mobile
+           },
+           background: { color: '#f8f9fa' },
+           interacting: { nodeMovable: false },
+           panning: true,
+           mousewheel: true,
+           connecting: {
+               router: {
+                   name: 'manhattan',
+                   args: {
+                       excludeShapes: ['course-node'],
+                       maximumLoops: 100,
+                       // Conditional orientation based on mobile detection
+                       startDirections: mobileOnly ? ['top'] : ['right'],
+                       endDirections: mobileOnly ? ['bottom'] : ['left']
+                   }
+               }
+           }
+       });
+        if (mobileOnly) {
+            graph.zoomToFit({ padding: 20, maxScale: 0.9 });
+            graph.centerContent();
+        }
         graphRef.current = graph;
         // Pre-process courses data
         const validatedCourses = courses.map(course => ({
@@ -530,6 +541,7 @@ const Flowchart = () => {
             }
         });
     }, [showPrerequisites, showCorequisites]);
+    const { mobileOnly } = useResponsive();
     return (
         <>
             <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
@@ -543,7 +555,7 @@ const Flowchart = () => {
                             <Typography.Text
                                 style={{ ...bannerStyles.text, ...bannerStyles.responsiveText }}
                             >
-                                Plan of Study of [Computer and Commmunication Engineering]
+                               {t("pos.text")} [Computer and Commmunication Engineering]
 
                             </Typography.Text>
                         </Space>
@@ -551,24 +563,24 @@ const Flowchart = () => {
                 </Col>
             </Row>
             <FlowchartContext.Provider value={{ showCorequisites, showCourseStatus, }}>
-                <LegendContainer>
+                <LegendContainer style={{ bottom: "5px" , fontSize:  mobileOnly ? "0.6rem" : "1rem", } }>
                     <div style={{ marginBottom: '12px', fontWeight: '600', color: '#038b94' }}>
-                        Legends
+                        {t("pos.legends")}
                     </div>
 
                     {/* Node Status */}
                     <div style={{ marginBottom: '16px' }}>
                         <LegendItem>
                             <ColorSwatch color="#06c2bf" />
-                            <span>Passed Course</span>
+                            <span>{t("pos.passed_course")}</span>
                         </LegendItem>
                         <LegendItem>
                             <ColorSwatch color="#defeff" />
-                            <span>Registered Course</span>
+                            <span>{t("pos.registered_course")}</span>
                         </LegendItem>
                         <LegendItem>
                             <ColorSwatch color="#f70f05" />
-                            <span>Failed Course</span>
+                            <span>{t("pos.failed_course")}</span>
                         </LegendItem>
                     </div>
 
@@ -576,15 +588,15 @@ const Flowchart = () => {
                     <div>
                         <LegendItem>
                             <SolidLine />
-                            <span>Prerequisites</span>
+                            <span>{t("pos.prerequisites")}</span>
                         </LegendItem>
                         <LegendItem>
                             <DashedLine />
-                            <span>Corequisites (with markers)</span>
+                            <span>{t("pos.corequisites")}</span>
                         </LegendItem>
                         <div style={{ fontSize: '0.8em', color: '#666', marginTop: '8px' }}>
-                            <div>● = Source course</div>
-                            <div>◆ = Target course</div>
+                            <div>● = {t("pos.source_course")}</div>
+                            <div>◆ = {t("pos.target_course")}</div>
                         </div>
                     </div>
                 </LegendContainer>
@@ -592,7 +604,8 @@ const Flowchart = () => {
                     <Space style={{
                         position: 'absolute',
                         top: 10,
-                        right: 10,
+                        right:  mobileOnly  ? 4 : 10,
+                        fontSize:  mobileOnly  ? "0.55rem" : "1rem", 
                         zIndex: 1000,
                         background: 'white',
                         padding: 8,
@@ -606,7 +619,7 @@ const Flowchart = () => {
                             onChange={setShowCourseStatus}
                             style={{ marginRight: 8 }}
                         />
-                        <span style={{ marginRight: "10px" }}>Show Course Status </span>
+                        <span style={{ marginRight: "10px" }}>{t("pos.show")}</span>
                         <Switch
                             checkedChildren={<CheckOutlined />}
                             unCheckedChildren={<CloseOutlined />}
@@ -614,7 +627,7 @@ const Flowchart = () => {
                             onChange={setShowPrerequisites}
                             style={{ marginRight: 8 }}
                         />
-                        <span>Prerequisites</span>
+                        <span>{t("pos.prerequisites")}</span>
 
                         <Switch
                             checkedChildren={<CheckOutlined />}
@@ -623,7 +636,7 @@ const Flowchart = () => {
                             onChange={setShowCorequisites}
                             style={{ marginLeft: 16, marginRight: 8 }}
                         />
-                        <span>Corequisites</span>
+                        <span>{t("pos.corequisites")}</span>
 
 
                     </Space>
@@ -649,8 +662,8 @@ const Flowchart = () => {
                                 {tooltip.content.name}
                             </h4>
                             <div style={{ marginTop: 8, fontSize: "0.8rem" }}>
-                                <div>Prerequisites: {(tooltip.content.prerequisites || []).join(', ') || 'None'}</div>
-                                <div>Corequisites: {(tooltip.content.corequisites || []).join(', ') || 'None'}</div>
+                                <div>{t("pos.prerequisites")}: {(tooltip.content.prerequisites || []).join(', ') || 'None'}</div>
+                                <div>{t("pos.corequisites")}: {(tooltip.content.corequisites || []).join(', ') || 'None'}</div>
                             </div>
                         </div>
                     )}

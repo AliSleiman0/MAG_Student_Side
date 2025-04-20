@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { AppstoreOutlined, LaptopOutlined, MailOutlined, MenuFoldOutlined, MenuUnfoldOutlined, NotificationOutlined, ScheduleOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuProps, TableColumnsType } from 'antd';
 import { Button, Card, Col, ConfigProvider, Layout, Menu, Row, Table } from 'antd';
@@ -6,10 +6,11 @@ import SubMenu from 'antd/lib/menu/SubMenu';
 import { CourseData, Semester_AutoPOS } from '../../../components/Semester_AutoPOS';
 import Modal from 'antd/lib/modal/Modal';
 import Spin from 'antd/es/spin';
-import './DynamicPOS.styles.css';
+import './CustomizedPOS.styles.css';
 import Typography from 'antd/lib/typography/Typography';
 import { useResponsive } from '../../../hooks/useResponsive';
 import MobileSiderMenu from '../../../components/sider_DPOS_xs';
+import { Checkbox } from '../../../components/common/BaseCheckbox/BaseCheckbox.styles';
 import { useTranslation } from 'react-i18next';
 const { Content, Sider } = Layout;
 interface Corerequisite {
@@ -104,7 +105,7 @@ const CourseOpenedForRegistation: Course[] = [
         "courseid": 119,
         "coursename": "Capstone Project I",
         "coursecode": "CS401",
-        "coursetype": "Major",
+        "coursetype": "General Elective",
         "credits": 3,
         "corerequisites": [
 
@@ -519,14 +520,43 @@ const computeAcademicYears = (semesters: any[], baseYear: number) => {
 
 DynamicSemesters = computeAcademicYears(DynamicSemesters, new Date().getFullYear());
 
-const DynamicPOS: React.FC = () => {
+const CustomizedPOS: React.FC = () => {
     const { t } = useTranslation();
     const translateCourseType = (courseType: string) => {
         return t(`courses.course_types.${courseType}` as any) as string;
     };
     const columns: TableColumnsType<Course> = [
         {
+            title: t("customised_pos.select"),
+            key: 'select',
+            dataIndex: 'select',
+            width: '5%',
+            align: 'center',
+            render: (_, record: Course) => {
+                const currentCredits = selectedCourses.reduce((sum, c) => sum + c.credits, 0);
 
+                return (
+                    <Checkbox
+                        checked={selectedCourses.some(c => c.courseid === record.courseid)}
+                        onChange={(e) => {
+                            if (e.target.checked) {
+                                // Check credit limit before adding
+                                if (currentCredits + record.credits > 20) {
+                                    setShowCreditWarning(true);
+                                    return;
+                                }
+                                setSelectedCourses(prev => [...prev, record]);
+                            } else {
+                                setSelectedCourses(prev =>
+                                    prev.filter(c => c.courseid !== record.courseid)
+                                );
+                            }
+                        }}
+                    />
+                );
+            }
+        },
+        {
             title: t("customised_pos.priority"),
             key: 'priority',
             dataIndex: 'priority',
@@ -582,7 +612,8 @@ const DynamicPOS: React.FC = () => {
     const [isGeneratedSemesters, setIsGeneratedSemesters] = useState(false);
     const [isFullViewSemesters, setIsFullViewSemesters] = useState(false);
     const [selectedSemester, setSelectedSemester] = useState<Semester>(DynamicSemesters[0]);
-
+    const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
+    const [showCreditWarning, setShowCreditWarning] = useState(false);
     const totalCredits =
         selectedSemester?.courses.reduce((sum, c) => sum + c.credits, 0) ?? 0;
 
@@ -612,7 +643,7 @@ const DynamicPOS: React.FC = () => {
     };
     const isFirstSemester = selectedSemester === semesters[0];
     const { isTablet, mobileOnly, tabletOnly, desktopOnly, isDesktop } = useResponsive();
-   
+    const totalCreditsSelected = selectedCourses.reduce((sum, c) => sum + c.credits, 0);
     return (
 
         <Layout style={{ background: '#e7f2f3' }}>
@@ -636,13 +667,22 @@ const DynamicPOS: React.FC = () => {
                     </Button>,
                 ]}
             >
-                <div style={{ textAlign: 'center' }}>
+                <div>
                     {isLoadingGenerate ? (
                         <p>{t("customised_pos.creating_your_optimal_semester_plan")}</p>
                     ) : (
-                            <p>{t("customised_pos.modal_text_generate_dynamic")}</p>
+                            <p>{t("customised_pos.modal_text_generate_customized")}<strong style={{ fontWeight: "750", fontStyle: "italic" }}>{t("customised_pos.modal_text_generate_customized1")}</strong>{t("customised_pos.modal_text_generate_customized2")}</p>
                     )}
                 </div>
+            </Modal>
+            <Modal
+                title="Credit Limit Exceeded"
+                open={showCreditWarning}
+                onOk={() => setShowCreditWarning(false)}
+                onCancel={() => setShowCreditWarning(false)}
+            >
+                <p>{t("customised_pos.modal_max1")} {totalCreditsSelected} credits.</p>
+                <p>{t("customised_pos.modal_max1")}</p>
             </Modal>
 
             {(!isFullViewSemesters && isDesktop && isGeneratedSemesters) && (
@@ -700,7 +740,7 @@ const DynamicPOS: React.FC = () => {
                     handleSemesterSelect={handleSemesterSelect}
                     isGeneratedSemesters={isGeneratedSemesters}
                     shouldFlash={shouldFlash}
-                    title={t("customised_pos.generated_semesters")}
+                    title={t("customised_pos.generated_semesters") }
                 />
             )}
 
@@ -771,7 +811,7 @@ const DynamicPOS: React.FC = () => {
                                     return (
                                         <Col key={index} xs={24} md={12} lg={12}>
                                             <SemesterDetailView
-                                                title={`Best Plan for ${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} - ${semester.year}`}
+                                                title={`${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} - ${semester.year}`}
                                                 credits={totalCredits}
                                                 courseList={semester.courses}
                                                 Upcoming={index === 0 ? t("customised_pos.upcoming") : ""}
@@ -785,10 +825,11 @@ const DynamicPOS: React.FC = () => {
                         (() => {
                             // 1. Derive once, use strict equality:
 
-                                const translateCourseType = (courseType: string) => {
-                                    return t(`course_types.${courseType}` as any) as string;
-                                };
+                            const translateCourseType = (courseType: string) => {
+                                return t(`course_types.${courseType}` as any) as string;
+                            };
                             return (
+
                                 <Row gutter={[16, 16]}>
                                     {isFirstSemester ? (
                                         <>
@@ -823,18 +864,24 @@ const DynamicPOS: React.FC = () => {
                                                 />
                                             </Col>
                                             <Col span={8} xs={24} md={24} lg={24} xl={8}>
+
                                                 <SemesterDetailView
-                                                    title={`Best Plan for ${t("customised_pos.title")} ${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")}  | ${selectedSemester.year}`}
-                                                    credits={totalCredits}
-                                                    courseList={selectedSemester.courses}
+                                                    title={`${t("customised_pos.title")} ${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")}  | ${selectedSemester.year}`}
+                                                    credits={totalCreditsSelected}
+                                                    courseList={selectedCourses}
                                                     Upcoming={t("customised_pos.upcoming")}
+                                                    extraInfo={
+                                                        <div style={{ color: totalCreditsSelected > 20 ? 'red' : 'inherit' }}>
+                                                            {totalCreditsSelected}/20 {t("customised_pos.credits_selected")}
+                                                        </div>
+                                                    }
                                                 />
                                             </Col>
                                         </>
                                     ) : (
                                         <Col xs={24} md={24} lg={16} style={{ height: "100%", width: "100%" }}>
                                             <SemesterDetailView
-                                                    title={`${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} } – ${selectedSemester.year}`}
+                                                title={`${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} } � ${selectedSemester.year}`}
                                                 credits={totalCredits}
                                                 courseList={selectedSemester.courses}
                                             />
@@ -864,4 +911,4 @@ const SemesterDetailView = (courseData: CourseData) => (
 );
 
 
-export default DynamicPOS;
+export default CustomizedPOS;

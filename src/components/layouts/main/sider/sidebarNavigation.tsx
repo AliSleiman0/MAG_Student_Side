@@ -13,6 +13,7 @@ import {
     BlockOutlined,
     PartitionOutlined,
     GoldOutlined,
+    BranchesOutlined,
 } from '@ant-design/icons';
 import { ReactComponent as NftIcon } from '@app/assets/icons/nft-icon.svg';
 
@@ -40,23 +41,18 @@ export const sidebarNavigation: SidebarNavigationItem[] = [
         icon: < PartitionOutlined />,
     },
     {
-        title: 'Automated POS',
-        key: 'auto-pos',
+        title: 'Dynamic POS',
+        key: 'Dynamic-pos',
         url: '/DynamicPOS',
         icon: <GoldOutlined />,
     },
-    //{
-    //    title: 'common.apps',
-    //    key: 'apps',
-    //    icon: <HomeOutlined />,
-    //    children: [
-    //        {
-    //            title: 'common.feed',
-    //            key: 'feed',
-    //            url: '/apps/feed',
-    //        },
-    //    ],
-    //},
+    {
+        title: 'Customized POS',
+        key: 'apps',
+        url: '/CustomizedPOS',
+        icon: <BranchesOutlined />,
+       
+    },
     {
         title: 'common.authPages',
         key: 'auth',

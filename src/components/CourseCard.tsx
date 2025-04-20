@@ -1,6 +1,7 @@
 import { Card, Row, Col, Tag, Typography, Divider, Statistic } from 'antd';
 import { BookOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
 import { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
 
@@ -31,6 +32,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
     canRegister=null,
     borderC = "#dedede",
 }) => {
+    const { t } = useTranslation();
     const borderRaduisDynamic = grade == "Current" ? "10%" : "30%";
     return (
         <Card hoverable style={{ marginBottom: "10px", borderColor: borderC } }>
@@ -65,7 +67,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                             <Col>
                                 <Statistic
                                     value={credits}
-                                    suffix="Credits"
+                                    suffix={t("courses.credits.credits")}
                                     valueStyle={{ fontSize: 14 }}
                                 />
                             </Col>

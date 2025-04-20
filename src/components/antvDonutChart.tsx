@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Pie } from '@antv/g2plot';
 import { remainingCourses } from './samplecoursesdata';
+import { useTranslation } from 'react-i18next';
 
 interface DonutChartProps {
     completed: number;
@@ -17,16 +18,17 @@ const DonutChart: React.FC<DonutChartProps> = ({
     height = 300,
     kkey ="something"
 }) => {
+    const { t } = useTranslation();
     const containerId = `donut-chart-${Math.random().toString(36).substr(2, 9)}`;
 
     useEffect(() => {
         const data = kkey==="percentage" ? [
-            { type: 'Passed', value: completed },
-            { type: 'Failed', value: total - completed },
+            { type: t("courses.passed_percentage.passed"), value: completed },
+            { type: t("courses.passed_percentage.failed"), value: total - completed },
         ] :
             [
-                { type: 'Completed', value: completed },
-                { type: 'Remaining', value: total - completed },
+                { type: t("courses.completed_vs_required.completed"), value: completed },
+                { type: t("courses.completed_vs_required.remaining"), value: total - completed },
             ];
         const percentagePassed = (completed / total - completed);
         const donutPlot = new Pie(containerId, {
@@ -56,7 +58,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
             innerRadius: 0.8,
             statistic: {
                 title: {
-                    content: kkey === "percentage" ? "Percentage" : title,
+                    content: kkey === "percentage" ? t("courses.passed_percentage.percentage") : t("courses.credits.progress"),
                     style: { fontSize: '14px', paddingBottom:"10px" }
                 },
                 content: {
