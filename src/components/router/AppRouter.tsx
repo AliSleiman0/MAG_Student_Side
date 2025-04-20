@@ -21,6 +21,7 @@ import Dashboard from '../../pages/30/Dashboard';
 import GraphComponent from '../../pages/30/POS';
 import AutoPOS from '../../pages/30/AutoPOS';
 import DynamicPOS from '../../pages/30/DyanmicPOS/DynamicPOS';
+import CustomizedPOS from '../../pages/30/CustomizedPOS/CustomizedPOS';
 
 
 
@@ -138,7 +139,7 @@ export const AppRouter: React.FC = () => {
             AutoPOS
                 <Route path={NFT_DASHBOARD_PATH} element={protectedLayout}>
                     <Route index element={<Dashboard />} />
-                    <Route path={"/AutoPOS"} element={<AutoPOS />} />
+                    <Route path={"/CustomizedPOS"} element={<CustomizedPOS />} />
                     <Route path={"/DynamicPOS"} element={<DynamicPOS />} />
                     <Route path="/POS" element={<GraphComponent />} />
                     <Route path="apps">

@@ -5,17 +5,19 @@ import { BookOutlined, CalendarOutlined, LinkOutlined, NumberOutlined } from '@a
 import { useResponsive } from '@app/hooks/useResponsive';
 import { Course } from '../pages/30/DyanmicPOS/DynamicPOS';
 import { BREAKPOINTS } from '../styles/themes/constants';
+import { useTranslation } from 'react-i18next';
 
 export interface CourseData {
     title?: string;
     credits?: number;
-    courseList: Array<Course>;
+    courseList?: Array<Course>;
     Upcoming?: string;
+    extraInfo?: React.ReactNode;
 }
 
 export const Semester_AutoPOS = ({ courseData }: { courseData: CourseData }) => {
     const { mobileOnly, tabletOnly, desktopOnly, isBigScreen } = useResponsive();
-
+    
     // Responsive style configurations using all breakpoints
     const responsiveStyles = {
         badgeStyle: {
@@ -25,7 +27,7 @@ export const Semester_AutoPOS = ({ courseData }: { courseData: CourseData }) => 
         },
         iconStyle: {
             color: '#038b94',
-            fontSize: mobileOnly ? '14px' : tabletOnly ? '16px' : '18px',
+            fontSize: mobileOnly ? '10px' : tabletOnly ? '12px' : '18px',
             marginRight: mobileOnly ? "3px" : "5px"
         },
         headerTitle: {
@@ -48,53 +50,59 @@ export const Semester_AutoPOS = ({ courseData }: { courseData: CourseData }) => 
             maxHeight: "fit-content"
         }
     };
-
+    const { t } = useTranslation();
     const CustomHeader = () => (
+
         <Row justify="space-between" gutter={[16, 16]} >
-            <Col xs={24} md={16}>
+            <Col xs={24} md={24}>
                 <Row style={{ marginBottom: mobileOnly ? "5px" : "10px" }}>
-                    <Col style={responsiveStyles.headerTitle}>
-                        <strong>Best Plan for {courseData.title}</strong>
+                    <Col style={{
+                        ...responsiveStyles.headerTitle,
+                        ...(mobileOnly ? {
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            flexWrap: 'nowrap',
+                            overflow: 'hidden'
+                        } : {}),
+                      
+                    }}>
+                        
+                        <strong >{courseData.title}</strong>
+                        <h3 style={{
+                            ...(mobileOnly ? {
+                                margin: 0,
+                                padding: 0,
+                                display: 'inline-block',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                            } : {})
+                           
+                        }}>
+                            {courseData.Upcoming && courseData.Upcoming}
+                        </h3>
                     </Col>
+                    
                 </Row>
                 <Row>
-                    <Space  size="small" wrap>
+                    <Space size="small" wrap >
                         <Space style={responsiveStyles.badgeStyle}>
                             <CalendarOutlined style={responsiveStyles.iconStyle} />
                             <Typography.Text style={responsiveStyles.badgeText}>
-                                {courseData.credits} credits
+                                {courseData.credits} {t("customised_pos.credits") }
                             </Typography.Text>
                         </Space>
                         <Space   style={responsiveStyles.badgeStyle}>
                             <BookOutlined style={responsiveStyles.iconStyle} />
                             <Typography.Text style={responsiveStyles.badgeText}>
-                                {courseData.courseList?.length} Courses
+                                {courseData.courseList?.length ? courseData.courseList?.length : 0} {t("courses.my_courses")}
                             </Typography.Text>
                         </Space>
                     </Space>
                 </Row>
             </Col>
-            {courseData.Upcoming && (
-                <Col
-                    xs={24}
-                    md={6}
-                    
-                    style={{
-                        
-                        display: 'flex',
-                        justifyContent:  'flex-end',
-                        marginTop: "0px",
-                        alignItems: 'top'
-                    }}
-                >
-                    <Typography.Text style={{
-                        ...responsiveStyles.badgeText,
-                        ...responsiveStyles.upcomingText
-                    }}>
-                        {courseData.Upcoming}
-                    </Typography.Text>
-                </Col>
-            )}
+           
         </Row>
     );
 
@@ -107,8 +115,9 @@ export const Semester_AutoPOS = ({ courseData }: { courseData: CourseData }) => 
                 borderLeft: "4px solid #038b94",
                 margin: "0px 0px",
                 width: "100%",
-                maxWidth: "100%",
-                overflowY: "auto"
+              
+               
+              
             }}
         >
             <Collapse.Panel
@@ -116,9 +125,13 @@ export const Semester_AutoPOS = ({ courseData }: { courseData: CourseData }) => 
                 header={<CustomHeader />}
                 style={{
                     borderBottom: '1px solid #038b94',
-                    padding:'16px'
+                    padding:'16px',
+
                 }}
             >
+                {( courseData.credits == 0 && courseData.courseList?.length == 0) && (
+                    <div>{t("customised_pos.place_holder")}</div>
+                )}
                 {(courseData?.courseList || []).map((course: Course, index: number) => (
                     <React.Fragment key={index}>
                         <Row
@@ -148,7 +161,7 @@ export const Semester_AutoPOS = ({ courseData }: { courseData: CourseData }) => 
                                                     fontSize: mobileOnly ? '12px' : 'inherit'
                                                 }}
                                             >
-                                                {course.coursetype}
+                                                {t(`courses.course_types.${course.coursetype}`)}
                                             </Tag>
                                         </Space>
                                     </Col>
@@ -165,12 +178,16 @@ export const Semester_AutoPOS = ({ courseData }: { courseData: CourseData }) => 
 
                             <Col
                                 xs={24}
-                                md={6}
+                                md={12}
+                                lg={12}
+                                xl={12}
                                 style={{
                                     paddingTop: mobileOnly ? '4px' : tabletOnly ? '8px' : '10px',
+                                   
                                     display: 'flex',
                                     justifyContent: mobileOnly ? 'flex-start' : 'flex-end',
-                                    alignItems: 'center'
+                                    alignItems: 'center',
+                                    
                                 }}
                             >
                                 <Space size={4} wrap>
@@ -184,12 +201,12 @@ export const Semester_AutoPOS = ({ courseData }: { courseData: CourseData }) => 
                                             color: "#050505"
                                         }}
                                     >
-                                        {course.credits} Credits
+                                        {course.credits} {t(`courses.credits.credits`)}
                                     </Typography.Text>
                                 </Space>
                             </Col>
                         </Row>
-                        {index < courseData.courseList.length - 1 && (
+                        {index < courseData.courseList!!.length - 1 && (
                             <Divider style={{
                                 margin: mobileOnly ? '8px 0' : tabletOnly ? '10px 0' : '12px 0',
                                 borderColor: '#038b9433'
@@ -197,6 +214,7 @@ export const Semester_AutoPOS = ({ courseData }: { courseData: CourseData }) => 
                         )}
                     </React.Fragment>
                 ))}
+              
             </Collapse.Panel>
         </Collapse>
     );

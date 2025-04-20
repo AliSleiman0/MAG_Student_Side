@@ -1,8 +1,9 @@
 ﻿import React, { useState } from 'react';
 import { Row, Col, Tag, Typography, Collapse, Divider } from 'antd';
-import { BookOutlined, CalendarOutlined, CheckCircleOutlined, ExclamationCircleOutlined, FormOutlined, MinusCircleOutlined, WarningOutlined } from '@ant-design/icons';
+import { BookOutlined, CalendarOutlined, CheckCircleOutlined, ExclamationCircleOutlined, FormOutlined, LockOutlined, MinusCircleOutlined, UnlockOutlined, WarningOutlined } from '@ant-design/icons';
 import CourseCard from './CourseCard';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 const { Panel } = Collapse;
 const { Text } = Typography;
@@ -10,7 +11,7 @@ const { Text } = Typography;
 
 const CourseLists: React.FC = () => {
     const [loading] = useState<boolean>(true);
-
+    const { t } = useTranslation();
     return (
         <Row gutter={[16, 16]} justify="center" style={{ width: "100%" }}>
             {/* Completed Courses */}
@@ -27,7 +28,7 @@ const CourseLists: React.FC = () => {
                                                 <CheckCircleOutlined style={{ color: '#52c41a' }} />
                                             </Col>
                                             <Col>
-                                                <Text strong>Completed Courses</Text>
+                                                <Text strong>{t("courses.courses_lists.completed_courses")}</Text>
                                             </Col>
                                         </Row>
                                     </Col>
@@ -45,30 +46,30 @@ const CourseLists: React.FC = () => {
                                 <CourseCard
                                     courseName="CS 101: Introduction to Programming"
                                     grade="A+"
-                                    semester="Fall 2021"
+                                    semester={`${t("welcome.semester_fall")} 2021`}
                                     credits={3}
-                                    textBottom="Core Requirement"
+                                    textBottom={t("courses.course_types.major") }
                                 />
                                 <CourseCard
                                     courseName="CS 102: Data Structures"
                                     grade="A"
-                                    semester="Spring 2022"
+                                    semester={`${t("welcome.semester_summer")} 2021`}
                                     credits={4}
-                                    textBottom="Core Requirement"
+                                    textBottom={t("courses.course_types.core")}
                                 />
                                 <CourseCard
                                     courseName="CS 201: Algorithms"
                                     grade="B+"
-                                    semester="Fall 2022"
+                                    semester={`${t("welcome.semester_spring")} 2021`}
                                     credits={4}
-                                    textBottom="Major Requirement"
+                                    textBottom={t("courses.course_types.major_elective")}
                                 />
                                 <CourseCard
                                     courseName="MATH 101: Calculus"
                                     grade="A-"
-                                    semester="Spring 2021"
+                                    semester={`${t("welcome.semester_fall")} 2021`}
                                     credits={4}
-                                    textBottom="General Requirement"
+                                    textBottom={t("courses.course_types.general_elective")}
                                 />
                                 {/* Additional cards will trigger scroll */}
                                 <CourseCard
@@ -76,7 +77,7 @@ const CourseLists: React.FC = () => {
                                     grade="B"
                                     semester="Fall 2020"
                                     credits={4}
-                                    textBottom="General Requirement"
+                                    textBottom={t("courses.course_types.general_education")}
                                 />
                             </div>
                         </Panel>
@@ -99,7 +100,7 @@ const CourseLists: React.FC = () => {
                                                 <FormOutlined style={{ color: '#038b94' }} />
                                             </Col>
                                             <Col>
-                                                <Text strong>Currently Registered</Text>
+                                                <Text strong>{t("courses.courses_lists.currently_registered")}</Text>
                                             </Col>
                                         </Row>
                                     </Col>
@@ -118,45 +119,45 @@ const CourseLists: React.FC = () => {
                                 <CourseCard
                                     courseName="CS 101: Introduction to Programming"
                                     gradeColor="#038b94"
-                                    semester="Fall 2021"
+                                    semester={`${t("welcome.semester_fall")} 2021`}
                                     credits={3}
-                                    textBottom="Mon, Wed 2:00 PM"
+                                    textBottom={`${t("days.mon_wed")} 2:00${t("time_periods.am")}` }
                                     iconBottom={<CalendarOutlined />}
 
                                 />
                                 <CourseCard
                                     courseName="CS 101: Introduction to Programming"
                                     gradeColor="#038b94"
-                                    semester="Fall 2021"
+                                    semester={`${t("welcome.semester_fall")} 2021`}
                                     credits={3}
-                                    textBottom="Mon, Wed 2:00 PM"
+                                    textBottom={`${t("days.mon_wed")} 2:00${t("time_periods.am")}`}
                                     iconBottom={<CalendarOutlined />}
 
                                 />
                                 <CourseCard
                                     courseName="CS 101: Introduction to Programming"
                                     gradeColor="#038b94"
-                                    semester="Fall 2021"
+                                    semester={`${t("welcome.semester_fall")} 2021`}
                                     credits={3}
-                                    textBottom="Mon, Wed 2:00 PM"
+                                    textBottom={`${t("days.mon_wed")} 2:00${t("time_periods.am")}`}
                                     iconBottom={<CalendarOutlined />}
 
                                 />
                                 <CourseCard
                                     courseName="CS 101: Introduction to Programming"
                                     gradeColor="#038b94"
-                                    semester="Fall 2021"
+                                    semester={`${t("welcome.semester_fall")} 2021`}
                                     credits={3}
-                                    textBottom="Mon, Wed 2:00 PM"
+                                    textBottom={`${t("days.mon_wed")} 2:00${t("time_periods.am")}`}
                                     iconBottom={<CalendarOutlined />}
 
                                 />
                                 <CourseCard
                                     courseName="CS 101: Introduction to Programming"
                                     gradeColor="#038b94"
-                                    semester="Fall 2021"
+                                    semester={`${t("welcome.semester_fall")} 2021`}
                                     credits={3}
-                                    textBottom="Mon, Wed 2:00 PM"
+                                    textBottom={`${t("days.mon_wed")} 2:00${t("time_periods.am")}`}
                                     iconBottom={<CalendarOutlined />}
 
                                 />
@@ -179,7 +180,7 @@ const CourseLists: React.FC = () => {
                                                 <ExclamationCircleOutlined style={{ color: '#faad14' }} />
                                             </Col>
                                             <Col>
-                                                <Text strong>Remaining-Failed Courses</Text>
+                                                <Text strong>{t("courses.courses_lists.remianing_failed_courses")}</Text>
                                             </Col>
                                         </Row>
                                     </Col>
@@ -189,7 +190,7 @@ const CourseLists: React.FC = () => {
                                 </Row>
                             }
                         >
-                            <Divider orientation="left" style={{ borderColor: '#038b94' }}>Remaining</Divider>
+                            <Divider orientation="left" style={{ borderColor: '#038b94' }}>{t("courses.credits.remaining") }</Divider>
                             <div style={{
                                 maxHeight: '250px',  // Adjust this value based on your card height (4 cards * card height)
                                 overflowY: 'auto',
@@ -199,11 +200,11 @@ const CourseLists: React.FC = () => {
                                 <CourseCard
                                     courseName="CS 101: Introduction to Programming"
                                     gradeColor="transparent"
-                                    semester="Fall 2021"
+                                    semester={`${t("welcome.semester_fall")} 2021`}
 
                                     credits={3}
-
-                                    iconBottom={<CalendarOutlined />}
+                                    textBottom={t("courses.register_status.can_register")}
+                                    iconBottom={<LockOutlined />}
                                     canRegister={true}
 
 
@@ -211,17 +212,17 @@ const CourseLists: React.FC = () => {
                                 <CourseCard
                                     courseName="CS 101: Introduction to Programming"
                                     gradeColor="transparent"
-                                    semester="Fall 2021"
+                                    semester={`${t("welcome.semester_fall")} 2021`}
                                     credits={3}
-                                    textBottom="Mon, Wed 2:00 PM"
-                                    iconBottom={<CalendarOutlined />}
+                                    textBottom={t("courses.register_status.cannot_register")}
+                                    iconBottom={<UnlockOutlined />}
                                     canRegister={false}
 
 
                                 />
 
                             </div>
-                            <Divider orientation="left" style={{ borderColor: '#038b94' }}>Failed/Withdrawn</Divider>
+                            <Divider orientation="left" style={{ borderColor: '#038b94' }}>{t("courses.credits.failed_withdrawn")}</Divider>
                             <div style={{
                                 maxHeight: '250',  // Adjust this value based on your card height (4 cards * card height)
                                 overflowY: 'auto',
@@ -230,9 +231,9 @@ const CourseLists: React.FC = () => {
                                 <CourseCard
                                     courseName="CS 101: Programming"
 
-                                    semester="Fall 2021"
+                                    semester={`${t("welcome.semester_fall")} 2021`}
                                     credits={3}
-                                    textBottom="Retake Needed"
+                                    textBottom={t("courses.failed_withdrawn_status.status_f")}
                                     textColor="red"
                                     iconBottom={< WarningOutlined style={{ color: "red" }} />}
                                     borderC="red"
@@ -242,14 +243,15 @@ const CourseLists: React.FC = () => {
                                 <CourseCard
                                     courseName="CS 101: Programming"
 
-                                    semester="Fall 2021"
+                                    semester={`${t("welcome.semester_fall")} 2021`}
                                     credits={3}
-                                    textBottom="Withdrawn"
+                                    textBottom={t("courses.failed_withdrawn_status.status_w")}
                                     textColor="grey"
                                     iconBottom={<MinusCircleOutlined style={{ color: "grey" }} />}
                                     borderC="grey"
                                     grade="W"
                                     gradeColor="grey"
+
                                 />
 
 

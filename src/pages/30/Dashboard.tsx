@@ -15,7 +15,7 @@ import { useResponsive } from '../../hooks/useResponsive';
 const { } = Typography;
 
 const Dashboard: React.FC = () => {
-    //$env: NODE_OPTIONS = "--openssl-legacy-provider"; yarn start
+    //$env:NODE_OPTIONS = "--openssl-legacy-provider"; yarn start
     const { isDesktop } = useResponsive();
     const { t } = useTranslation();
     const bannerStyles = {
@@ -40,9 +40,9 @@ const Dashboard: React.FC = () => {
         }
     };
     const stats = [
-        { title: 'Completed vs. Required Courses', completed: 8, total: 12, key: "something" },
-        { title: '% of Passed/Taken Courses', completed: 5, total: 50, key: "percentage" },
-        { title: 'Credits Completed', completed: 5, total: 7, key: "something" }
+        { title: t('courses.completed_vs_required.title') , completed: 8, total: 12, key: "something" },
+        { title: t('courses.passed_percentage.title'), completed: 5, total: 50, key: "percentage" },
+        { title: t('courses.credits.title'), completed: 5, total: 7, key: "something" }
     ];
     const data = [
         { grade: 'A', count: 8 },
@@ -54,7 +54,7 @@ const Dashboard: React.FC = () => {
     return (
         <>
             <PageTitle>{t('common.dashboard')}</PageTitle>
-            <h1>{t('alerts.accept')}</h1>
+            
             <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
                 <Col span={24}>
                     <div style={bannerStyles.banner}>
@@ -66,14 +66,14 @@ const Dashboard: React.FC = () => {
                             <Typography.Text
                                 style={{ ...bannerStyles.text, ...bannerStyles.responsiveText }}
                             >
-                                Welcome back! It's Fall semester. Registration is currently {' '}
+                                {t('welcome.title')}{' '}{t('welcome.semester_fall')}{'. '}{t('welcome.registration')} {' '}
                                 <span style={{
                                     color: true ? '#038b94' : '#cf1322', // Ant Design success/danger colors
                                     fontWeight: 500
                                 }}>
-                                    {true ? 'OPEN' : 'CLOSED'}
+                                    {true ? t('welcome.reg_status_open') : t('welcome.reg_status_closed')}
                                 </span>
-                                . {13 > 0 ? `View ${13} available courses` : 'No courses currently available'}
+                                {t('welcome.contact')}
                             </Typography.Text>
                         </Space>
                     </div>
@@ -125,7 +125,7 @@ const Dashboard: React.FC = () => {
                 >
                     <HoverableDiv2>
                         <Card
-                            title={"My Grades Distribution"}
+                            title={t("grades.distribution")}
 
                             style={{
                                 width: '100%',
@@ -143,7 +143,7 @@ const Dashboard: React.FC = () => {
 
             </Row>
             <br /><br />
-            <Divider style={{ borderColor: '#038b94' }}>My Courses</Divider>
+            <Divider style={{ borderColor: '#038b94' }}>{t("courses.my_courses") }</Divider>
             <br />
             <Row>
 

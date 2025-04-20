@@ -4,6 +4,7 @@ import { AppstoreOutlined, MenuFoldOutlined, MenuUnfoldOutlined, ScheduleOutline
 import { useResponsive } from '@app/hooks/useResponsive';
 import { Semester } from '../pages/30/DyanmicPOS/DynamicPOS';
 import SubMenu from 'antd/lib/menu/SubMenu';
+import { useTranslation } from 'react-i18next';
 
 const { Sider } = Layout;
 
@@ -12,13 +13,15 @@ interface SiderProps {
     handleSemesterSelect: (semester: Semester) => void;
     isGeneratedSemesters: boolean;
     shouldFlash: boolean;
+    title: string;
 }
 
 const MobileSiderMenu = ({
     semesters,
     handleSemesterSelect,
     isGeneratedSemesters,
-    shouldFlash
+    shouldFlash,
+    title
 }: SiderProps) => {
     const [isSiderCollapsed, setIsSiderCollapsed] = useState(false);
     const { mobileOnly, tabletOnly } = useResponsive();
@@ -26,7 +29,7 @@ const MobileSiderMenu = ({
     const handleMenuToggle = () => {
         setIsSiderCollapsed(prev => !prev);
     };
-
+    const { t } = useTranslation();
     return (
         <>
             {/* Mobile Toggle Button */}
@@ -96,7 +99,7 @@ const MobileSiderMenu = ({
                         <SubMenu
                             key="generated"
                             icon={<AppstoreOutlined />}
-                            title="Generated Semesters"
+                            title={title }
                             className={shouldFlash ? 'flash-highlight' : ''}
                             popupClassName={mobileOnly ? 'mobile-submenu' : ''}
                         >
