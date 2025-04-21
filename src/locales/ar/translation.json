@@ -1,4 +1,56 @@
 {
+  "common": {
+    "dashboard": "لوحة القيادة",
+    "change_theme": "تغيير المظهر",
+    "change_lang": "تغيير اللغة",
+    "confirm": "تأكيد",
+    "error": "خطأ",
+    "back": "رجوع"
+  },
+  "sider": {
+    "plan_of_study": "خطة الدراسة",
+    "dynamic_pos": "خطة دراسة ديناميكية",
+    "customized_pos": "خطة دراسة مخصصة",
+    "logout": "تسجيل الخروج",
+    "forget_pass": "نسيت كلمة المرور",
+    "profile": "الملف الشخصي",
+    "auth_pages": "المصادقة"
+  },
+  "profile": {
+    "profile": "الملف الشخصي",
+    "personal_info": "المعلومات الشخصية",
+    "security_settings": "إعدادات الأمان",
+    "full_name": "الاسم الكامل",
+    "id": "المعرف",
+    "email": "البريد الإلكتروني",
+    "campus": "الحرم الجامعي",
+    "update_profile_image": "تحديث الملف الشخصي",
+    "basic": "تحميل أساسي",
+    "bulkUpload": "يمكنك تحديث صورة ملفك الشخصي هنا عن طريق سحب صورة جديدة",
+    "clickToUpload": "انقر للتحميل",
+    "directory": "دليل التحميل",
+    "dragger": "تحميل بالسحب",
+    "dragUpload": "انقر أو اسحب الملف إلى هذه المنطقة للتحميل",
+    "failedUpload": "فشل تحميل الملف {{name}}.",
+    "successUpload": "تم تحميل الملف {{name}} بنجاح.",
+    "change_password": "تغيير كلمة المرور",
+    "new_password": "كلمة المرور الجديدة",
+    "confirm_password": "تأكيد كلمة المرور",
+    "required": "مطلوب"
+  },
+  "securitySettings": {
+    "changePassword": "تغيير كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "currentPassword": "كلمة المرور الحالية",
+    "dontMatchPassword": "كلمتا المرور اللتان أدخلتهما غير متطابقتين",
+    "newPassword": "كلمة المرور الجديدة",
+    "notValidPassword": "يجب أن تكون كلمة المرور مكونة من ثمانية أحرف على الأقل وتحتوي على حرف كبير وحرف صغير ورقم واحد",
+    "requiredPassword": "الرجاء إدخال كلمة المرور!",
+    "samePassword": "لا يمكن أن تكون كلمة المرور الجديدة هي نفس كلمة المرور السابقة",
+    "title": "إعدادات الأمان",
+    "twoFactorAuth": "المصادقة الثنائية",
+    "verify": "تحقق"
+  },
   "welcome": {
     "semester_fall": " الفصل الدراسي الخريفي",
     "semester_spring": " الفصل الدراسي الربيعي",

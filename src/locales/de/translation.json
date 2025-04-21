@@ -1,4 +1,56 @@
 {
+  "common": {
+    "dashboard": "Dashboard",
+    "change_theme": "Thema ändern",
+    "change_lang": "Sprache ändern",
+    "confirm": "Bestätigen",
+    "error": "Fehler",
+    "back": "Zurück"
+  },
+  "sider": {
+    "plan_of_study": "POS",
+    "dynamic_pos": "Dynamischer POS",
+    "customized_pos": "Angepasster POS",
+    "logout": "Abmelden",
+    "forget_pass": "Passwort vergessen",
+    "profile": "Profil",
+    "auth_pages": "Authentifizierung"
+  },
+  "profile": {
+    "profile": "Profil",
+    "personal_info": "Persönliche Daten",
+    "security_settings": "Sicherheitseinstellungen",
+    "full_name": "Vollständiger Name",
+    "id": "ID",
+    "email": "E‑Mail",
+    "campus": "Campus",
+    "update_profile_image": "Profilbild aktualisieren",
+    "basic": "Basis-Upload",
+    "bulkUpload": "Sie können hier Ihr Profilfoto aktualisieren, indem Sie ein neues Profilbild per Drag & Drop hochladen.",
+    "clickToUpload": "Zum Hochladen klicken",
+    "directory": "Upload-Verzeichnis",
+    "dragger": "Drag‑and‑Drop‑Upload",
+    "dragUpload": "Datei hierher ziehen oder klicken, um sie hochzuladen",
+    "failedUpload": "Der Upload der Datei {{name}} ist fehlgeschlagen.",
+    "successUpload": "Die Datei {{name}} wurde erfolgreich hochgeladen.",
+    "change_password": "Passwort ändern",
+    "new_password": "Neues Passwort",
+    "confirm_password": "Passwort bestätigen",
+    "required": "Erforderlich"
+  },
+  "securitySettings": {
+    "changePassword": "Passwort ändern",
+    "confirmPassword": "Passwort bestätigen",
+    "currentPassword": "Aktuelles Passwort",
+    "dontMatchPassword": "Die beiden Passwörter stimmen nicht überein.",
+    "newPassword": "Neues Passwort",
+    "notValidPassword": "Ihr Passwort muss mindestens acht Zeichen lang sein und mindestens einen Großbuchstaben, einen Kleinbuchstaben und eine Zahl enthalten.",
+    "requiredPassword": "Bitte geben Sie Ihr Passwort ein!",
+    "samePassword": "Ihr neues Passwort darf nicht mit dem vorherigen Passwort übereinstimmen.",
+    "title": "Sicherheitseinstellungen",
+    "twoFactorAuth": "Zwei-Faktor-Authentifizierung",
+    "verify": "Verifizieren"
+  },
   "welcome": {
     "semester_fall": "Herbstsemester",
     "semester_spring": "Frühlingssemester",

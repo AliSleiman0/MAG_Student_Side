@@ -8,7 +8,7 @@ const PersonalInfoPage: React.FC = () => {
 
   return (
     <>
-      <PageTitle>{t('profile.nav.personalInfo.title')}</PageTitle>
+      <PageTitle>{t('profile.profile')}</PageTitle>
       <PersonalInfo />
     </>
   );

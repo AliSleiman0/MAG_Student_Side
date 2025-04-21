@@ -1,12 +1,14 @@
 import React from 'react';
 import * as S from './References.styles';
 import { FacebookOutlined, GithubOutlined, LinkedinOutlined, TwitterOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 export const References: React.FC = () => {
+    const { t } = useTranslation();
     return (
         <S.ReferencesWrapper style={{ borderTop: "1px solid #d3f5f1" }}>
             <S.Text>
-                Made by{' '}
+                {t('footer.f_text1')}{' '}
                 <a href="https://github.com/AliSleiman0" target="_blank" rel="noreferrer">
                     Ali{' '}
                 </a>
@@ -14,9 +16,10 @@ export const References: React.FC = () => {
                 <a href="https://github.com/Doaa2024" target="_blank" rel="noreferrer">
                     Doaa{' '}
                 </a>
-                in 2025 &copy;. Based on{' '}
+                {t('footer.f_text2')} {new Date().getFullYear()} &copy;{' '}
+                {t('footer.f_text3')}{' '}
                 <a href="https://ant.design/" target="_blank" rel="noreferrer">
-                    Ant-design.
+                    Ant Design
                 </a>
             </S.Text>
             <S.Icons>

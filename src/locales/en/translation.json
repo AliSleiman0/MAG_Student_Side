@@ -1,7 +1,59 @@
 {
-  "commmon": {
-    "dashboard": "Dashboard"
+  "common": {
+    "dashboard": "Dashboard",
+    "change_theme": "Change Theme",
+    "change_lang": "Change Language",
+    "confirm": "Confirm",
+    "error": "Error",
+    "back": "Back"
   },
+  "sider": {
+    "plan_of_study": "POS",
+    "dynamic_pos": "Dynamic POS",
+    "customized_pos": "Customized POS",
+    "logout": "Logout",
+    "forget_pass": "Forget Password",
+    "profile": "Profile",
+    "auth_pages": "Auth"
+
+  },
+  "profile": {
+    "profile": "Profile",
+    "personal_info": "Personal Info",
+    "security_settings": "Security Settings",
+    "full_name": "Full Name",
+    "id": "ID",
+    "email": "Email",
+    "campus": "Campus",
+    "update_profile_image": "Update Profile",
+    "basic": "Basic upload",
+    "bulkUpload": "You can update your profile photo here just by dragging a new profile",
+    "clickToUpload": "Click to upload",
+    "directory": "Upload directory",
+    "dragger": "Dragger upload",
+    "dragUpload": "Click or drag file to this area to upload",
+    "failedUpload": "{{name}} file upload failed.",
+    "successUpload": "{{name}} file uploaded successfully.",
+    "change_password": "Change Password",
+    "new_password": "New Password",
+    "confirm_password": "Confirm Password",
+    "required": "Required"
+
+  },
+  "securitySettings": {
+    "changePassword": "Change Password",
+    "confirmPassword": "Confirm Password",
+    "currentPassword": "Current Password",
+    "dontMatchPassword": "The two passwords that you entered do not match",
+    "newPassword": "New Password",
+    "notValidPassword": "Your password should be minimum eight characters and contain at least one uppercase letter, one lowercase letter and one number",
+    "requiredPassword": "Please input your password!",
+    "samePassword": "Your new password can't be same as previous password",
+    "title": "Security Settings",
+    "twoFactorAuth": "Two–factor authentication",
+    "verify": "Verify"
+  },
+
   "welcome": {
     "semester_fall": "Fall Semester",
     "semester_spring": "Spring Semester",
@@ -78,7 +130,7 @@
   "footer": {
     "f_text1": "Made by",
     "f_text2": "in",
-    "f_text3": ". Based on"
+    "f_text3": "Based on"
   },
   "grades": {
     "distribution": "My Grades Distribution"
@@ -116,7 +168,7 @@
     "generated_semesters": "Generated Semesters",
     "collapse_view": "Collapse View",
     "creating_your_optimal_semester_plan": "Creating your optimal semester plan...",
-    "courses_eligible_for_registration_below:": "Courses Eligible for Registration Below:",
+    "courses_eligible_for_registration_below": "Courses Eligible for Registration Below:",
     "modal_max1": "Maximum 20 credits allowed. Currently selected: ",
     "modal_max2": "Please deselect some courses before selecting new ones.",
     "upcoming": "Upcoming",

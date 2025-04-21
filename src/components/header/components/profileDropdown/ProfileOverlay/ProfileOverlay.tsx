@@ -9,11 +9,11 @@ export const ProfileOverlay: React.FC = ({ ...props }) => {
   return (
     <div {...props}>
       <S.Text>
-        <Link to="/profile">{t('profile.title')}</Link>
+              <Link to="/profile">{t('profile.profile')}</Link>
       </S.Text>
       <S.ItemsDivider />
       <S.Text>
-        <Link to="/logout">{t('header.logout')}</Link>
+              <Link to="/logout">{t('sider.logout')}</Link>
       </S.Text>
     </div>
   );

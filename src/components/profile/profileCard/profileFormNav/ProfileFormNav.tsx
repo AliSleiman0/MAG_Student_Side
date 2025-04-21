@@ -27,10 +27,7 @@ export const ProfileFormNav: React.FC<ProfileFormNavProps> = ({ menu }) => {
       break;
     }
 
-    case 'payments': {
-      currentMenu = <Payments />;
-      break;
-    }
+    
 
     default: {
       currentMenu = null;
