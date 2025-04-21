@@ -34,7 +34,7 @@ const ProfileLayout: React.FC = () => {
 
     return (
         <div style={{ minHeight: "75vh" }}>
-            <PageTitle>{t('profile.title')}</PageTitle>
+            <PageTitle>{t('profile.profile')}</PageTitle>
             {!isTitleShown && (
                 <Btn icon={<LeftOutlined />} type="text" onClick={() => navigate('/profile')}>
                     {t('common.back')}

@@ -36,34 +36,34 @@ const UploadsPage: React.FC = () => {
                 console.log(info.file, info.fileList);
             }
             if (status === 'done') {
-                notificationController.success({ message: t('uploads.successUpload', { name: info.file.name }) });
+                notificationController.success({ message: t('profile.successUpload', { name: info.file.name }) });
             } else if (status === 'error') {
-                notificationController.error({ message: t('uploads.failedUpload', { name: info.file.name }) });
+                notificationController.error({ message: t('profile.failedUpload', { name: info.file.name }) });
             }
         },
     };
 
     return (
         <>
-            <PageTitle>{t('common.upload')}</PageTitle>
+            <PageTitle>{t('profile.upload')}</PageTitle>
             <BaseCol>
-                <S.Card title={t('uploads.basic')}>
+                <S.Card title={t('profile.basic')}>
                     <BaseUpload {...uploadProps}>
-                        <BaseButton icon={<UploadOutlined />}>{t('uploads.clickToUpload')}</BaseButton>
+                        <BaseButton icon={<UploadOutlined />}>{t('profile.clickToUpload')}</BaseButton>
                     </BaseUpload>
                 </S.Card>
-                <S.Card title={t('uploads.directory')}>
+                <S.Card title={t('profile.directory')}>
                     <BaseUpload action="https://www.mocky.io/v2/5cc8019d300000980a055e76" directory>
-                        <BaseButton icon={<UploadOutlined />}>{t('uploads.directory')}</BaseButton>
+                        <BaseButton icon={<UploadOutlined />}>{t('profile.directory')}</BaseButton>
                     </BaseUpload>
                 </S.Card>
-                <S.Card title={t('uploads.dragger')}>
+                <S.Card title={t('profile.dragger')}>
                     <BaseUpload.Dragger {...uploadProps}>
                         <DraggerIconWrapper>
                             <InboxOutlined />
                         </DraggerIconWrapper>
-                        <DraggerTitle>{t('uploads.dragUpload')}</DraggerTitle>
-                        <DraggerDescription>{t('uploads.bulkUpload')}</DraggerDescription>
+                        <DraggerTitle>{t('profile.dragUpload')}</DraggerTitle>
+                        <DraggerDescription>{t('profile.bulkUpload')}</DraggerDescription>
                     </BaseUpload.Dragger>
                 </S.Card>
             </BaseCol>

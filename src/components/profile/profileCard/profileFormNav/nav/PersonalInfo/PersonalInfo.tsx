@@ -65,9 +65,9 @@ export const PersonalInfo: React.FC = () => {
                 console.log(info.file, info.fileList);
             }
             if (status === 'done') {
-                notificationController.success({ message: t('uploads.successUpload', { name: info.file.name }) });
+                notificationController.success({ message: t('profile.successUpload', { name: info.file.name }) });
             } else if (status === 'error') {
-                notificationController.error({ message: t('uploads.failedUpload', { name: info.file.name }) });
+                notificationController.error({ message: t('profile.failedUpload', { name: info.file.name }) });
             }
         },
     };
@@ -86,33 +86,33 @@ export const PersonalInfo: React.FC = () => {
                 <BaseRow gutter={{ xs: 10, md: 15, xl: 30 }}>
                     <BaseCol span={24}>
                         <BaseButtonsForm.Item>
-                            <BaseButtonsForm.Title>{t('profile.nav.personalInfo.title')}</BaseButtonsForm.Title>
+                            <BaseButtonsForm.Title>{t('profile.personal_info')}</BaseButtonsForm.Title>
                         </BaseButtonsForm.Item>
                     </BaseCol>
 
                     <BaseCol xs={24} md={12}>
                         
-                            <InputDisplay title="Full Name"  />
+                        <InputDisplay title={t('profile.full_name')}  />
                         
                     </BaseCol>
                     <BaseCol xs={24} md={12}>
-                         <InputDisplay title="ID" />
+                        <InputDisplay title={t('profile.id')} />
                          </BaseCol>
                     <BaseCol xs={24} md={12}>
-                      <InputDisplay title="Email" />
+                        <InputDisplay title={t('profile.email')} />
                          </BaseCol>
 
                     <BaseCol xs={24} md={12}>
-                          <InputDisplay title="Campus" />
+                        <InputDisplay title={t('profile.campus')} />
                           </BaseCol>
                     <BaseCol xs={24} md={24} lg={24} style={{ paddingBottom: "30px" }}>
-                        <h4 style={{ color: "#038b94" }}>Update Profile Image</h4>
+                        <h4 style={{ color: "#038b94" }}>{t('profile.update_profile_image')}</h4>
                         <BaseUpload.Dragger {...uploadProps}>
                             <DraggerIconWrapper>
                                 <InboxOutlined />
                             </DraggerIconWrapper>
-                            <DraggerTitle>{t('uploads.dragUpload')}</DraggerTitle>
-                            <DraggerDescription>{t('uploads.bulkUpload')}</DraggerDescription>
+                            <DraggerTitle>{t('profile.dragUpload')}</DraggerTitle>
+                            <DraggerDescription>{t('profile.bulkUpload')}</DraggerDescription>
                         </BaseUpload.Dragger>
                     </BaseCol>
 

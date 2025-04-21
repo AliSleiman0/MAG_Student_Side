@@ -16,6 +16,7 @@ import {
     BranchesOutlined,
 } from '@ant-design/icons';
 import { ReactComponent as NftIcon } from '@app/assets/icons/nft-icon.svg';
+import { useTranslation } from 'react-i18next';
 
 export interface SidebarNavigationItem {
     title: string;
@@ -26,6 +27,7 @@ export interface SidebarNavigationItem {
 }
 
 export const sidebarNavigation: SidebarNavigationItem[] = [
+
     {
         title: 'common.dashboard',
         key: 'dashboard',
@@ -34,34 +36,39 @@ export const sidebarNavigation: SidebarNavigationItem[] = [
         icon: <HomeOutlined />,
     },
     {
-        title: 'POS',
+        title: 'sider.plan_of_study',
         key: 'pos',
         // TODO use path variable
         url: '/POS',
         icon: < PartitionOutlined />,
     },
     {
-        title: 'Dynamic POS',
+        title: 'sider.dynamic_pos',
         key: 'Dynamic-pos',
         url: '/DynamicPOS',
         icon: <GoldOutlined />,
     },
     {
-        title: 'Customized POS',
+        title: 'sider.customized_pos',
         key: 'apps',
         url: '/CustomizedPOS',
         icon: <BranchesOutlined />,
        
     },
     {
-        title: 'common.authPages',
+        title: 'sider.auth_pages',
         key: 'auth',
         icon: <UserOutlined />,
         children: [
             {
-                title: 'common.login',
-                key: 'login',
-                url: '/auth/login',
+                title: 'sider.profile',
+                key: 'profile',
+                url: '/profile',
+            },
+            {
+                title: 'sider.logout',
+                key: 'logout',
+                url: '/auth/logout',
             },
             //{
             //    title: 'common.signUp',
@@ -74,7 +81,7 @@ export const sidebarNavigation: SidebarNavigationItem[] = [
             //    url: '/auth/lock',
             //},
             {
-                title: 'common.forgotPass',
+                title: 'sider.forget_pass',
                 key: 'forgotPass',
                 url: '/auth/forgot-password',
             },
@@ -141,28 +148,24 @@ export const sidebarNavigation: SidebarNavigationItem[] = [
     //        },
     //    ],
     //},
-    {
-        title: 'common.pages',
-        key: 'pages',
-        icon: <LayoutOutlined />,
-        children: [
-            {
-                title: 'common.profilePage',
-                key: 'profile',
-                url: '/profile',
-            },
-            {
-                title: 'common.serverError',
-                key: 'serverError',
-                url: '/server-error',
-            },
-            {
-                title: 'common.clientError',
-                key: '404Error',
-                url: '/404',
-            },
-        ],
-    },
+    //{
+    //    title: 'common.pages',
+    //    key: 'pages',
+    //    icon: <LayoutOutlined />,
+    //    children: [
+           
+    //        {
+    //            title: 'serverError',
+    //            key: 'serverError',
+    //            url: '/server-error',
+    //        },
+    //        {
+    //            title: 'clientError',
+    //            key: '404Error',
+    //            url: '/404',
+    //        },
+    //    ],
+    //},
     //{
     //    title: 'common.ui',
     //    key: 'ui',

@@ -12,14 +12,14 @@ interface ProfileNavItem {
 export const profileNavData: ProfileNavItem[] = [
   {
     id: 1,
-    name: 'profile.nav.personalInfo.title',
+        name: 'profile.personal_info',
     icon: <UserOutlined />,
     color: 'primary',
     href: 'personal-info',
   },
   {
     id: 2,
-    name: 'profile.nav.securitySettings.title',
+      name: 'profile.security_settings',
     icon: <SecurityScanOutlined />,
     color: 'success',
     href: 'security-settings',

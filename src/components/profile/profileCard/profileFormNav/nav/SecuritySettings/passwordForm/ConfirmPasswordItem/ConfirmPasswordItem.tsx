@@ -9,19 +9,19 @@ export const ConfirmItemPassword: React.FC = () => {
   return (
     <BaseButtonsForm.Item
       name="confirmPassword"
-      label={t('profile.nav.securitySettings.confirmPassword')}
+          label={t('securitySettings.confirmPassword')}
       dependencies={['newPassword']}
       rules={[
         {
           required: true,
-          message: t('profile.nav.securitySettings.requiredPassword'),
+              message: t('securitySettings.requiredPassword'),
         },
         ({ getFieldValue }) => ({
           validator(_, value) {
             if (!value || getFieldValue('newPassword') === value) {
               return Promise.resolve();
             }
-            return Promise.reject(new Error(t('profile.nav.securitySettings.dontMatchPassword')));
+                return Promise.reject(new Error(t('securitySettings.dontMatchPassword')));
           },
         }),
       ]}

@@ -1,4 +1,56 @@
 {
+  "common": {
+    "dashboard": "Tableau de bord",
+    "change_theme": "Changer le thème",
+    "change_lang": "Changer de langue",
+    "confirm": "Confirmer",
+    "error": "Erreur",
+    "back": "Retour"
+  },
+  "sider": {
+    "plan_of_study": "POS",
+    "dynamic_pos": "POS dynamique",
+    "customized_pos": "POS personnalisé",
+    "logout": "Déconnexion",
+    "forget_pass": "Mot de passe oublié",
+    "profile": "Profil",
+    "auth_pages": "Authentification"
+  },
+  "profile": {
+    "profile": "Profil",
+    "personal_info": "Infos personnelles",
+    "security_settings": "Paramètres de sécurité",
+    "full_name": "Nom complet",
+    "id": "Identifiant",
+    "email": "E-mail",
+    "campus": "Campus",
+    "update_profile_image": "Mettre à jour l’image de profil",
+    "basic": "Téléchargement de base",
+    "bulkUpload": "Vous pouvez mettre à jour votre photo de profil ici en glissant une nouvelle photo",
+    "clickToUpload": "Cliquez pour télécharger",
+    "directory": "Répertoire de téléchargement",
+    "dragger": "Téléchargement par glisser-déposer",
+    "dragUpload": "Cliquez ou faites glisser le fichier vers cette zone pour télécharger",
+    "failedUpload": "Échec du téléchargement du fichier {{name}}.",
+    "successUpload": "Le fichier {{name}} a été téléchargé avec succès.",
+    "change_password": "Changer le mot de passe",
+    "new_password": "Nouveau mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
+    "required": "Requis"
+  },
+  "securitySettings": {
+    "changePassword": "Changer le mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "currentPassword": "Mot de passe actuel",
+    "dontMatchPassword": "Les deux mots de passe que vous avez saisis ne correspondent pas",
+    "newPassword": "Nouveau mot de passe",
+    "notValidPassword": "Votre mot de passe doit contenir au moins huit caractères, dont au moins une lettre majuscule, une lettre minuscule et un chiffre",
+    "requiredPassword": "Veuillez saisir votre mot de passe !",
+    "samePassword": "Votre nouveau mot de passe ne peut pas être identique à l’ancien mot de passe",
+    "title": "Paramètres de sécurité",
+    "twoFactorAuth": "Authentification à deux facteurs",
+    "verify": "Vérifier"
+  },
   "welcome": {
     "semester_fall": "Semestre d'automne",
     "semester_spring": "Semestre de printemps",
