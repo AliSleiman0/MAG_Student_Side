@@ -14,7 +14,13 @@
     "logout": "Déconnexion",
     "forget_pass": "Mot de passe oublié",
     "profile": "Profil",
-    "auth_pages": "Authentification"
+    "auth_pages": "Authentification",
+    "schedule": "Outil de planification",
+    "advisor": "Conseillers respectifs",
+    "chat": "Contacter le conseiller",
+    "advisor_text1": "Conseillers académiques",
+    "advisor_text2": "Rencontrez nos membres du corps professoral expérimentés correspondant à votre école et campus",
+    "reach_out": "Nous contacter"
   },
   "profile": {
     "profile": "Profil",

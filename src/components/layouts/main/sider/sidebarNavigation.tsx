@@ -14,6 +14,9 @@ import {
     PartitionOutlined,
     GoldOutlined,
     BranchesOutlined,
+    SolutionOutlined,
+    MessageOutlined,
+    CalendarOutlined,
 } from '@ant-design/icons';
 import { ReactComponent as NftIcon } from '@app/assets/icons/nft-icon.svg';
 import { useTranslation } from 'react-i18next';
@@ -53,9 +56,31 @@ export const sidebarNavigation: SidebarNavigationItem[] = [
         key: 'apps',
         url: '/CustomizedPOS',
         icon: <BranchesOutlined />,
-       
+
+    }, {
+    title: 'sider.schedule',
+    key: 'schedule',
+    url: '/Scheduling_Tool',
+    icon: <CalendarOutlined />, 
+
+    },
+  
+    {
+        title: 'sider.advisor',
+        key: 'advisor',
+        url: '/advisors',
+        icon: <SolutionOutlined />,
+
     },
     {
+        title: 'sider.chat',
+        key: 'chat',
+        url: '/chat',
+        icon: <MessageOutlined />,
+
+
+    },
+     {
         title: 'sider.auth_pages',
         key: 'auth',
         icon: <UserOutlined />,
@@ -97,18 +122,6 @@ export const sidebarNavigation: SidebarNavigationItem[] = [
             //},
         ],
     },
-    //{
-    //    title: 'common.forms',
-    //    key: 'forms',
-    //    icon: <FormOutlined />,
-    //    children: [
-    //        {
-    //            title: 'common.advancedForms',
-    //            key: 'advanced-forms',
-    //            url: '/forms/advanced-forms',
-    //        },
-    //    ],
-    //},
     //{
     //    title: 'common.dataTables',
     //    key: 'dataTables',
@@ -153,7 +166,7 @@ export const sidebarNavigation: SidebarNavigationItem[] = [
     //    key: 'pages',
     //    icon: <LayoutOutlined />,
     //    children: [
-           
+
     //        {
     //            title: 'serverError',
     //            key: 'serverError',

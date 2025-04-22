@@ -14,7 +14,13 @@
     "logout": "Logout",
     "forget_pass": "Forget Password",
     "profile": "Profile",
-    "auth_pages": "Auth"
+    "auth_pages": "Auth",
+    "schedule": "Scheduling Tool",
+    "advisor": "Respective Advisors",
+    "chat": "Contact Advisor",
+    "advisor_text1": "Academic Advisors",
+    "advisor_text2": "Meet our experienced faculty members corresponding to your school and campus",
+    "reach_out": "Reach Out"
 
   },
   "profile": {

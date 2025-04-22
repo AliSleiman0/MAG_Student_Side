@@ -13,10 +13,6 @@ import styled from 'styled-components';
 import { FONT_SIZE, FONT_WEIGHT } from '../../../../../../styles/themes/constants';
 import { InboxOutlined } from '@ant-design/icons';
 import { BaseCol } from '@app/components/common/BaseCol/BaseCol';
-
-
-
-
 export const PersonalInfo: React.FC = () => {
 
     const DraggerIconWrapper = styled.div`
