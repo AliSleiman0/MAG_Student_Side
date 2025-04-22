@@ -14,7 +14,13 @@
     "logout": "Abmelden",
     "forget_pass": "Passwort vergessen",
     "profile": "Profil",
-    "auth_pages": "Authentifizierung"
+    "auth_pages": "Authentifizierung",
+    "schedule": "Planungstool",
+    "advisor": "Zuständige Berater",
+    "chat": "Berater kontaktieren",
+    "advisor_text1": "Akademische Berater",
+    "advisor_text2": "Lernen Sie unsere erfahrenen Fakultätsmitglieder kennen, die Ihrer Schule und Ihrem Campus zugeordnet sind",
+    "reach_out": "Kontakt aufnehmen"
   },
   "profile": {
     "profile": "Profil",

@@ -22,6 +22,9 @@ import GraphComponent from '../../pages/30/POS';
 import AutoPOS from '../../pages/30/AutoPOS';
 import DynamicPOS from '../../pages/30/DyanmicPOS/DynamicPOS';
 import CustomizedPOS from '../../pages/30/CustomizedPOS/CustomizedPOS';
+import { ChatComponent as Chat } from '../../firebase/Chat';
+import AdvisorsList from '../../pages/30/AdvisorsPage';
+import SchedulingTool from '../../pages/30/SchedulingTool';
 
 
 
@@ -142,6 +145,9 @@ export const AppRouter: React.FC = () => {
                     <Route path={"/CustomizedPOS"} element={<CustomizedPOS />} />
                     <Route path={"/DynamicPOS"} element={<DynamicPOS />} />
                     <Route path="/POS" element={<GraphComponent />} />
+                    <Route path="/chat" element={<Chat receiverId={12345} />} />
+                    <Route path="/advisors" element={<AdvisorsList />} />
+                    <Route path="/Scheduling_Tool" element={< SchedulingTool />} />/
                     <Route path="apps">
                         <Route path="feed" element={<NewsFeed />} />
                     </Route>
