@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { Advisor, getRespectiveAdvisors } from '../../apiMAG/advisor';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 
@@ -51,11 +52,17 @@ const CardContainer = styled.div`
 
 const AdvisorCard = ({ advisor }: { advisor: Advisor }) => {
     const [isHovered, setIsHovered] = useState(false);
-  
+    const navigate = useNavigate();
+    const { t } = useTranslation();
+
+    const handleChatStart = () => {
+        if (!advisor?.userid) return;
+        navigate(`/chat/${advisor.userid}`);
+    };
     const handleHover = useCallback((state: boolean) => () => {
         setIsHovered(state);
     }, []);
-    const { t } = useTranslation();
+  
     return (
         <CardContainer>
             <Card
@@ -97,7 +104,9 @@ const AdvisorCard = ({ advisor }: { advisor: Advisor }) => {
                     >
                         {advisor.email}
                     </Text>
-                    <Button style={{ color: "white", backgroundColor: "#038b94", marginTop: "9px" }}>  {t("sider.reach_out")}</Button>
+                    <Button onClick={handleChatStart}
+                        style={{ color: "white", backgroundColor: "#038b94", marginTop: "9px" }}>
+                        {t("sider.reach_out")}</Button>
                 </div>
             </Card>
         </CardContainer>
@@ -155,7 +164,7 @@ const AdvisorsGrid = () => {
         <PageContainer>
             <StyledHeader>
                 <Title level={2} style={{ color: 'inherit', marginBottom: 8 }}>
-                    {t("sider.advisor_text1") }
+                    {t("sider.advisor_text1")}
                 </Title>
                 <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 16 }}>
                     {t("sider.advisor_text2")}
@@ -166,7 +175,7 @@ const AdvisorsGrid = () => {
             <div
                 style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
                     gap: '24px',
                 }}
             >

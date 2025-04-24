@@ -1,31 +1,38 @@
-// firestore.ts
-import { useState, useEffect } from "react";
+﻿// firestore.ts
+import { useEffect, useMemo, useState } from "react";
 import { db } from "./firebase";
-import { collection, addDoc, query, where, onSnapshot, orderBy, serverTimestamp,  updateDoc, doc, getDocs } from "firebase/firestore";
-localStorage.setItem("userId", "123"); // Use actual MySQL user ID
+import {
+    collection, addDoc, query, where,
+    onSnapshot, orderBy, serverTimestamp,
+    updateDoc, doc, getDocs, Timestamp
+} from "firebase/firestore";
+import { useParams, useNavigate } from "react-router-dom";
+
 // Firestore collections
 const chatsCollection = collection(db, "chats");
-const messagesCollection = (chatId: string) => collection(db, "chats", chatId, "messages");
+const messagesCollection = (chatId: string) =>
+    collection(db, "chats", chatId, "messages");
 
 // Types
 interface Chat {
     id: string;
-    participants: number[];
+    participants: string[];
     lastMessage: string;
     timestamp: Date;
 }
 
 interface Message {
-    senderId: number;
-    receiverId: number;
+    id: string;
+    senderId: string;
+    receiverId: string;
     text: string;
-    timestamp: Date;
+    timestamp: Timestamp;
 }
 
-// Chat functions
+// Chat Service
 export const chatService = {
     // Create or get existing chat
-    async getOrCreateChat(senderId: number, receiverId: number): Promise<string> {
+    async getOrCreateChat(senderId: string, receiverId: string): Promise<string> {
         const participants = [senderId, receiverId].sort();
         const q = query(chatsCollection, where("participants", "==", participants));
 
@@ -44,49 +51,68 @@ export const chatService = {
     },
 
     // Send message
-    async sendMessage(text: string, receiverId: number): Promise<void> {
-        const senderId = Number(localStorage.getItem("userId"));
+    async sendMessage(text: string, receiverId: string): Promise<void> {
+        const senderId = localStorage.getItem("userId") || '';
+        if (!senderId) throw new Error("User not authenticated");
+
         const chatId = await this.getOrCreateChat(senderId, receiverId);
 
-        await addDoc(messagesCollection(chatId), {
-            senderId,
-            receiverId,
-            text,
-            timestamp: serverTimestamp()
-        });
+        try {
+            await addDoc(messagesCollection(chatId), {
+                senderId,
+                receiverId,
+                text,
+                timestamp: serverTimestamp()
+            });
 
-        await updateDoc(doc(chatsCollection, chatId), {
-            lastMessage: text,
-            timestamp: serverTimestamp()
-        });
+            await updateDoc(doc(chatsCollection, chatId), {
+                lastMessage: text,
+                timestamp: serverTimestamp()
+            });
+        } catch (error) {
+            console.error("Error sending message:", error);
+            throw error;
+        }
     },
 
     // Real-time message listener
-    listenToMessages(receiverId: number, callback: (messages: Message[]) => void) {
-        const senderId = Number(localStorage.getItem("userId"));
+    listenToMessages(receiverId: string, callback: (messages: Message[]) => void) {
+        const senderId = localStorage.getItem("userId") || '';
         const participants = [senderId, receiverId].sort();
+        let unsubscribeMessages: () => void = () => { };
 
         const q = query(chatsCollection, where("participants", "==", participants));
-        return onSnapshot(q, (snapshot) => {
-            snapshot.docChanges().forEach(async (change) => {
-                if (change.type === "modified") {
+
+        const unsubscribeChat = onSnapshot(q, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === "added") {
+                    if (unsubscribeMessages) unsubscribeMessages();
+
                     const messagesQuery = query(
                         messagesCollection(change.doc.id),
                         orderBy("timestamp", "asc")
                     );
 
-                    onSnapshot(messagesQuery, (messagesSnapshot) => {
-                        const messages = messagesSnapshot.docs.map(doc => doc.data() as Message);
+                    unsubscribeMessages = onSnapshot(messagesQuery, (messagesSnapshot) => {
+                        const messages = messagesSnapshot.docs.map(doc => ({
+                            id: doc.id,
+                            ...doc.data() as Omit<Message, "id">
+                        }));
                         callback(messages);
                     });
                 }
             });
         });
+
+        return () => {
+            unsubscribeChat();
+            unsubscribeMessages();
+        };
     },
 
     // Get all chats for current user
     listenToUserChats(callback: (chats: Chat[]) => void) {
-        const userId = Number(localStorage.getItem("userId"));
+        const userId = localStorage.getItem("userId") || '';
         const q = query(chatsCollection, where("participants", "array-contains", userId));
 
         return onSnapshot(q, (snapshot) => {
@@ -96,50 +122,112 @@ export const chatService = {
             }));
             callback(chats);
         });
+    },
+
+    // Typing indicators
+    listenToTypingIndicator(chatId: string, userId: string, callback: (isTyping: boolean) => void) {
+        const typingRef = doc(db, `chats/${chatId}/typing/${userId}`);
+        return onSnapshot(typingRef, (snap) => {
+            callback(snap.exists() ? snap.data()?.isTyping : false);
+        });
+    },
+
+    async updateTypingStatus(chatId: string, userId: string, isTyping: boolean) {
+        const typingRef = doc(db, `chats/${chatId}/typing/${userId}`);
+        await updateDoc(typingRef, {
+            isTyping,
+            timestamp: serverTimestamp()
+        });
     }
 };
 
-export const ChatComponent = ({ receiverId }: { receiverId: number }) => {
+// Chat Component
+export const Chat = () => {
+    const { advisorId } = useParams<{ advisorId: string }>();
+    const navigate = useNavigate();
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState("");
     const [chats, setChats] = useState<Chat[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [activeChat, setActiveChat] = useState<string>();
 
-    // Load messages
+    const senderId = localStorage.getItem("userId") || '';
+    const receiverId = advisorId || '';
+
+    const advisorChats = useMemo(() =>
+        chats.filter(chat =>
+            chat.participants.includes(receiverId) &&
+            chat.participants.includes(senderId)
+        ),
+        [chats, receiverId, senderId]
+    );
+
     useEffect(() => {
-        const unsubscribe = chatService.listenToMessages(receiverId, setMessages);
-        return () => unsubscribe();
+        if (!senderId || !receiverId) {
+            setError('Invalid chat parameters');
+            setLoading(false);
+            navigate('/chat-error');
+            return;
+        }
+    }, [senderId, receiverId, navigate]);
+
+    useEffect(() => {
+        const unsubscribeMessages = chatService.listenToMessages(receiverId, setMessages);
+        return unsubscribeMessages;
     }, [receiverId]);
 
-    // Load user's chats
     useEffect(() => {
-        const unsubscribe = chatService.listenToUserChats(setChats);
-        return () => unsubscribe();
+        const unsubscribeChats = chatService.listenToUserChats(setChats);
+        return unsubscribeChats;
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newMessage.trim()) return;
 
-        await chatService.sendMessage(newMessage.trim(), receiverId);
-        setNewMessage("");
+        try {
+            await chatService.sendMessage(newMessage.trim(), receiverId);
+            setNewMessage("");
+        } catch (error) {
+            setError('Failed to send message');
+        }
     };
+
+    if (error) return <div className="error">{error}</div>;
 
     return (
         <div className="chat-container">
             <div className="chat-list">
-                {chats.map(chat => (
-                    <div key={chat.id} className="chat-item">
-                        <div>Chat with {chat.participants.find(id => id !== Number(localStorage.getItem("userId")))}</div>
-                        <div className="last-message">{chat.lastMessage}</div>
+                {advisorChats.map(chat => (
+                    <div
+                        key={chat.id}
+                        className={`chat-item ${activeChat === chat.id ? 'active' : ''}`}
+                        onClick={() => setActiveChat(chat.id)}
+                    >
+                        <div className="chat-participant">
+                            Advisor: {chat.participants.find(id => id !== senderId)}
+                        </div>
+                        <div className="chat-preview">
+                            {chat.lastMessage}
+                            <span className="timestamp">
+                                {new Date(chat.timestamp).toLocaleTimeString()}
+                            </span>
+                        </div>
                     </div>
                 ))}
             </div>
 
             <div className="message-container">
-                {messages.map((message, index) => (
-                    <div key={index} className={`message ${message.senderId === Number(localStorage.getItem("userId")) ? "sent" : "received"}`}>
+                {messages.map((message) => (
+                    <div
+                        key={message.id}
+                        className={`message ${message.senderId === senderId ? "sent" : "received"}`}
+                    >
                         <div className="message-text">{message.text}</div>
-                        <div className="message-time">{new Date(message.timestamp).toLocaleTimeString()}</div>
+                        <div className="message-time">
+                            {message.timestamp?.toDate().toLocaleTimeString()}
+                        </div>
                     </div>
                 ))}
 

@@ -149,6 +149,8 @@
   },
   "customised_pos": {
     "title": "Plan d'Études Personnalisé pour ",
+    "Best_title": "Meilleur plan d'étude pour ",
+
     "generate_remaining_semesters": "Générer les Semestres Restants",
     "place_holder": "Ajoutez des Cours pour Compléter votre Plan !",
     "select": "Sélectionner",
