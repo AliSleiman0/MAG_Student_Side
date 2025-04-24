@@ -2592,6 +2592,55 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fullcalendar/core@npm:^6.1.17":
+  version: 6.1.17
+  resolution: "@fullcalendar/core@npm:6.1.17"
+  dependencies:
+    preact: ~10.12.1
+  checksum: 76a398adf7cababcce1043de0b2fe2e7ed732eb24e8e13821e065572e12583fc864f38ed1e2d447ab18db641682eff10ed640593bd2078bd70cc3692f67944e1
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/daygrid@npm:^6.1.17, @fullcalendar/daygrid@npm:~6.1.17":
+  version: 6.1.17
+  resolution: "@fullcalendar/daygrid@npm:6.1.17"
+  peerDependencies:
+    "@fullcalendar/core": ~6.1.17
+  checksum: 2391b67f121993ccc47d427fd770bf6e9f9ab7c0a39a60c90b878bad66fadc8845483b1c37b068f02178858f9eeea3ff1c23b90adcc6bb5c7186c446aca7acb2
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/interaction@npm:^6.1.17":
+  version: 6.1.17
+  resolution: "@fullcalendar/interaction@npm:6.1.17"
+  peerDependencies:
+    "@fullcalendar/core": ~6.1.17
+  checksum: 1121d743d99a31af1e54eef0637871d8792e0da504cfee0b7ae71ae31541a972e2f3bdaa0dca8fa3c9ee7b8665ba22f733b6d2a939b4a88356d05cb9ea67bdd5
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/react@npm:^6.1.17":
+  version: 6.1.17
+  resolution: "@fullcalendar/react@npm:6.1.17"
+  peerDependencies:
+    "@fullcalendar/core": ~6.1.17
+    react: ^16.7.0 || ^17 || ^18 || ^19
+    react-dom: ^16.7.0 || ^17 || ^18 || ^19
+  checksum: 11dcf2fa85c7d69e3d020c1d3163efcd4ea294d9f8ca3d59e15b2b047ae1df2d52db09b6bb43cbedeb6c352ac962d2a5f476a9707cca41126bc11176eaf78963
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/timegrid@npm:^6.1.17":
+  version: 6.1.17
+  resolution: "@fullcalendar/timegrid@npm:6.1.17"
+  dependencies:
+    "@fullcalendar/daygrid": ~6.1.17
+  peerDependencies:
+    "@fullcalendar/core": ~6.1.17
+  checksum: 196325c0e37e9358cd19665460ab9d6b845a720db72fa608fb444d19e0c5fa49a8b9c903b149ef54b680bfdb7727d06b67893acad678c0835e3c91c2e69bccce
+  languageName: node
+  linkType: hard
+
 "@gar/promisify@npm:^1.0.1, @gar/promisify@npm:^1.1.3":
   version: 1.1.3
   resolution: "@gar/promisify@npm:1.1.3"
@@ -4829,6 +4878,11 @@ __metadata:
     "@antv/x6-plugin-snapline": ^2.1.7
     "@antv/x6-react-shape": ^2.2.3
     "@craco/craco": ^6.1.2
+    "@fullcalendar/core": ^6.1.17
+    "@fullcalendar/daygrid": ^6.1.17
+    "@fullcalendar/interaction": ^6.1.17
+    "@fullcalendar/react": ^6.1.17
+    "@fullcalendar/timegrid": ^6.1.17
     "@lit-labs/react": ^1.0.2
     "@react-google-maps/api": ^2.18.1
     "@reduxjs/toolkit": ^1.7.1
@@ -18669,6 +18723,13 @@ __metadata:
   dependencies:
     xtend: ^4.0.0
   checksum: 746b71f93805ae33b03528e429dc624706d1f9b20ee81bf743263efb6a0cd79ae02a642a8a480dbc0f09547b4315ab7df6ce5ec0be77ed700bac42730f5c76b2
+  languageName: node
+  linkType: hard
+
+"preact@npm:~10.12.1":
+  version: 10.12.1
+  resolution: "preact@npm:10.12.1"
+  checksum: 0de99f477563ab7f94a0f964952ad216375973c0dcd9eb49881f8eb5effc5ed6948da062548c87d5bb0d82f1a1e516b649020e760eab3a0503dfdd8e64d34a26
   languageName: node
   linkType: hard
 

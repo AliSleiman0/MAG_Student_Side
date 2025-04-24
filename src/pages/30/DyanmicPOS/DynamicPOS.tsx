@@ -824,7 +824,7 @@ const DynamicPOS: React.FC = () => {
                                             </Col>
                                             <Col span={8} xs={24} md={24} lg={24} xl={8}>
                                                 <SemesterDetailView
-                                                    title={`Best Plan for ${t("customised_pos.title")} ${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")}  | ${selectedSemester.year}`}
+                                                    title={`${t("customised_pos.Best_title")} ${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")}  | ${selectedSemester.year}`}
                                                     credits={totalCredits}
                                                     courseList={selectedSemester.courses}
                                                     Upcoming={t("customised_pos.upcoming")}

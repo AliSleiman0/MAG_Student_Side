@@ -149,6 +149,7 @@
   },
   "customised_pos": {
     "title": "Personalisierter Studienplan für ",
+    "Best_title": "Bester Studienplan für ",
     "generate_remaining_semesters": "Verbleibende Semester generieren",
     "place_holder": "Fügen Sie Kurse hinzu, um Ihren Plan zu füllen!",
     "select": "Auswählen",
