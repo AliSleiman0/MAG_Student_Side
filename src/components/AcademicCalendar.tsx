@@ -21,8 +21,10 @@ const AcademicCalendar: React.FC<AcademicCalendarProps> = ({ events, mobileOnly 
         <div style={{
             borderLeft: "4px solid #038b94",
             borderRadius: "5px",
+          
             ...(mobileOnly && { width: 'fit-content' })
         }}>
+       
             <FullCalendar
                 plugins={[timeGridPlugin]}
                 initialView="timeGridWeek"
