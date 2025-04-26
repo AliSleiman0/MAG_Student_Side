@@ -5,10 +5,11 @@ import { EventInput } from '@fullcalendar/core';
 
 interface CalendarEvent {
     title: string;
-    professor: string;
+    professor?: string;
     daysOfWeek: number[];
     startTime: string;
     endTime: string;
+    color?: string;
 }
 
 interface AcademicCalendarProps {
@@ -17,6 +18,11 @@ interface AcademicCalendarProps {
 }
 
 const AcademicCalendar: React.FC<AcademicCalendarProps> = ({ events, mobileOnly = false }) => {
+    const getEventBackground = (event: EventInput) => {
+        // Use provided color if available, otherwise use default gradient
+        return event.color || 'linear-gradient(150deg, #038b94 0%, #036956 100%)';
+    };
+
     return (
         <div style={{
             borderLeft: "4px solid #038b94",
@@ -43,6 +49,7 @@ const AcademicCalendar: React.FC<AcademicCalendarProps> = ({ events, mobileOnly 
                 events={(fetchInfo, successCallback) => {
                     const processedEvents: EventInput[] = events.map(event => ({
                         ...event,
+                        color: event.color,
                         extendedProps: {
                             professor: event.professor
                         },
@@ -57,7 +64,28 @@ const AcademicCalendar: React.FC<AcademicCalendarProps> = ({ events, mobileOnly 
                 selectable={false}
                 dayCellClassNames={(arg) => arg.isThu ? '' : 'normal-day'}
                 eventDidMount={(info) => {
-                    info.el.style.background = 'linear-gradient(150deg, #038b94 0%, #036956 100%)';
+                    // Convert EventImpl to EventInput
+                    const eventInput: EventInput = {
+                        title: info.event.title,
+                        start: info.event.start?.toISOString(),
+                        end: info.event.end?.toISOString(),
+                        color: info.event.backgroundColor,
+                        extendedProps: info.event.extendedProps
+                    };
+
+                    // Apply the background
+                    info.el.style.background = getEventBackground(eventInput);
+
+                    // Keep existing hover effects
+                    info.el.style.transition = 'all 0.3s ease';
+                    info.el.addEventListener('mouseenter', () => {
+                        info.el.style.filter = 'brightness(110%)';
+                        info.el.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+                    });
+                    info.el.addEventListener('mouseleave', () => {
+                        info.el.style.filter = 'brightness(100%)';
+                        info.el.style.boxShadow = 'none';
+                    });
                 }}
                 eventContent={(arg) => (
                     <div style={{

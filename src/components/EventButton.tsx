@@ -11,7 +11,7 @@ type IconButtonProps = {
     type?: string;
 } & ButtonProps;
 
-const IconButton: React.FC<IconButtonProps> = ({ icon, text, onClick, type, ...buttonProps }) => {
+const EventButton: React.FC<IconButtonProps> = ({ icon, text, onClick, type, ...buttonProps }) => {
     const { mobileOnly } = useResponsive();
     return (
         <Button
@@ -23,8 +23,10 @@ const IconButton: React.FC<IconButtonProps> = ({ icon, text, onClick, type, ...b
                 alignItems: 'center',
                 gap: mobileOnly ? '4px' : '8px',
                 transition: 'all 0.3s ease',
-                fontSize: mobileOnly ? '10px' : '16px',
-                height: 'auto',  
+                fontSize: mobileOnly ? '10px' : '12px',
+                height: 'auto',
+                borderRadius: "25px",
+                padding: "7px"
             }}
             onClick={onClick }
             onMouseEnter={(e) => {
@@ -37,12 +39,11 @@ const IconButton: React.FC<IconButtonProps> = ({ icon, text, onClick, type, ...b
                 e.currentTarget.style.color = '#038b94';
                 e.currentTarget.style.boxShadow = 'none';
             }}
-            {...buttonProps}
+
         >
-            {icon && React.cloneElement(icon, { style: { fontSize: mobileOnly ? '12px' : '18px' } })}
-            {text}
+            {text }
         </Button>
     );
 };
 
-export default IconButton;
+export default EventButton;
