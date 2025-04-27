@@ -25,11 +25,11 @@ const Banner: React.FC<BannerProps> = ({
             width: '100%' as const,
         },
         icon: {
-            fontSize: mobileOnly ? '16px' : '20px',
+            fontSize: mobileOnly ? '12px' : '15px',
             color: color.icon,
         },
         text: {
-            fontSize: mobileOnly ? '14px' : '16px',
+            fontSize: mobileOnly ? '10px' : '13px',
             color: '#262626',
         }
     };

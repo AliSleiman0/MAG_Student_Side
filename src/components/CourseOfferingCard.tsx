@@ -49,7 +49,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         >
             <Row justify="space-between" style={{ height: "auto", marginBottom: "8px" }} gutter={[0,16] } >
                 <Col>
-                    <Text style={{ marginBottom: "8px", height: "auto" }}>
+                        <Text style={{ marginBottom: "8px", height: "auto", fontFamily: "monospace" }}>
                         {course.code} -   {course.name}
                     </Text>
                 </Col>
