@@ -27,10 +27,10 @@ const AcademicCalendar: React.FC<AcademicCalendarProps> = ({ events, mobileOnly 
         <div style={{
             borderLeft: "4px solid #038b94",
             borderRadius: "5px",
-          
+
             ...(mobileOnly && { width: 'fit-content' })
         }}>
-       
+
             <FullCalendar
                 plugins={[timeGridPlugin]}
                 initialView="timeGridWeek"
@@ -50,6 +50,7 @@ const AcademicCalendar: React.FC<AcademicCalendarProps> = ({ events, mobileOnly 
                     const processedEvents: EventInput[] = events.map(event => ({
                         ...event,
                         color: event.color,
+                        borderColor: "black",
                         extendedProps: {
                             professor: event.professor
                         },
@@ -62,20 +63,22 @@ const AcademicCalendar: React.FC<AcademicCalendarProps> = ({ events, mobileOnly 
                 weekends={false}
                 editable={false}
                 selectable={false}
-                dayCellClassNames={(arg) => arg.isThu ? '' : 'normal-day'}
+
                 eventDidMount={(info) => {
+                    info.el.style.borderColor = 'black';
                     // Convert EventImpl to EventInput
                     const eventInput: EventInput = {
                         title: info.event.title,
                         start: info.event.start?.toISOString(),
                         end: info.event.end?.toISOString(),
                         color: info.event.backgroundColor,
+                        borderColor: "black",
                         extendedProps: info.event.extendedProps
                     };
 
                     // Apply the background
                     info.el.style.background = getEventBackground(eventInput);
-
+                    info.el.style.borderColor = getEventBackground(eventInput);
                     // Keep existing hover effects
                     info.el.style.transition = 'all 0.3s ease';
                     info.el.addEventListener('mouseenter', () => {
@@ -97,7 +100,7 @@ const AcademicCalendar: React.FC<AcademicCalendarProps> = ({ events, mobileOnly 
                         overflowWrap: 'break-word',
                         display: 'flex',
                         flexDirection: 'column',
-                      
+                        color: "black",
                         lineHeight: '1.3'
                     }}>
                         <div><strong>{arg.event.title}</strong></div>

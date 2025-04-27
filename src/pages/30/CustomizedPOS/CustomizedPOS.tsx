@@ -40,7 +40,7 @@ export interface Semester {
     totalCredits?: number;
 }
 
-const CourseOpenedForRegistation: Course[] = [
+export const CourseOpenedForRegistation: Course[] = [
     {
         "courseid": 107,
         "coursename": "Database Systems",
