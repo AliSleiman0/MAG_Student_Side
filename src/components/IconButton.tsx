@@ -23,7 +23,7 @@ const IconButton: React.FC<IconButtonProps> = ({ icon, text, onClick, type, ...b
                 alignItems: 'center',
                 gap: mobileOnly ? '4px' : '8px',
                 transition: 'all 0.3s ease',
-                fontSize: mobileOnly ? '10px' : '16px',
+                fontSize: mobileOnly ? '10px' : '12px',
                 height: 'auto',  
             }}
             onClick={onClick }
@@ -39,7 +39,7 @@ const IconButton: React.FC<IconButtonProps> = ({ icon, text, onClick, type, ...b
             }}
             {...buttonProps}
         >
-            {icon && React.cloneElement(icon, { style: { fontSize: mobileOnly ? '12px' : '18px' } })}
+            {icon && React.cloneElement(icon, { style: { fontSize: mobileOnly ? '12px' : '14px' } })}
             {text}
         </Button>
     );

@@ -1,6 +1,6 @@
-﻿import { Row, Col, Typography, Space, Card, Form, TimePicker } from 'antd';
+﻿import { Row, Col, Typography, Space, Card, Form, TimePicker, Switch } from 'antd';
 import { useMemo, useState } from 'react';
-import { CalendarOutlined, ImportOutlined, ToolOutlined } from '@ant-design/icons';
+import { CalendarOutlined, DownloadOutlined, ImportOutlined, ToolOutlined } from '@ant-design/icons';
 import { useResponsive } from '../../../hooks/useResponsive';
 import AcademicCalendar from '../../../components/AcademicCalendar';
 import PlannerTypeModal from '../../../components/ PlannerTypeModal';
@@ -18,6 +18,7 @@ import { CourseOpenedForRegistation } from '../CustomizedPOS/CustomizedPOS';
 
 import CourseCard from '../../../components/CourseOfferingCard';
 import styled from 'styled-components';
+import CourseCardOfferingSmart, { CourseSection } from '../../../components/CourseCardOfferingSmart';
 // ====================== Interfaces ======================
 /** 
  * Represents a calendar event with scheduling details
@@ -74,6 +75,15 @@ const permanentCourses = [{
         startTime: '11:00',
         endTime: '12:30',
         instructor: 'Prof. Smith'
+    },
+    {
+        id: 'section3',
+        name: 'Section 3',
+        schedule: 'Tue/Thu: 11:00-12:30',
+        daysOfWeek: [2, 4],
+        startTime: '11:00',
+        endTime: '12:30',
+        instructor: 'Prof. Ahmad'
     }]
 }, {
     id: 'math101',
@@ -99,25 +109,9 @@ const permanentCourses = [{
         instructor: 'Prof. Smith'
     }]
 }];
-//const courses = [
-//    {
-//        title: "Math Class",
-//        professor: "Prof. Smith",
-//        daysOfWeek: [1, 3],
-//        startTime: "08:00",
-//        endTime: "09:15",
-//        color: 'linear-gradient(150deg, #038b94 0%, #036956 100%)',
-//    },
-//    {
-//        title: "Science Lab",
-//        professor: "Prof. Smith",
-//        daysOfWeek: [2, 4],
-//        startTime: "09:30",
-//        endTime: "10:45",
-//        color: 'linear-gradient(150deg, #038b94 0%, #036956 100%)',
-//    },
-//];
+
 export default function SchedulingTool() {
+    const [showCourses, setShowCourses] = useState(true); // Default to showing courses
     // ====================== State Management ======================
     // Schedule constraints and breaks
     const [breaks, setBreaks] = useState<CalendarEvent[]>([]);
@@ -142,8 +136,9 @@ export default function SchedulingTool() {
     // Course selection state
     const [selectedSections, setSelectedSections] = useState<Record<string, string>>({});
 
-    //const [SourceType, setSourceType] = useState<"CUS" | "AUTO" | "">("");
-
+    const [SourceType, setSourceType] = useState<"CUS" | "AUTO" | "">("");
+    // ====================== Smart starts here Functionality ======================
+    const [selectedPrefferedSections, setSelectedPrefferedSections] = useState<CourseSection>();
     // ====================== Core Functionality ======================
     /** Convert course sections to calendar events */
     const calendarEventsToBeAdded = permanentCourses.flatMap(course => {
@@ -202,7 +197,7 @@ export default function SchedulingTool() {
         setPlannerTypeModalVisible(false);
     };
     const handleSourceSelect = (type: "CUS" | "AUTO") => {
-        //setSourceType(type);
+        setSourceType(type);
         setCourseModalVisible(false);
     };
 
@@ -253,7 +248,7 @@ export default function SchedulingTool() {
         };
 
         // Check for conflicts with existing events
-        const conflict = checkForConflicts(newBreak, [ ...breaks, ...calendarEventsToBeAdded]);
+        const conflict = checkForConflicts(newBreak, [...breaks, ...calendarEventsToBeAdded]);
 
         if (conflict) {
             setConflictingEvent(conflict);
@@ -358,7 +353,7 @@ export default function SchedulingTool() {
                 modalCoursesSource={true}
             />
             {/* Main Content (only shown after selecting planner) */}
-            {(!plannerTypeModalVisible && plannerType == "Manual") ? (
+            {(!plannerTypeModalVisible) ? (
                 <>
 
                     <Row align="top" gutter={[16, 16]}>
@@ -370,6 +365,7 @@ export default function SchedulingTool() {
                                             <IconButton icon={<CalendarOutlined />} text="Switch Planner Type" onClick={() => { setPlannerTypeModalVisible(prev => !prev); setEditingPlanner(true); }} />
 
                                             <IconButton icon={<ImportOutlined />} className={`${shouldFlash ? 'flash-highlight' : ''}`} text="Import Courses" onClick={() => { setCourseModalVisible(prev => !prev); }} />
+                                            {plannerType != "Manual" && <IconButton icon={<DownloadOutlined />} text={'Generate Schedule'} onClick={() => console.log("doNothing")} />}
                                         </Space >
                                     </Col>
                                 </Row>)}
@@ -377,25 +373,76 @@ export default function SchedulingTool() {
                                 <Col style={{ width: "100%" }}>
                                     <Banner
                                         color={{ background: '#e3faf8', icon: '#038b94' }}
-                                        text="This is the manual schedule tool. You may select only one offering per course. Time conflicts will trigger warnings, and you may add descriptive breaks to customize your weekly schedule."
+                                        text={
+                                            plannerType === "Manual"
+                                                ? "This is the manual schedule tool. You may select only one offering per course. Time conflicts will trigger warnings, and you may add descriptive breaks to customize your weekly schedule."
+                                                : "This is Smart Scheduling mode. It automatically optimizes your timetable based on your preferences. Mark sections (doctors, course offerings) as preferred or excluded, and the system will find the best combination with the fewest gaps between courses. Note that user-added breaks take top priority and will override course sections in case of time conflicts."
+                                        }
                                     />
                                 </Col>
                             </Row>
                             <Row style={{ marginBottom: "16px", marginTop: "8px" }}>
-                                <Col style={{ width: "100%" }}>
+                                {plannerType == "Manual" ? (
+                                    <Col style={{ width: "100%" }}>
+                                        <HoverableDiv>
+                                            <Card
+                                                title={
+                                                    <>
+                                                        <Row style={{ marginBottom: "7px" }}>
+                                                            <Typography.Text>Choose Courses Offerings</Typography.Text>
+                                                        </Row>
+                                                        <Row>
+                                                            <Space
+                                                                style={{
+                                                                    borderRadius: "20px",
+                                                                    color: "#0b58b8",
+                                                                    backgroundColor: "#cae0fa",
+                                                                    fontSize: "10px",
+                                                                    padding: "6px",
+                                                                    fontWeight: "bold",
+                                                                    paddingLeft: "9px",
+                                                                    paddingRight: "9px",
+                                                                    display: 'flex',
+                                                                    alignItems: 'center'
+                                                                }}
+                                                            >
+                                                                <ToolOutlined style={{ fontSize: "12px" }} />
+                                                                Manual Selection Mode
+                                                            </Space>
+                                                        </Row>
+                                                    </>
+                                                }
+                                                style={{ width: "100%", borderLeft: "4px solid #038b94" }}
+                                            >
+                                                {showCourses ? (
+                                                    permanentCourses.map((course: Course) => (
+                                                        <CourseCard
+                                                            key={course.id}
+                                                            course={course}
+                                                            selectedSectionId={selectedSections[course.id]}
+                                                            onSectionChange={handleSectionChange}
+                                                        />
+                                                    ))
+                                                ) : (
+                                                    <EmptyCourseCard onClick={handleFlashButton} />
+                                                )}
+                                            </Card>
+                                        </HoverableDiv>
+                                    </Col>
+                                ) : (<Col style={{ width: "100%" }}>
                                     <HoverableDiv>
                                         <Card
                                             title={
                                                 <>
                                                     <Row style={{ marginBottom: "7px" }}>
-                                                        <Typography.Text>Choose Courses Offerings</Typography.Text>
+                                                        <Typography.Text>Choose Preferences</Typography.Text>
                                                     </Row>
                                                     <Row>
                                                         <Space
                                                             style={{
                                                                 borderRadius: "20px",
-                                                                color: "#0b58b8",
-                                                                backgroundColor: "#cae0fa",
+                                                                color: "#7e0bb8",
+                                                                backgroundColor: "#e7cafa",
                                                                 fontSize: "10px",
                                                                 padding: "6px",
                                                                 fontWeight: "bold",
@@ -406,20 +453,19 @@ export default function SchedulingTool() {
                                                             }}
                                                         >
                                                             <ToolOutlined style={{ fontSize: "12px" }} />
-                                                            Manual Selection Mode
+                                                            Smart Selection Mode
                                                         </Space>
                                                     </Row>
                                                 </>
                                             }
                                             style={{ width: "100%", borderLeft: "4px solid #038b94" }}
                                         >
-                                            {CourseOpenedForRegistation ? (
+                                            {showCourses ? (
                                                 permanentCourses.map((course: Course) => (
-                                                    <CourseCard
+                                                    <CourseCardOfferingSmart
                                                         key={course.id}
                                                         course={course}
                                                         selectedSectionId={selectedSections[course.id]}
-                                                        onSectionChange={handleSectionChange}
                                                     />
                                                 ))
                                             ) : (
@@ -428,6 +474,7 @@ export default function SchedulingTool() {
                                         </Card>
                                     </HoverableDiv>
                                 </Col>
+                                )}
                             </Row>
                             <BreaksCard
                                 breaks={breaks}
@@ -449,7 +496,7 @@ export default function SchedulingTool() {
                                         style={{
                                             color: '#038b94',
                                             fontWeight: 'bold',
-                                            fontSize: mobileOnly ? 20 : 25,
+                                            fontSize: mobileOnly ? 16 : 20,
                                         }}
                                     >
                                         {plannerType} Weekly Schedule:
@@ -460,6 +507,7 @@ export default function SchedulingTool() {
                                 {isTablet && (
                                     <Col flex="none" >
                                         <Space size={8}>
+                                            {plannerType != "Manual" && <IconButton icon={<DownloadOutlined />} text={'Generate Schedule'} onClick={() => console.log("doNothing")} />}
                                             <IconButton
                                                 icon={<CalendarOutlined />}
                                                 text="Switch Planner Type"
@@ -474,6 +522,7 @@ export default function SchedulingTool() {
                                                 onClick={() => { setCourseModalVisible(prev => !prev); }}
                                                 className={`${shouldFlash ? 'flash-highlight' : ''}`}
                                             />
+
                                         </Space>
                                     </Col>
                                 )}
@@ -483,6 +532,12 @@ export default function SchedulingTool() {
                                     <AcademicCalendar
                                         mobileOnly={mobileOnly}
                                         events={[...calendarEventsToBeAdded, ...breaks]}
+                                    />
+                                    <Switch
+                                        checked={showCourses}
+                                        onChange={setShowCourses}
+                                        checkedChildren="Visible"
+                                        unCheckedChildren="Hidden"
                                     />
                                 </Col>
 
