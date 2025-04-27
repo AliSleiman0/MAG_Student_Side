@@ -24,7 +24,7 @@ import DynamicPOS from '../../pages/30/DyanmicPOS/DynamicPOS';
 import CustomizedPOS from '../../pages/30/CustomizedPOS/CustomizedPOS';
 import { Chat } from '../../firebase/Chat';
 import AdvisorsList from '../../pages/30/AdvisorsPage';
-import SchedulingTool from '../../pages/30/SchedulingTool';
+import SchedulingTool from '@app/pages/30/SchedulingTool/SchedulingTool';
 
 
 

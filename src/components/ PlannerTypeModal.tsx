@@ -1,30 +1,47 @@
-// PlannerTypeModal.tsx
-import React from 'react';
+﻿import React from 'react';
 import { Modal, Row, Col, Typography, ModalProps } from 'antd';
 import { EditOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import Banner from './Banner';
+import { Model } from 'echarts';
 
 const { Title, Text } = Typography;
 
 type PlannerType = 'Manual' | 'Smart';
-
+type SourceType = 'CUS' | 'AUTO';
 interface PlannerTypeModalProps extends Omit<ModalProps, 'title' | 'visible'> {
-    /** Controls modal visibility */
+    edit: boolean;
     open: boolean;
-    /** Whether the view is mobile-only */
     mobileOnly: boolean;
-    /** Callback when a planner type is selected */
-    onPlannerSelect: (type: PlannerType) => void;
+    onPlannerSelect?: (type: PlannerType) => void;
+    onSourceSelect?: (type: SourceType) => void;
+    // 🆕 Text Props
+    titleText?: string;
+    bannerText?: string;
+    manualTitle?: string;
+    manualDescription?: string;
+    smartTitle?: string;
+    smartDescription?: string;
+    modalCoursesSource: boolean;
 }
 
 const PlannerTypeModal: React.FC<PlannerTypeModalProps> = ({
+    edit,
     open,
+    modalCoursesSource,
     mobileOnly,
     onPlannerSelect,
+    onSourceSelect,
+    titleText = 'Select Planner Type',
+    bannerText,
+    manualTitle = 'Custom Plan',
+    manualDescription = 'Manually create and adjust your academic schedule',
+    smartTitle = 'Smart Planner',
+    smartDescription = 'Automatically generate optimized schedules',
+
     ...modalProps
 }) => {
-    // base style for each card
     const cardBaseStyle: React.CSSProperties = {
-        background: 'linear-gradient(135deg, #f0fafa 0%, #ffffff 100%)',
+        background: modalCoursesSource ? 'linear-gradient(135deg, #038b94 0%, #010f0f 100%)' : 'linear-gradient(135deg, #f0fafa 0%, #ffffff 100%)',
         borderRadius: '12px',
         padding: mobileOnly ? 16 : 24,
         cursor: 'pointer',
@@ -37,6 +54,10 @@ const PlannerTypeModal: React.FC<PlannerTypeModalProps> = ({
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
     };
 
+    const effectiveBannerText = modalCoursesSource
+        ? 'Choose the courses you want to make a schedule with.'
+        : 'Changing the current plan will delete all unsaved changes';
+
     return (
         <Modal
             title={
@@ -47,7 +68,7 @@ const PlannerTypeModal: React.FC<PlannerTypeModalProps> = ({
                         fontSize: mobileOnly ? 24 : 35,
                     }}
                 >
-                    Select Planner Type
+                    {titleText}
                 </Title>
             }
             open={open}
@@ -59,60 +80,74 @@ const PlannerTypeModal: React.FC<PlannerTypeModalProps> = ({
                 padding: mobileOnly ? 12 : 24,
                 background: 'transparent',
             }}
-            maskStyle={{ background: 'rgba(255, 255, 255, 0.8)' }}
+            maskStyle={{ background: 'rgba(255, 255, 255, 0.8)', minHeight: "fitContent" }}
             {...modalProps}
         >
             <Row gutter={[mobileOnly ? 0 : 24, 24]} justify="space-between">
-                {/* Custom Plan */}
+                {edit && <Banner text={effectiveBannerText} />}
+
+                {/* Manual Plan Card */}
                 <Col span={mobileOnly ? 24 : 11} style={{ marginBottom: mobileOnly ? 16 : 0 }}>
                     <div
                         style={{ ...cardBaseStyle, border: '2px solid #038b94' }}
-                        onClick={() => onPlannerSelect('Manual')}
+                        onClick={() => {
+                            if (modalCoursesSource) {
+                                onSourceSelect?.('CUS');
+                            } else {
+                                onPlannerSelect?.('Manual');
+                            }
+                        }}
                         onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.02)')}
                         onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                     >
                         <EditOutlined
                             style={{
-                                fontSize: mobileOnly ? 32 : 48,
-                                color: '#038b94',
+                                fontSize: modalCoursesSource ? (mobileOnly ? 30 : 38) : (mobileOnly ? 32 : 48),
+                                color: modalCoursesSource ? "white" : '#038b94',
                                 marginBottom: 16,
                             }}
                         />
-                        <Title level={mobileOnly ? 4 : 3} style={{ color: '#038b94', margin: 0 }}>
-                            Custom Plan
+                        <Title level={modalCoursesSource ? (mobileOnly ? 4 : 3) : (mobileOnly ? 4 : 3)} style={{ color: modalCoursesSource ? "white" : '#038b94', margin: 0 }}>
+                            {manualTitle}
                         </Title>
                         <Text
                             type="secondary"
-                            style={{ textAlign: 'center', fontSize: mobileOnly ? 12 : 14 }}
+                            style={{ textAlign: 'center', fontSize: modalCoursesSource ? (mobileOnly ? 10 : 12) : (mobileOnly ? 12 : 14), color: modalCoursesSource ? "white" : '#038b94', }}
                         >
-                            Manually create and adjust your academic schedule
+                            {manualDescription}
                         </Text>
                     </div>
                 </Col>
 
-                {/* Smart Planner */}
+                {/* Smart Planner Card */}
                 <Col span={mobileOnly ? 24 : 11}>
                     <div
                         style={{ ...cardBaseStyle, border: '2px solid #036956' }}
-                        onClick={() => onPlannerSelect('Smart')}
+                        onClick={() => {
+                            if (modalCoursesSource) {
+                                onSourceSelect?.('AUTO');
+                            } else {
+                                onPlannerSelect?.('Smart');
+                            }
+                        }}
                         onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.02)')}
                         onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                     >
                         <ThunderboltOutlined
                             style={{
-                                fontSize: mobileOnly ? 32 : 48,
-                                color: '#036956',
+                                fontSize: modalCoursesSource ? (mobileOnly ? 30 : 38) : (mobileOnly ? 32 : 48),
+                                color: modalCoursesSource ? "white" : '#038b94',
                                 marginBottom: 16,
                             }}
                         />
-                        <Title level={mobileOnly ? 4 : 3} style={{ color: '#036956', margin: 0 }}>
-                            Smart Planner
+                        <Title level={modalCoursesSource ? (mobileOnly ? 4 : 3) : (mobileOnly ? 4 : 3)} style={{ color: modalCoursesSource ? "white" : '#038b94', margin: 0 }}>
+                            {smartTitle}
                         </Title>
                         <Text
                             type="secondary"
-                            style={{ textAlign: 'center', fontSize: mobileOnly ? 12 : 14 }}
+                            style={{ textAlign: 'center', fontSize: modalCoursesSource ? (mobileOnly ? 10 : 12) : (mobileOnly ? 12 : 14), color: modalCoursesSource ? "white" : '#038b94', }}
                         >
-                            Automatically generate optimized schedules
+                            {smartDescription}
                         </Text>
                     </div>
                 </Col>

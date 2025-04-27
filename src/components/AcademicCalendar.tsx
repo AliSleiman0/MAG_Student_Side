@@ -5,10 +5,11 @@ import { EventInput } from '@fullcalendar/core';
 
 interface CalendarEvent {
     title: string;
-    professor: string;
+    professor?: string;
     daysOfWeek: number[];
     startTime: string;
     endTime: string;
+    color?: string;
 }
 
 interface AcademicCalendarProps {
@@ -17,12 +18,19 @@ interface AcademicCalendarProps {
 }
 
 const AcademicCalendar: React.FC<AcademicCalendarProps> = ({ events, mobileOnly = false }) => {
+    const getEventBackground = (event: EventInput) => {
+        // Use provided color if available, otherwise use default gradient
+        return event.color || 'linear-gradient(150deg, #038b94 0%, #036956 100%)';
+    };
+
     return (
         <div style={{
             borderLeft: "4px solid #038b94",
             borderRadius: "5px",
+
             ...(mobileOnly && { width: 'fit-content' })
         }}>
+
             <FullCalendar
                 plugins={[timeGridPlugin]}
                 initialView="timeGridWeek"
@@ -41,6 +49,8 @@ const AcademicCalendar: React.FC<AcademicCalendarProps> = ({ events, mobileOnly 
                 events={(fetchInfo, successCallback) => {
                     const processedEvents: EventInput[] = events.map(event => ({
                         ...event,
+                        color: event.color,
+                        borderColor: "black",
                         extendedProps: {
                             professor: event.professor
                         },
@@ -53,9 +63,32 @@ const AcademicCalendar: React.FC<AcademicCalendarProps> = ({ events, mobileOnly 
                 weekends={false}
                 editable={false}
                 selectable={false}
-                dayCellClassNames={(arg) => arg.isThu ? '' : 'normal-day'}
+
                 eventDidMount={(info) => {
-                    info.el.style.background = 'linear-gradient(150deg, #038b94 0%, #036956 100%)';
+                    info.el.style.borderColor = 'black';
+                    // Convert EventImpl to EventInput
+                    const eventInput: EventInput = {
+                        title: info.event.title,
+                        start: info.event.start?.toISOString(),
+                        end: info.event.end?.toISOString(),
+                        color: info.event.backgroundColor,
+                        borderColor: "black",
+                        extendedProps: info.event.extendedProps
+                    };
+
+                    // Apply the background
+                    info.el.style.background = getEventBackground(eventInput);
+                    info.el.style.borderColor = getEventBackground(eventInput);
+                    // Keep existing hover effects
+                    info.el.style.transition = 'all 0.3s ease';
+                    info.el.addEventListener('mouseenter', () => {
+                        info.el.style.filter = 'brightness(110%)';
+                        info.el.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+                    });
+                    info.el.addEventListener('mouseleave', () => {
+                        info.el.style.filter = 'brightness(100%)';
+                        info.el.style.boxShadow = 'none';
+                    });
                 }}
                 eventContent={(arg) => (
                     <div style={{
@@ -67,7 +100,7 @@ const AcademicCalendar: React.FC<AcademicCalendarProps> = ({ events, mobileOnly 
                         overflowWrap: 'break-word',
                         display: 'flex',
                         flexDirection: 'column',
-                      
+                        color: "black",
                         lineHeight: '1.3'
                     }}>
                         <div><strong>{arg.event.title}</strong></div>
