@@ -38,23 +38,67 @@ const CourseCard: React.FC<CourseCardProps> = ({
         <Card hoverable style={{ marginBottom: "10px", borderColor: borderC } }>
             <Card.Meta
                 title={
-                    <Row wrap={false} justify="space-between" align="middle" gutter={[16, 0]} style={{ width: '100%' }}>
-                        <Col>
-                            <Title style={{ margin: 0, fontSize: "0.9rem" }}>
+                    <Row
+                        wrap={grade === "Current"}
+                        justify="space-between"
+                        align="middle"
+                        
+                        style={{
+                            width: '100%',
+                            display: 'flex',
+                            flexWrap: grade === "Current" ? 'wrap' : 'nowrap'
+                        }}
+                    >
+                        <Col
+                            flex="auto"
+                            style={{
+                                overflow: 'hidden',
+                                minWidth: '60%',  // Prevent title from shrinking too much
+                                ...(grade === "Current" ? {
+                                    maxWidth: '100%',
+                                    flexBasis: '100%',
+                                    marginBottom: 8  // Add spacing when wrapped
+                                } : {})
+                            }}
+                        >
+                            <Title
+                                style={{
+                                    margin: 0,
+                                    fontSize: "0.8rem",
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis'
+                                }}
+                            >
                                 {courseName}
                             </Title>
                         </Col>
-                        <Col>
-                            <Tag style={{
-                                borderRadius:  borderRaduisDynamic ,
-                                padding: '4px 8px',
-                                backgroundColor: gradeColor,
-                                color: "white",
-                                border: "none"
-                            }}>
+
+                        <Col
+                            flex="none"
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'flex-end',
+                                ...(grade === "Current" ? {
+                                    width: '100%',
+                                    justifyContent: 'flex-start'
+                                } : {})
+                            }}
+                        >
+                            <Tag
+                                style={{
+                                    borderRadius: borderRaduisDynamic,
+                                    padding: '4px 8px',
+                                    backgroundColor: gradeColor,
+                                    color: "white",
+                                    border: "none",
+                                    fontSize: grade === "Current" ? "0.8rem" : "1rem",
+                                    flexShrink: 0  // Prevent tag from shrinking
+                                }}
+                            >
                                 {canRegister === null
-                                    ? grade
-                                    : (canRegister ? <UnlockOutlined style={{ color: "black", fontSize: "1.5rem" }} /> : <LockOutlined style={{ color: "black", fontSize: "1.5rem" }} />)}
+                                    && grade
+                                }
                             </Tag>
                         </Col>
                     </Row>
@@ -63,7 +107,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                     <div>
                         <Divider style={{ margin: '12px 0' }} />
                         <Row justify="space-between">
-                            <Col><Text type="secondary">{semester}</Text></Col>
+                            <Col><Text type="secondary" style={{ fontSize: "0.9rem" } }>{semester}</Text></Col>
                             <Col>
                                 <Statistic
                                     value={credits}
@@ -74,7 +118,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                         </Row>
                         <Row align="middle" gutter={8} style={{ marginTop: 8 }}>
                             <Col>{iconBottom}</Col>
-                            <Col><Text type="secondary" style={{ color: textColor } }>{textBottom}</Text></Col>
+                            <Col><Text type="secondary" style={{ color: textColor,fontSize:"0.9rem" } }>{textBottom}</Text></Col>
                         </Row>
                     </div>
                 }

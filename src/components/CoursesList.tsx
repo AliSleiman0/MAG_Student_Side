@@ -1,17 +1,74 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Row, Col, Tag, Typography, Collapse, Divider } from 'antd';
 import { BookOutlined, CalendarOutlined, CheckCircleOutlined, ExclamationCircleOutlined, FormOutlined, LockOutlined, MinusCircleOutlined, UnlockOutlined, WarningOutlined } from '@ant-design/icons';
 import CourseCard from './CourseCard';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import { Course, DashboardData } from '../apiMAG/Dashboard';
+import { countReset } from 'console';
+import { TFunction } from 'i18next';
 
 const { Panel } = Collapse;
 const { Text } = Typography;
+const gradeColorMap: Record<string, string> = {
+    'A+': '#389e0d',  // Ant green-6
+    'A': '#52c41a',   // Ant green-5
+    'A-': '#73d13d',  // Ant green-4
+    'B+': '#1890ff',  // Ant blue-6
+    'B': '#40a9ff',   // Ant blue-5
+    'B-': '#69c0ff',  // Ant blue-4
+    'C+': '#ffc53d',  // Ant gold-5
+    'C': '#ffd666',   // Ant gold-4
+    'C-': '#fff1b8',  // Ant gold-2
+    'D': '#ff9c6e',   // Ant volcano-4
+    'F': '#cf1322',   // Ant red-6
+    'W': '#595959',   // Ant gray-8
+    '': '#8c8c8c'     // Ant gray-6 for ungraded
+};
+const getGradeColor = (grade?: string | null): string => {
+    if (!grade) return gradeColorMap[''];
+    return gradeColorMap[grade.trim().toUpperCase()] || gradeColorMap[''];
+};
 
+const semesterMap: Record<string, string> = {
+    'FALL': 'semester_fall',
+    'SPRING': 'semester_spring',
+    'SUMMER': 'semester_summer',
+    'FALL-SPRING': 'semester_fall_spring',  // Combined key
+    'SPRING-FALL': 'semester_spring_fall',  // Reverse order
+    'SUMMER-FALL': 'semester_summer_fall',
+    'FALL-SUMMER': 'semester_fall_summer',
+    '': 'unknown_semester'
+};
 
-const CourseLists: React.FC = () => {
+const getCombinedSemesterTrans = (sem: string | null | undefined, t: TFunction): string => {
+    const normalizedSem = sem?.trim().toUpperCase() || '';
+
+    // Handle combined semesters first
+    if (normalizedSem.includes('-')) {
+        const [first, second] = normalizedSem.split('-');
+
+        const firstPart = t(`welcome.${semesterMap[first] || 'unknown_semester'}`);
+        const secondPart = t(`welcome.${semesterMap[second] || 'unknown_semester'}`);
+
+        return `${firstPart} - ${secondPart}`;
+    }
+
+    // Handle single semesters
+    return t(`welcome.${semesterMap[normalizedSem] || 'unknown_semester'}`);
+};
+
+interface CoursesListProps {
+    data?: DashboardData; // Properly type the data prop
+}
+const CourseLists: React.FC<CoursesListProps> = ({ data }) => {
+    useEffect(() => {
+        console.log('Full Data:', data);
+        console.log('Distribution Data:', data?.courses_destribution_by_status);
+    }, [data]);
     const [loading] = useState<boolean>(true);
     const { t } = useTranslation();
+
     return (
         <Row gutter={[16, 16]} justify="center" style={{ width: "100%" }}>
             {/* Completed Courses */}
@@ -33,7 +90,7 @@ const CourseLists: React.FC = () => {
                                         </Row>
                                     </Col>
                                     <Col>
-                                        <Tag color="geekblue">7</Tag>
+                                        <Tag color="geekblue">{data?.courses_destribution_by_status?.Passed.course_count}</Tag>
                                     </Col>
                                 </Row>
                             }
@@ -43,42 +100,19 @@ const CourseLists: React.FC = () => {
                                 overflowY: 'auto',
                                 paddingRight: '8px'  // Prevents scrollbar from overlapping content
                             }}>
-                                <CourseCard
-                                    courseName="CS 101: Introduction to Programming"
-                                    grade="A+"
-                                    semester={`${t("welcome.semester_fall")} 2021`}
-                                    credits={3}
-                                    textBottom={t("courses.course_types.major") }
-                                />
-                                <CourseCard
-                                    courseName="CS 102: Data Structures"
-                                    grade="A"
-                                    semester={`${t("welcome.semester_summer")} 2021`}
-                                    credits={4}
-                                    textBottom={t("courses.course_types.core")}
-                                />
-                                <CourseCard
-                                    courseName="CS 201: Algorithms"
-                                    grade="B+"
-                                    semester={`${t("welcome.semester_spring")} 2021`}
-                                    credits={4}
-                                    textBottom={t("courses.course_types.major_elective")}
-                                />
-                                <CourseCard
-                                    courseName="MATH 101: Calculus"
-                                    grade="A-"
-                                    semester={`${t("welcome.semester_fall")} 2021`}
-                                    credits={4}
-                                    textBottom={t("courses.course_types.general_elective")}
-                                />
-                                {/* Additional cards will trigger scroll */}
-                                <CourseCard
-                                    courseName="PHYS 101: Physics"
-                                    grade="B"
-                                    semester="Fall 2020"
-                                    credits={4}
-                                    textBottom={t("courses.course_types.general_education")}
-                                />
+                                {data?.courses_destribution_by_status?.Passed?.courses?.map((course) => (
+                                    <CourseCard
+                                        key={`passed-${course.courseid}-${course.semestertaken}`}
+                                        courseName={`${course.coursename}`}
+                                        grade={course.grade || t('common.no_grade')}
+                                        gradeColor={getGradeColor(course.grade)}
+                                        semester={getCombinedSemesterTrans(course.semestertaken.toUpperCase(), t)}
+                                        credits={course.credits ?? 0}
+                                        textBottom={t(`courses.course_types.${course.coursetype}`)}
+                                    />
+                                ))}
+
+
                             </div>
                         </Panel>
                     </Collapse>
@@ -105,7 +139,7 @@ const CourseLists: React.FC = () => {
                                         </Row>
                                     </Col>
                                     <Col>
-                                        <Tag color="geekblue">2</Tag>
+                                        <Tag color="geekblue">{data?.courses_destribution_by_status?.Registered.course_count}</Tag>
                                     </Col>
                                 </Row>
                             }
@@ -116,51 +150,19 @@ const CourseLists: React.FC = () => {
                                 overflowY: 'auto',
                                 paddingRight: '8px'  // Prevents scrollbar from overlapping content
                             }}>
-                                <CourseCard
-                                    courseName="CS 101: Introduction to Programming"
-                                    gradeColor="#038b94"
-                                    semester={`${t("welcome.semester_fall")} 2021`}
-                                    credits={3}
-                                    textBottom={`${t("days.mon_wed")} 2:00${t("time_periods.am")}` }
-                                    iconBottom={<CalendarOutlined />}
 
-                                />
-                                <CourseCard
-                                    courseName="CS 101: Introduction to Programming"
-                                    gradeColor="#038b94"
-                                    semester={`${t("welcome.semester_fall")} 2021`}
-                                    credits={3}
-                                    textBottom={`${t("days.mon_wed")} 2:00${t("time_periods.am")}`}
-                                    iconBottom={<CalendarOutlined />}
+                                {data?.courses_destribution_by_status?.Registered?.courses?.map((course) => (
+                                    <CourseCard
+                                        key={`registered-${course.courseid}-${course.semestertaken}`}
+                                        gradeColor="#038b94"
+                                        courseName={`${course.coursename}`}
 
-                                />
-                                <CourseCard
-                                    courseName="CS 101: Introduction to Programming"
-                                    gradeColor="#038b94"
-                                    semester={`${t("welcome.semester_fall")} 2021`}
-                                    credits={3}
-                                    textBottom={`${t("days.mon_wed")} 2:00${t("time_periods.am")}`}
-                                    iconBottom={<CalendarOutlined />}
-
-                                />
-                                <CourseCard
-                                    courseName="CS 101: Introduction to Programming"
-                                    gradeColor="#038b94"
-                                    semester={`${t("welcome.semester_fall")} 2021`}
-                                    credits={3}
-                                    textBottom={`${t("days.mon_wed")} 2:00${t("time_periods.am")}`}
-                                    iconBottom={<CalendarOutlined />}
-
-                                />
-                                <CourseCard
-                                    courseName="CS 101: Introduction to Programming"
-                                    gradeColor="#038b94"
-                                    semester={`${t("welcome.semester_fall")} 2021`}
-                                    credits={3}
-                                    textBottom={`${t("days.mon_wed")} 2:00${t("time_periods.am")}`}
-                                    iconBottom={<CalendarOutlined />}
-
-                                />
+                                        semester={getCombinedSemesterTrans(course.semestertaken.toUpperCase(), t)}
+                                        credits={course.credits ?? 0}
+                                        textBottom={t(`courses.course_types.${course.coursetype}`)}
+                                        iconBottom={<CalendarOutlined />}
+                                    />
+                                ))}
                             </div>
                         </Panel>
                     </Collapse></HoverableDiv>
@@ -185,41 +187,32 @@ const CourseLists: React.FC = () => {
                                         </Row>
                                     </Col>
                                     <Col>
-                                        <Tag color="geekblue">5</Tag>
+                                        <Tag color="geekblue">{(data?.courses_destribution_by_status?.Failed?.course_count || 0) + (data?.courses_destribution_by_status?.WithDrawn?.course_count || 0) + (data?.remaining_courses.length || 0)}</Tag>
                                     </Col>
                                 </Row>
                             }
                         >
-                            <Divider orientation="left" style={{ borderColor: '#038b94' }}>{t("courses.credits.remaining") }</Divider>
+                            <Divider orientation="left" style={{ borderColor: '#038b94' }}>{t("courses.credits.remaining")}</Divider>
                             <div style={{
                                 maxHeight: '250px',  // Adjust this value based on your card height (4 cards * card height)
                                 overflowY: 'auto',
                                 paddingRight: '8px', // Prevents scrollbar from overlapping content
                                 marginBottom: "20px"
                             }}>
-                                <CourseCard
-                                    courseName="CS 101: Introduction to Programming"
-                                    gradeColor="transparent"
-                                    semester={`${t("welcome.semester_fall")} 2021`}
+                                {data?.remaining_courses?.map((course) => {
+                                    console.log("rem ", course.semester.toUpperCase());
+                                    return (
+                                        <CourseCard
+                                            courseName={course.coursename}
+                                            gradeColor="transparent"
+                                            semester={getCombinedSemesterTrans(course.semester.toUpperCase(), t)}
+                                            credits={course.credits}
+                                            textBottom={course.canregister ? t("courses.register_status.can_register") : t("courses.register_status.cannot_register")}
+                                            iconBottom={course.canregister ? <UnlockOutlined /> : <LockOutlined />}
+                                            canRegister={course.canregister}
+                                        />)
+                                })}
 
-                                    credits={3}
-                                    textBottom={t("courses.register_status.can_register")}
-                                    iconBottom={<LockOutlined />}
-                                    canRegister={true}
-
-
-                                />
-                                <CourseCard
-                                    courseName="CS 101: Introduction to Programming"
-                                    gradeColor="transparent"
-                                    semester={`${t("welcome.semester_fall")} 2021`}
-                                    credits={3}
-                                    textBottom={t("courses.register_status.cannot_register")}
-                                    iconBottom={<UnlockOutlined />}
-                                    canRegister={false}
-
-
-                                />
 
                             </div>
                             <Divider orientation="left" style={{ borderColor: '#038b94' }}>{t("courses.credits.failed_withdrawn")}</Divider>
@@ -228,32 +221,38 @@ const CourseLists: React.FC = () => {
                                 overflowY: 'auto',
                                 paddingRight: '8px'  // Prevents scrollbar from overlapping content
                             }}>
-                                <CourseCard
-                                    courseName="CS 101: Programming"
+                                {(!data?.courses_destribution_by_status?.Failed?.courses && !data?.courses_destribution_by_status?.WithDrawn?.courses) &&
+                                    <h4 style={{ padding: "5px", alignContent: "center", alignItems: "center" }}>No Failed/Withdrawn Courses, You are doing great!!</h4>
+                                }
+                                {data?.courses_destribution_by_status?.Failed?.courses?.map((course) => (
+                                    <CourseCard
+                                        courseName={course.coursename}
 
-                                    semester={`${t("welcome.semester_fall")} 2021`}
-                                    credits={3}
-                                    textBottom={t("courses.failed_withdrawn_status.status_f")}
-                                    textColor="red"
-                                    iconBottom={< WarningOutlined style={{ color: "red" }} />}
-                                    borderC="red"
-                                    grade="F"
-                                    gradeColor="red"
-                                />
-                                <CourseCard
-                                    courseName="CS 101: Programming"
+                                        semester={`${getCombinedSemesterTrans(course.semester.toUpperCase(), t)} - ${course.yeartaken}`}
+                                        credits={course.credits}
+                                        textBottom={t("courses.failed_withdrawn_status.status_f")}
+                                        textColor="red"
+                                        iconBottom={< WarningOutlined style={{ color: "red" }} />}
+                                        borderC="red"
+                                        grade="F"
+                                        gradeColor="red"
+                                    />
+                                ))}
+                                {data?.courses_destribution_by_status?.WithDrawn?.courses?.map((course) => (
+                                    <CourseCard
+                                        courseName={course.coursename}
 
-                                    semester={`${t("welcome.semester_fall")} 2021`}
-                                    credits={3}
-                                    textBottom={t("courses.failed_withdrawn_status.status_w")}
-                                    textColor="grey"
-                                    iconBottom={<MinusCircleOutlined style={{ color: "grey" }} />}
-                                    borderC="grey"
-                                    grade="W"
-                                    gradeColor="grey"
+                                        semester={`${getCombinedSemesterTrans(course.semester.toUpperCase(), t)} - ${course.yeartaken}`}
+                                        credits={course.credits}
+                                        textBottom={t("courses.failed_withdrawn_status.status_w")}
+                                        textColor="grey"
+                                        iconBottom={<MinusCircleOutlined style={{ color: "grey" }} />}
+                                        borderC="grey"
+                                        grade="W"
+                                        gradeColor="grey"
 
-                                />
-
+                                    />
+                                ))}
 
 
                             </div>
@@ -277,3 +276,4 @@ const HoverableDiv = styled.div`
   }
 `;
 export default CourseLists;
+

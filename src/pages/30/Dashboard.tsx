@@ -11,13 +11,73 @@ import CoursesList from '../../components/CoursesList';
 import BarChart from '../../components/antvBarChart';
 import styled from 'styled-components';
 import { useResponsive } from '../../hooks/useResponsive';
+import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
+import { getDashboardData } from '../../apiMAG/Dashboard';
+import { Alert } from '../../components/common/BaseAlert/BaseAlert.styles';
+import Spin from 'antd/es/spin';
 //$env:NODE_OPTIONS = "--openssl-legacy-provider"; yarn start
 const { } = Typography;
-
+// Query client configuration
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnWindowFocus: false,
+            retry: 3,
+            staleTime: 1000 * 60 * 5,
+        },
+    },
+});
 const Dashboard: React.FC = () => {
-    //$env:NODE_OPTIONS = "--openssl-legacy-provider"; yarn start
+    
     const { isDesktop } = useResponsive();
     const { t } = useTranslation();
+    //$env:NODE_OPTIONS = "--openssl-legacy-provider"; yarn start
+    const { data, isLoading, isError, error, refetch } = useQuery(
+        'advisors',
+        getDashboardData,
+        {
+            useErrorBoundary: true,
+        }
+    );
+
+    if (isLoading) {
+        return (
+            <div style={{ textAlign: 'center', padding: '64px' }}>
+                <Spin size="large" tip="Loading Dashboard Data..." />
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <div style={{ padding: '32px' }}>
+                <Alert
+                    message="Connection Error"
+                    description={error instanceof Error ? error.message : 'Failed to load Data'}
+                    type="error"
+                    showIcon
+                    action={
+                        <button
+                            onClick={() => refetch()}
+                            style={{
+                                marginTop: '16px',
+                                padding: '8px 16px',
+                                cursor: 'pointer',
+                                backgroundColor: '#1890ff',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '4px'
+                            }}
+                        >
+                            Retry
+                        </button>
+                    }
+                />
+            </div>
+        );
+    }
+
+ 
     const bannerStyles = {
         banner: {
             backgroundColor: '#e3faf8', // Subtle grey matching Ant Design's palette
@@ -39,22 +99,23 @@ const Dashboard: React.FC = () => {
             }
         }
     };
-    const stats = [
-        { title: t('courses.completed_vs_required.title') , completed: 8, total: 12, key: "something" },
-        { title: t('courses.passed_percentage.title'), completed: 5, total: 50, key: "percentage" },
-        { title: t('courses.credits.title'), completed: 5, total: 7, key: "something" }
-    ];
-    const data = [
-        { grade: 'A', count: 8 },
-        { grade: 'B', count: 5 },
-        { grade: 'C', count: 5 },
-        { grade: 'D', count: 8 },
-        { grade: 'F', count: 8 },
-    ];
+  
+    const coursesTakenNumber = (data?.total_courses || 0) - (data?.remaining_courses?.length || 0);
+    //const data = [
+    //    { grade: 'A', count: 8 },
+    //    { grade: 'B', count: 5 },
+    //    { grade: 'C', count: 5 },
+    //    { grade: 'D', count: 8 },
+    //    { grade: 'F', count: 8 },
+    //];
+    const barChartData = Object.entries(data?.grades_distribution ?? {}).map(([grade, count]) => ({
+        grade: grade || 'Ungraded',  // Handle empty string case
+        count: count
+    }));
     return (
         <>
             <PageTitle>{t('common.dashboard')}</PageTitle>
-            
+           
             <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
                 <Col span={24}>
                     <div style={bannerStyles.banner}>
@@ -80,36 +141,89 @@ const Dashboard: React.FC = () => {
                 </Col>
             </Row>
             <Row gutter={[16, 16]} justify="space-between">
-                {stats.map((stat, index) => (
-                    <Col
-                        key={index}
-                        xs={24}    // Full width on mobile
-                        sm={24}    // Full width on small tablets
-                        md={24}    // 2 per row on tablets
-                        lg={7}     // 3 per row on desktops
-                        xl={7}
-                        style={{ display: 'flex' }}
-                    >
-                        <HoverableDiv>
-                            <Card
-                                title={stat.title}
+                <Col
+                    xs={24}    // Full width on mobile
+                    sm={24}    // Full width on small tablets
+                    md={24}    // 2 per row on tablets
+                    lg={7}     // 3 per row on desktops
+                    xl={7}
+                    style={{ display: 'flex' }}
+                >
+                    <HoverableDiv>
+                        <Card
+                            title={t('courses.completed_vs_required.title')}
 
-                                style={{
-                                    width: '100%',
-                                    minHeight: '400px', // Consistent card height
-                                    boxShadow: '0 2px 8px rgba(0,0,0,0.09)'
-                                }}
-                            >
-                                <DonutChart
-                                    completed={stat.completed}
-                                    total={stat.total}
-                                    height={300} // Fixed chart height
-                                    kkey={stat.key}
-                                />
-                            </Card>
-                        </HoverableDiv>
-                    </Col>
-                ))}
+                            style={{
+                                width: '100%',
+                                minHeight: '400px', // Consistent card height
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.09)'
+                            }}
+                        >
+                            <DonutChart
+                                completed={ data?.courses_destribution_by_status.Passed.course_count}
+                                total={data?.total_courses}
+                                height={300}
+                                kkey="something"
+                            />
+                        </Card>
+                    </HoverableDiv>
+                </Col>
+                <Col
+
+                    xs={24}    // Full width on mobile
+                    sm={24}    // Full width on small tablets
+                    md={24}    // 2 per row on tablets
+                    lg={7}     // 3 per row on desktops
+                    xl={7}
+                    style={{ display: 'flex' }}
+                >
+                    <HoverableDiv>
+                        <Card
+                            title={t('courses.passed_percentage.title')}
+
+                            style={{
+                                width: '100%',
+                                minHeight: '400px', // Consistent card height
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.09)'
+                            }}
+                        >
+                            <DonutChart
+                                completed={data?.courses_destribution_by_status.Passed.course_count}
+                                total={coursesTakenNumber}
+                                height={300}
+                                kkey="percentage"
+                            />
+                        </Card>
+                    </HoverableDiv>
+                </Col>
+                <Col
+
+                    xs={24}    // Full width on mobile
+                    sm={24}    // Full width on small tablets
+                    md={24}    // 2 per row on tablets
+                    lg={7}     // 3 per row on desktops
+                    xl={7}
+                    style={{ display: 'flex' }}
+                >
+                    <HoverableDiv>
+                        <Card
+                            title={t('courses.credits.title')}
+
+                            style={{
+                                width: '100%',
+                                minHeight: '400px', // Consistent card height
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.09)'
+                            }}
+                        >
+                            <DonutChart
+                                completed={data?.courses_destribution_by_status.Passed.credits_count}
+                                total={data?.total_credits}
+                                height={300}
+                                kkey="something"
+                            />
+                        </Card>
+                    </HoverableDiv>
+                </Col>
             </Row>
             <br />
             <Row >
@@ -135,7 +249,7 @@ const Dashboard: React.FC = () => {
                             }}
                         >
                             <BarChart
-                                data={data}
+                                data={barChartData}
                             />
                         </Card>
                     </HoverableDiv2>
@@ -143,13 +257,12 @@ const Dashboard: React.FC = () => {
 
             </Row>
             <br /><br />
-            <Divider style={{ borderColor: '#038b94' }}>{t("courses.my_courses") }</Divider>
+            <Divider style={{ borderColor: '#038b94' }}>{t("courses.my_courses")}</Divider>
             <br />
             <Row>
-
-                <CoursesList />
+                <CoursesList data={data} />
             </Row>
-          
+
         </>
     );
 };
@@ -173,4 +286,10 @@ const HoverableDiv2 = styled.div`
     box-shadow: 0 10px 20px rgba(3, 139, 148, 0.3);
   }
 `;
-export default Dashboard;
+
+const App = () => (
+    <QueryClientProvider client={queryClient}>
+        <Dashboard />
+    </QueryClientProvider>
+)
+export default App;;
