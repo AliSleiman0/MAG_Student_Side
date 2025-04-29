@@ -65,10 +65,10 @@
     "semester_spring": "Spring Semester",
     "semester_summer": "Summer Semester",
     "title": "Welcome back! It’s ",
-    "registration": ". Registration is currently ",
+    "registration": " Registration is currently ",
     "reg_status_open": "Open",
     "reg_status_closed": "Closed",
-    "contact": ".If you have any questions, do not hesitate to contact your advisor via the build in chatting tool."
+    "contact": ". If you have any questions, do not hesitate to contact your advisor via the built-in chatting tool."
   },
   "courses": {
     "my_courses": "My Courses",
@@ -79,7 +79,7 @@
       "remaining": "Remaining"
     },
     "passed_percentage": {
-      "title": "Percentage of Passed/Taken Courses",
+      "title": "% Passed/Taken Courses",
       "percentage": "Percentage",
       "passed": "Passed",
       "failed": "Failed"

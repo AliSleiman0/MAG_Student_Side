@@ -4,8 +4,8 @@ import { remainingCourses } from './samplecoursesdata';
 import { useTranslation } from 'react-i18next';
 
 interface DonutChartProps {
-    completed: number;
-    total: number;
+    completed: number | undefined;
+    total?: number | undefined | string;
     title?: string;
     height?: number;
     kkey?: string;

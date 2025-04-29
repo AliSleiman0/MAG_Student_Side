@@ -1,5 +1,5 @@
 ﻿import { Row, Col, Typography, Space, Card, Form, TimePicker, Switch } from 'antd';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CalendarOutlined, DownloadOutlined, ImportOutlined, ToolOutlined } from '@ant-design/icons';
 import { useResponsive } from '../../../hooks/useResponsive';
 import AcademicCalendar from '../../../components/AcademicCalendar';
@@ -111,7 +111,7 @@ const permanentCourses = [{
 }];
 
 export default function SchedulingTool() {
-    const [showCourses, setShowCourses] = useState(true); // Default to showing courses
+    const [showCourses, setShowCourses] = useState(false); // Default to showing courses
     // ====================== State Management ======================
     // Schedule constraints and breaks
     const [breaks, setBreaks] = useState<CalendarEvent[]>([]);
@@ -126,6 +126,7 @@ export default function SchedulingTool() {
     const [plannerType, setPlannerType] = useState<"Manual" | "Smart" | "">("");
     const [editingPlanner, setEditingPlanner] = useState(false);
     const [shouldFlash, setShouldFlash] = useState(false);
+    const [shouldFlashGenerate, setShouldFlashGenerate] = useState(false);
 
     // Conflict detection states
     const [conflictingEvent, setConflictingEvent] = useState<CalendarEvent | null>(null);
@@ -153,7 +154,17 @@ export default function SchedulingTool() {
             color: 'rgba(185, 250, 227, 0.6)'
         }] : [];
     });
-
+    useEffect(() => {
+        // Reset all scheduling-related states when planner type changes
+        setSelectedSections({});
+        setBreaks([]);
+        setPendingBreak(null);
+        setPendingSection(null);
+        if (plannerType == 'Smart') {
+            setShouldFlashGenerate(true);
+            setTimeout(() => setShouldFlashGenerate(false), 3000);
+        }
+    }, [plannerType]);
     /** Handle section selection with conflict checking */
     const handleSectionChange = (courseId: string, sectionId: string) => {
         const course = permanentCourses.find(c => c.id === courseId);
@@ -365,7 +376,7 @@ export default function SchedulingTool() {
                                             <IconButton icon={<CalendarOutlined />} text="Switch Planner Type" onClick={() => { setPlannerTypeModalVisible(prev => !prev); setEditingPlanner(true); }} />
 
                                             <IconButton icon={<ImportOutlined />} className={`${shouldFlash ? 'flash-highlight' : ''}`} text="Import Courses" onClick={() => { setCourseModalVisible(prev => !prev); }} />
-                                            {plannerType != "Manual" && <IconButton icon={<DownloadOutlined />} text={'Generate Schedule'} onClick={() => console.log("doNothing")} />}
+                                            {plannerType != "Manual" && <IconButton className={`${shouldFlashGenerate ? 'flash-highlight' : ''}`}  icon={<DownloadOutlined />} text={'Generate Schedule'} onClick={() => console.log("doNothing")} />}
                                         </Space >
                                     </Col>
                                 </Row>)}
@@ -507,7 +518,8 @@ export default function SchedulingTool() {
                                 {isTablet && (
                                     <Col flex="none" >
                                         <Space size={8}>
-                                            {plannerType != "Manual" && <IconButton icon={<DownloadOutlined />} text={'Generate Schedule'} onClick={() => console.log("doNothing")} />}
+
+                                            {plannerType != "Manual" && <IconButton icon={<DownloadOutlined />} className={`${shouldFlashGenerate ? 'flash-highlight' : ''}`}  text={'Generate Schedule'} onClick={() => console.log("doNothing")} />}
                                             <IconButton
                                                 icon={<CalendarOutlined />}
                                                 text="Switch Planner Type"
@@ -522,7 +534,6 @@ export default function SchedulingTool() {
                                                 onClick={() => { setCourseModalVisible(prev => !prev); }}
                                                 className={`${shouldFlash ? 'flash-highlight' : ''}`}
                                             />
-
                                         </Space>
                                     </Col>
                                 )}
