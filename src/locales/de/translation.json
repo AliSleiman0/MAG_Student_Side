@@ -143,8 +143,8 @@
     "passed_course": "Bestandener Kurs",
     "registered_course": "Registrierter Kurs",
     "failed_course": "Nicht bestandener Kurs",
-    "source_course": "- = Quellkurs",
-    "target_course": "- = Zielkurs",
+    "source_course": "Quellkurs",
+    "target_course": "Zielkurs",
     "text": "Studienplan von "
   },
   "customised_pos": {

@@ -149,8 +149,8 @@
     "passed_course": "Passed Course",
     "registered_course": "Registered Course",
     "failed_course": "Failed Course",
-    "source_course": "- = Source course",
-    "target_course": "- = Target course",
+    "source_course": "Source course",
+    "target_course": "Target course",
     "text": "Plan of Study of "
   },
   "customised_pos": {

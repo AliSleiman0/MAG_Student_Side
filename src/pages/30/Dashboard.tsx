@@ -76,8 +76,6 @@ const Dashboard: React.FC = () => {
             </div>
         );
     }
-
- 
     const bannerStyles = {
         banner: {
             backgroundColor: '#e3faf8', // Subtle grey matching Ant Design's palette
@@ -101,13 +99,7 @@ const Dashboard: React.FC = () => {
     };
   
     const coursesTakenNumber = (data?.total_courses || 0) - (data?.remaining_courses?.length || 0);
-    //const data = [
-    //    { grade: 'A', count: 8 },
-    //    { grade: 'B', count: 5 },
-    //    { grade: 'C', count: 5 },
-    //    { grade: 'D', count: 8 },
-    //    { grade: 'F', count: 8 },
-    //];
+   
     const barChartData = Object.entries(data?.grades_distribution ?? {}).map(([grade, count]) => ({
         grade: grade || 'Ungraded',  // Handle empty string case
         count: count
