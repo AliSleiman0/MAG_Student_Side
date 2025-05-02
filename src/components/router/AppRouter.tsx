@@ -18,7 +18,7 @@ import NftDashboardPage from '@app/pages/DashboardPages/NftDashboardPage';
 import MedicalDashboardPage from '@app/pages/DashboardPages/MedicalDashboardPage';
 
 import Dashboard from '../../pages/30/Dashboard';
-import GraphComponent from '../../pages/30/POS';
+import GraphComponent from '../../pages/30/POS/POS';
 import AutoPOS from '../../pages/30/AutoPOS';
 import DynamicPOS from '../../pages/30/DyanmicPOS/DynamicPOS';
 import CustomizedPOS from '../../pages/30/CustomizedPOS/CustomizedPOS';

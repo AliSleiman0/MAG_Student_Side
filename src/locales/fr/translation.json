@@ -143,8 +143,8 @@
     "passed_course": "Cours Réussi",
     "registered_course": "Cours Inscrit",
     "failed_course": "Cours Échoué",
-    "source_course": "- = Cours source",
-    "target_course": "- = Cours cible",
+    "source_course": "Cours source",
+    "target_course": "Cours cible",
     "text": "Plan d'études de "
   },
   "customised_pos": {

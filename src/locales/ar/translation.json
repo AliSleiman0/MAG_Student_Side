@@ -143,8 +143,8 @@
     "passed_course": "مادة تم اجتيازها",
     "registered_course": "مادة مسجلة",
     "failed_course": "مادة راسبة",
-    "source_course": "- = المادة المصدر",
-    "target_course": "- = المادة الهدف",
+    "source_course": "المادة المصدر",
+    "target_course": "المادة الهدف",
     "text": "خطة دراسة "
   },
   "customised_pos": {
