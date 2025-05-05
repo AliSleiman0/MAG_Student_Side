@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_URL = 'http://127.0.0.1:8000/api';
-localStorage.setItem('authToken', "bearer 6|mjAgiPkQZ6T9834nxKNt1G9QH6AjnbkboZvPJ9mQ0e2c6d34");
+localStorage.setItem('authToken', "bearer 15|culA8B7kCzbnAM7sst5up4qYJN85ipof4R6mSKEU3245671d");
 // Create axios instance with custom config
 const api = axios.create({
     baseURL: API_URL,

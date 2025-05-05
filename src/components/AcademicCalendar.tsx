@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import { EventInput } from '@fullcalendar/core';
 
-interface CalendarEvent {
+export interface CalendarEvent {
     title: string;
     professor?: string;
     daysOfWeek: number[];
@@ -15,9 +15,11 @@ interface CalendarEvent {
 interface AcademicCalendarProps {
     events: CalendarEvent[];
     mobileOnly?: boolean;
+    key?: string;
 }
 
-const AcademicCalendar: React.FC<AcademicCalendarProps> = ({ events, mobileOnly = false }) => {
+const AcademicCalendar = forwardRef<HTMLDivElement, AcademicCalendarProps>(
+    ({ events, mobileOnly = false }, ref) => {
     const getEventBackground = (event: EventInput) => {
         // Use provided color if available, otherwise use default gradient
         return event.color || 'linear-gradient(150deg, #038b94 0%, #036956 100%)';
@@ -29,7 +31,9 @@ const AcademicCalendar: React.FC<AcademicCalendarProps> = ({ events, mobileOnly 
             borderRadius: "5px",
 
             ...(mobileOnly && { width: 'fit-content' })
-        }}>
+
+        }}
+            ref={ref}>
 
             <FullCalendar
                 plugins={[timeGridPlugin]}
@@ -132,7 +136,9 @@ const AcademicCalendar: React.FC<AcademicCalendarProps> = ({ events, mobileOnly 
                 )}
             />
         </div>
-    );
-};
+        );
+    }
+);
+
 
 export default AcademicCalendar;

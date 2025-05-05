@@ -1,7 +1,7 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import { AppstoreOutlined, LaptopOutlined, MailOutlined, MenuFoldOutlined, MenuUnfoldOutlined, NotificationOutlined, ScheduleOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuProps, TableColumnsType } from 'antd';
-import { Button, Card, Col, ConfigProvider, Layout, Menu, Row, Table } from 'antd';
+import { Alert, Button, Card, Col, ConfigProvider, Layout, Menu, Row, Table } from 'antd';
 import SubMenu from 'antd/lib/menu/SubMenu';
 import { CourseData, Semester_AutoPOS } from '../../../components/Semester_AutoPOS';
 import Modal from 'antd/lib/modal/Modal';
@@ -11,529 +11,98 @@ import Typography from 'antd/lib/typography/Typography';
 import { useResponsive } from '../../../hooks/useResponsive';
 import MobileSiderMenu from '../../../components/sider_DPOS_xs';
 import { useTranslation } from 'react-i18next';
+import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
+import { Course, SemesterInfo, getDynamicPOS } from '../../../apiMAG/automated_pos';
 const { Content, Sider } = Layout;
-interface Corerequisite {
-    courseid: number;
-    prerequisitecourseid: number;
-    corerequisiteid: number | null;
-    created_at: string;
-    updated_at: string;
-}
 
-export interface Course {
-    courseid: number;
-    coursename: string;
-    coursecode: string | null;
-    coursetype: string;
-    credits: number;
-    corerequisites?: Corerequisite[];
-    postrequisitFor?: number;
-    score: number;
-    priority?: number | null
-}
-
-export interface Semester {
-    semester: string,
-    year?: string,
-    courses: Course[],
-    totalCredits?: number;
-}
-
-const CourseOpenedForRegistation: Course[] = [
-    {
-        "courseid": 107,
-        "coursename": "Database Systems",
-        "coursecode": "CS203",
-        "coursetype": "Major",
-        "credits": 3,
-        "corerequisites": [
-
-        ],
-        "postrequisitFor": 2,
-        "score": 6
+/*****************************
+ * Query Client Configuration
+ *****************************/
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnWindowFocus: false,  // Disable automatic refetch on window focus
+            retry: 3,                     // Retry failed queries 3 times
+            staleTime: 1000 * 60 * 5,     // Data becomes stale after 5 minutes
+        },
     },
-    {
-        "courseid": 109,
-        "coursename": "Operating Systems",
-        "coursecode": "CS205",
-        "coursetype": "Core",
-        "credits": 4,
-        "corerequisites": [
+});
 
-        ],
-        "postrequisitFor": 1,
-        "score": 6
-    },
-    {
-        "courseid": 111,
-        "coursename": "Artificial Intelligence",
-        "coursecode": "CS301",
-        "coursetype": "Major",
-        "credits": 4,
-        "corerequisites": [
-
-        ],
-        "postrequisitFor": 2,
-        "score": 6
-    },
-    {
-        "courseid": 108,
-        "coursename": "Computer Networks",
-        "coursecode": "CS204",
-        "coursetype": "Major",
-        "credits": 3,
-        "corerequisites": [
-
-        ],
-        "postrequisitFor": 1,
-        "score": 5
-    },
-    {
-        "courseid": 113,
-        "coursename": "Computer Graphics",
-        "coursecode": "CS303",
-        "coursetype": "Major",
-        "credits": 3,
-        "corerequisites": [
-
-        ],
-        "postrequisitFor": 1,
-        "score": 5
-    },
-    {
-        "courseid": 119,
-        "coursename": "Capstone Project I",
-        "coursecode": "CS401",
-        "coursetype": "Major",
-        "credits": 3,
-        "corerequisites": [
-
-        ],
-        "postrequisitFor": 1,
-        "score": 5
-    },
-    {
-        "courseid": 110,
-        "coursename": "Software Engineering",
-        "coursecode": "CS206",
-        "coursetype": "Major",
-        "credits": 3,
-        "corerequisites": [],
-        "postrequisitFor": 0,
-        "score": 4
-    },
-    {
-        "courseid": 129,
-        "coursename": "Ethics in Computing",
-        "coursecode": "CS411",
-        "coursetype": "Major",
-        "credits": 2,
-        "corerequisites": [],
-        "postrequisitFor": 0,
-        "score": 4
-    },
-    {
-        "courseid": 125,
-        "coursename": "Blockchain Technology",
-        "coursecode": "CS407",
-        "coursetype": "Major Elective",
-        "credits": 3,
-        "corerequisites": [],
-        "postrequisitFor": 0,
-        "score": 3
-    },
-    {
-        "courseid": 127,
-        "coursename": "Virtual Reality",
-        "coursecode": "CS409",
-        "coursetype": "Major Elective",
-        "credits": 3,
-        "corerequisites": [],
-        "postrequisitFor": 0,
-        "score": 3
-    }
-];
-//].map(course => ({
-//    ...course,
-//    key: course.courseid // Ant Design requires unique keys
-//}));
-var DynamicSemesters: Semester[] = [
-    {
-        "semester": "Fall",
-        "courses": [
-            {
-                "courseid": 107,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major",
-                "credits": 3,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 2,
-                "score": 6
-            },
-            {
-                "courseid": 109,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Core",
-                "credits": 4,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 1,
-                "score": 6
-            },
-            {
-                "courseid": 111,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major",
-                "credits": 4,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 2,
-                "score": 6
-            },
-            {
-                "courseid": 108,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major",
-                "credits": 3,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 1,
-                "score": 5
-            },
-            {
-                "courseid": 113,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major",
-                "credits": 3,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 1,
-                "score": 5
-            },
-            {
-                "courseid": 110,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major",
-                "credits": 3,
-                "corerequisites": [],
-                "postrequisitFor": 0,
-                "score": 4
-            }
-        ]
-    },
-    {
-        "semester": "Spring",
-        "courses": [
-            {
-                "courseid": 112,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major",
-                "credits": 4,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 1,
-                "score": 5
-            },
-            {
-                "courseid": 114,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major",
-                "credits": 3,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 0,
-                "score": 4
-            },
-            {
-                "courseid": 129,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major",
-                "credits": 2,
-                "corerequisites": [],
-                "postrequisitFor": 0,
-                "score": 4
-            },
-            {
-                "courseid": 116,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major Elective",
-                "credits": 3,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 0,
-                "score": 3
-            },
-            {
-                "courseid": 118,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major Elective",
-                "credits": 4,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 0,
-                "score": 3
-            },
-            {
-                "courseid": 122,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major Elective",
-                "credits": 3,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 0,
-                "score": 3
-            }
-        ]
-    },
-    {
-        "semester": "Fall",
-        "courses": [
-            {
-                "courseid": 119,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major",
-                "credits": 3,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 1,
-                "score": 5
-            },
-            {
-                "courseid": 127,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major Elective",
-                "credits": 3,
-                "corerequisites": [],
-                "postrequisitFor": 0,
-                "score": 3
-            },
-            {
-                "courseid": 115,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major",
-                "credits": 3,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 0,
-                "score": 4
-            },
-            {
-                "courseid": 117,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major Elective",
-                "credits": 3,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 1,
-                "score": 4
-            },
-            {
-                "courseid": 121,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major Elective",
-                "credits": 3,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 0,
-                "score": 3
-            },
-            {
-                "courseid": 125,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major Elective",
-                "credits": 3,
-                "corerequisites": [],
-                "postrequisitFor": 0,
-                "score": 3
-            }]
-    },
-    {
-        "semester": "Spring",
-        "courses": [
-            {
-                "courseid": 112,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major",
-                "credits": 4,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 1,
-                "score": 5
-            },
-            {
-                "courseid": 114,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major",
-                "credits": 3,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 0,
-                "score": 4
-            },
-            {
-                "courseid": 129,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major",
-                "credits": 2,
-                "corerequisites": [],
-                "postrequisitFor": 0,
-                "score": 4
-            },
-            {
-                "courseid": 116,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major Elective",
-                "credits": 3,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 0,
-                "score": 3
-            },
-            {
-                "courseid": 118,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major Elective",
-                "credits": 4,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 0,
-                "score": 3
-            },
-            {
-                "courseid": 122,
-                "coursename": "Database Systems",
-                "coursecode": "CS203",
-                "coursetype": "Major Elective",
-                "credits": 3,
-                "corerequisites": [
-
-                ],
-                "postrequisitFor": 0,
-                "score": 3
-            }
-        ]
-    },
-];
-//create priorities based on score
-const calculatePriorities = (courses: Course[]): Course[] => {
-    // 1. Clone and sort by score (descending) and courseid (ascending for tie-breaker)
+/************************************
+ * Priority Calculation Utilities
+ ************************************/
+/**
+ * Assigns course priorities based on score and course ID tie-breaker
+ * @param courses - Array of Course objects
+ * @returns Courses with priority assignments
+ */
+const calculatePriorities = (courses: Course[] | undefined): Course[] | undefined => {
+    if (!courses) return 
+    // Clone and sort by score (descending) and courseid (ascending)
     const sorted = [...courses].sort((a, b) => {
-        // First sort by score descending
-        if (b.score !== a.score) {
-            return b.score - a.score;
-        }
-        // For equal scores, sort by courseid ascending
+        // Primary sort by score
+        if (b.score !== a.score) return b.score - a.score;
+        // Secondary sort by course ID for tie-breaker
         return a.courseid - b.courseid;
     });
 
-    // 2. Assign sequential priorities
+    // Create priority mapping
     const priorityMap = new Map<number, number>();
     sorted.forEach((course, index) => {
-        // Priority starts at 1 and increments by 1 for each course
         priorityMap.set(course.courseid, index + 1);
     });
 
-    // 3. Merge priorities while preserving original order
+    // Merge priorities with original array order
     return courses.map(course => ({
         ...course,
         priority: priorityMap.get(course.courseid)!
     }));
 };
-const processedData = calculatePriorities(CourseOpenedForRegistation).map(course => ({
-    ...course,
-    key: course.courseid
-}));
-// Add temporary console log
-console.log("Processed Data:", processedData);
+function parseCourse(input: string) {
+    // Split the string at the colon
+    const [code, name] = input.split(':').map(str => str.trim());
 
-const computeAcademicYears = (semesters: any[], baseYear: number) => {
-    let currentYear = baseYear;
-    let hasFallOccurred = false;
+    // Extract the level from the course code (first digit after letters)
+    const levelDigit = code.match(/\d/);
+    const level = levelDigit ? parseInt(levelDigit[0]) * 100 : null;
 
-    return semesters.map((semester, index) => {
-        // Calculate academic year based on sequence
-        const academicYear = () => {
-            if (semester.semester === 'Fall') {
-                hasFallOccurred = true;
-                return `${currentYear}-${currentYear + 1}`;
-            }
+    // Return the structured object
+    return {
+        code: code,
+        level: level,
+        name: name
+    };
+}
+// Process course data and add unique keys
 
-            if (semester.semester === 'Spring' && hasFallOccurred) {
-                const year = `${currentYear}-${currentYear + 1}`;
-                currentYear++;
-                hasFallOccurred = false;
-                return year;
-            }
 
-            return `${currentYear}-${currentYear + 1}`;
-        };
 
-        return {
-            ...semester,
-            year: academicYear()
-        };
-    });
-};
-
-DynamicSemesters = computeAcademicYears(DynamicSemesters, new Date().getFullYear());
-
+/************************************
+ * Main Component: DynamicPOS
+ ************************************/
 const DynamicPOS: React.FC = () => {
+    /*************************
+     * Localization Setup
+     *************************/
     const { t } = useTranslation();
     const translateCourseType = (courseType: string) => {
         return t(`courses.course_types.${courseType}` as any) as string;
     };
+    const { data, isLoading, isError, error, refetch } = useQuery(
+        'Dynamic POS',
+        getDynamicPOS,
+        { useErrorBoundary: true }
+    );
+    /*************************
+     * Table Column Definitions
+     *************************/
     const columns: TableColumnsType<Course> = [
         {
-
             title: t("customised_pos.priority"),
             key: 'priority',
             dataIndex: 'priority',
-            // Original score remains hidden but used for sorting
-            sorter: (a, b) => b.score - a.score, // Maintain score-based sorting
+            sorter: (a, b) => b.score - a.score,  // Hidden score-based sorting
             render: (priority) => priority || 'Not ranked',
-            // Visual styling for priority
             className: 'priority-column',
             align: 'center',
             width: '5%'
@@ -550,7 +119,7 @@ const DynamicPOS: React.FC = () => {
             dataIndex: 'coursecode',
             key: 'coursecode',
             width: '5%',
-            render: (code: string | null) => code || 'N/A' // Handle null values
+            render: (code: string | null) => code || 'N/A'
         },
         {
             title: t("customised_pos.type"),
@@ -558,9 +127,7 @@ const DynamicPOS: React.FC = () => {
             key: 'coursetype',
             width: '5%',
             filters: [
-                {
-                    text: 'Core', value: t('courses.course_types.Core')
-                },
+                { text: 'Core', value: t('courses.course_types.Core') },
                 { text: 'Major', value: t('courses.course_types.Major') },
                 { text: 'Major Elective', value: t('courses.course_types.Major Elective') },
                 { text: 'General Requirement', value: t('courses.course_types.General Requirement') },
@@ -576,19 +143,28 @@ const DynamicPOS: React.FC = () => {
             width: '5%',
             sorter: (a, b) => a.credits - b.credits
         },
-
     ];
-    const [semesters, setSemesters] = useState<Semester[]>(DynamicSemesters);
+
+    /*************************
+     * State Management
+     *************************/
+    const [semesters, setSemesters] = useState<SemesterInfo[]>(data?.recommendedforRegestration ?? []);
+
     const [isGeneratedSemesters, setIsGeneratedSemesters] = useState(false);
     const [isFullViewSemesters, setIsFullViewSemesters] = useState(false);
-    const [selectedSemester, setSelectedSemester] = useState<Semester>(DynamicSemesters[0]);
-
-    const totalCredits =
-        selectedSemester?.courses.reduce((sum, c) => sum + c.credits, 0) ?? 0;
-
+    const [selectedSemester, setSelectedSemester] = useState<SemesterInfo | undefined>(data?.recommendedforRegestration[0]);
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [isLoadingGenerate, setIsLoadingGenerate] = useState(false);
     const [shouldFlash, setShouldFlash] = useState(false);
+
+    // Calculate total credits for selected semester
+    const totalCredits = selectedSemester?.courses.reduce((sum, c) => sum + c.credits, 0) ?? 0;
+    const isFirstSemester = selectedSemester === semesters[0];
+    const { isTablet, mobileOnly, tabletOnly, desktopOnly, isDesktop } = useResponsive();
+
+    /*************************
+     * Handler Functions
+     *************************/
     const handleGenerateSemesters = () => {
         setIsLoadingGenerate(true);
         setTimeout(() => {
@@ -604,19 +180,89 @@ const DynamicPOS: React.FC = () => {
         setIsFullViewSemesters(state => !state);
     };
 
-
-    const handleSemesterSelect = (semester: Semester) => {
+    const handleSemesterSelect = (semester: SemesterInfo) => {
         setSelectedSemester(semester);
-        const totalCredits = semester.courses.reduce((sum, c) => sum + c.credits, 0);
         setIsFullViewSemesters(false);
     };
-    const isFirstSemester = selectedSemester === semesters[0];
-    const { isTablet, mobileOnly, tabletOnly, desktopOnly, isDesktop } = useResponsive();
-   
+
+    /*************************
+     * Data Fetching & Rendering
+     *************************/
+    useEffect(() => {
+        if (data?.recommendedforRegestration) {
+            setSemesters(data.recommendedforRegestration);
+            setSelectedSemester(data.recommendedforRegestration[0]);
+            setIsGeneratedSemesters(false);
+            setShouldFlash(false);
+
+            // Store in sessionStorage instead
+            sessionStorage.setItem(
+                "coursesRecommendedDynamic",
+                JSON.stringify(data.offeredCourses[0])
+            );
+
+        }
+    }, [data]);
+
+    /*************************
+     * Derived Data Calculations
+     *************************/
+    const dataWithPrioirities = useMemo(() => {
+        if (!data?.recommendedforRegestration?.[0]?.courses) return [];
+
+        return calculatePriorities(data.offeredCourses[0].courses)?.map((course: Course) => ({ ...course, key: course.courseid }));
+    }, [data?.recommendedforRegestration]); // <-- Only recalculates when courses change
+    
+    const processedData = useMemo(() => {
+        return dataWithPrioirities?.map((course: Course) =>
+        ({
+            ...course,
+            coursename: parseCourse(course.coursename).name,
+            coursecode: parseCourse(course.coursename).code,
+        }));
+    }, [dataWithPrioirities]);
+    if (isLoading) {
+        return (
+            <div style={{ textAlign: 'center', padding: '64px' }}>
+                <Spin size="large" tip="Loading Data..." />
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <div style={{ padding: '32px' }}>
+                <Alert
+                    message="Connection Error"
+                    description={error instanceof Error ? error.message : 'Failed to load advisors'}
+                    type="error"
+                    showIcon
+                    action={
+                        <button
+                            onClick={() => refetch()}
+                            style={{
+                                marginTop: '16px',
+                                padding: '8px 16px',
+                                cursor: 'pointer',
+                                backgroundColor: '#1890ff',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '4px'
+                            }}
+                        >
+                            Retry
+                        </button>
+                    }
+                />
+            </div>
+        );
+    }
+
+    console.log(data);
     return (
-
-        <Layout style={{ background: '#e7f2f3' }}>
-
+        // <pre>{JSON.stringify(data, null, 2)}</pre>
+        <>  <Layout style={{ background: '#e7f2f3' }}>
+           
             <Modal
                 title={t("customised_pos.modal_title_generate")}
                 style={{ marginTop: "50px" }}
@@ -684,7 +330,9 @@ const DynamicPOS: React.FC = () => {
                                     <Menu.Item
                                         key={`generated-semester-${index}`}
                                         onClick={() => handleSemesterSelect(sem)}
+                                        icon={<ScheduleOutlined style={{ fontSize:"0.85rem"}} />}
                                         className="generated-semester-item"
+                                        style={{ fontSize: "0.85rem"}}
                                     >
                                         {sem.semester == "Fall" ? t("welcome.semester_fall") : sem.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} {sem.year}
                                     </Menu.Item>
@@ -706,7 +354,7 @@ const DynamicPOS: React.FC = () => {
 
 
 
-            <Layout style={{ background: '#f5f7fa', position: "relative" }}>
+            <Layout style={{ background: '#f5f7fa' }}>
 
                 <div style={{
                     display: 'flex',
@@ -718,9 +366,10 @@ const DynamicPOS: React.FC = () => {
                     {isGeneratedSemesters && (
                         <Button
                             style={{
-                                zIndex: 444,
+                             
                                 width: mobileOnly ? '190px' : '30%',
-                                position: "absolute",
+                                marginRight: "10px",
+                                marginTop: "10px",
                                 fontSize: mobileOnly ? '0.6rem' : '1rem'
                             }}
                             className={shouldFlash ? 'flash-highlight' : ''}
@@ -735,9 +384,9 @@ const DynamicPOS: React.FC = () => {
                             style={{
                                 background: '#038b94',
                                 color: 'white',
-                                zIndex: 444,
+                            
                                 width: mobileOnly ? '190px' : '30%',
-                                position: "absolute",
+                              
                                 flexWrap: "wrap",
                                 fontSize: mobileOnly ? '0.6rem' : '1rem',
 
@@ -748,7 +397,7 @@ const DynamicPOS: React.FC = () => {
                     )}
                 </div>
 
-                <Content style={{ padding: '24px', margin: 0, marginTop: mobileOnly ? "36px" : "" }}>
+                <Content style={{ padding: '12px', margin: 0, marginTop: mobileOnly ? "36px" : "" }}>
                     {(!isFullViewSemesters && isFirstSemester) &&
                         <Typography
                             style={{
@@ -765,13 +414,13 @@ const DynamicPOS: React.FC = () => {
                     }
                     {isFullViewSemesters ? (
                         <div style={{ margin: '0 auto' }}>
-                            <Row gutter={[150, 48]}>
+                            <Row gutter={[50, 48]}>
                                 {semesters?.map((semester, index) => {
                                     const totalCredits = semester.courses.reduce((sum, c) => sum + c.credits, 0);
                                     return (
                                         <Col key={index} xs={24} md={12} lg={12}>
                                             <SemesterDetailView
-                                                title={`Best Plan for ${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} - ${semester.year}`}
+                                                title={`Best Plan for ${selectedSemester?.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester?.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} - ${semester.year}`}
                                                 credits={totalCredits}
                                                 courseList={semester.courses}
                                                 Upcoming={index === 0 ? t("customised_pos.upcoming") : ""}
@@ -828,13 +477,14 @@ const DynamicPOS: React.FC = () => {
                                                     credits={totalCredits}
                                                     courseList={selectedSemester.courses}
                                                     Upcoming={t("customised_pos.upcoming")}
+                                                    height="fit-content"
                                                 />
                                             </Col>
                                         </>
                                     ) : (
                                         <Col xs={24} md={24} lg={16} style={{ height: "100%", width: "100%" }}>
                                             <SemesterDetailView
-                                                    title={`${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} } – ${selectedSemester.year}`}
+                                                    title={`${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} – ${selectedSemester.year}`}
                                                 credits={totalCredits}
                                                 courseList={selectedSemester.courses}
                                             />
@@ -849,7 +499,7 @@ const DynamicPOS: React.FC = () => {
 
             </Layout>
         </Layout >
-
+        </>
     );
 };
 
@@ -862,6 +512,11 @@ const SemesterDetailView = (courseData: CourseData) => (
     </>
 
 );
+const App = () => (
+    <QueryClientProvider client={queryClient}>
+        <DynamicPOS />
+    </QueryClientProvider>
+);
 
+export default App;
 
-export default DynamicPOS;

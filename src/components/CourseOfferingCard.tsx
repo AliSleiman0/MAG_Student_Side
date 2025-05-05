@@ -22,10 +22,10 @@ interface CourseSection {
 
 interface CourseCardProps {
     course: {
-        id: string;
-        code: string;
-        name: string;
-        credits: number;
+        id?: string | number;
+        code?: string |number;
+        name?: string;
+        credits?: number;
         sections: CourseSection[];
     };
     selectedSectionId?: string;
