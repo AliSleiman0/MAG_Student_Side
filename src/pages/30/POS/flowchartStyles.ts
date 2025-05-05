@@ -76,7 +76,7 @@ export const LegendItem = styled.div`
   display: flex;
   align-items: center;
   margin: 8px 0;
-  font-size:1.15rem;
+  font-size:1.1rem;
 `;
 
 export const ColorSwatch = styled.div<{ color: string, border:string }>`

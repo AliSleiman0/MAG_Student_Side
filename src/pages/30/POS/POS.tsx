@@ -474,151 +474,154 @@ export const Flowchart = () => {
     //<pre>{JSON.stringify(data, null, 2)}</pre>
     return (
         <>
-            {isLoading && <Spin className="overlay" tip={t('Loading data...')} />}
-            {isError && <Alert message={t('Error Loading Data')} description={error instanceof Error ? error.message : t('Unknown error')} type="error" showIcon action={<button onClick={() => refetch()}>{t('Retry')}</button>} />}
+            {isLoading ? (<div style={{ textAlign: 'center', padding: '64px' }}>
+                <Spin size="large" tip="Loading Data..." />
+            </div>) : (
 
-            <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-                <Col span={24}>
-                    <div style={bannerStyles.banner}>
-                        <Space align="center">
-                            {/* Info icon */}
-                            <InfoCircleOutlined style={bannerStyles.icon} />
+                <>
+                    <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+                        <Col span={24}>
+                            <div style={bannerStyles.banner}>
+                                <Space align="center">
+                                    {/* Info icon */}
+                                    <InfoCircleOutlined style={bannerStyles.icon} />
 
-                            {/* Dynamic content */}
-                            <Typography.Text
-                                style={{ ...bannerStyles.text, ...bannerStyles.responsiveText }}
-                            >
-                                {t("pos.text")} [Computer and Commmunication Engineering]
+                                    {/* Dynamic content */}
+                                    <Typography.Text
+                                        style={{ ...bannerStyles.text, ...bannerStyles.responsiveText }}
+                                    >
+                                        {t("pos.text")} [Computer and Commmunication Engineering]
 
-                            </Typography.Text>
-                        </Space>
-                    </div>
-                </Col>
-            </Row>
-            <Row style={{ width: "100%" }}>
-                <Col style={{ bottom: "5px", fontSize: mobileOnly ? "0.6rem" : "1rem", border: "2px solid #038b94", borderRadius: "18px", padding: "10px", width: "100%", boxShadow:"4px 2px 8px rgba(0,0,0,0.3)" }}>
-                    <Row style={{ fontWeight: '600', color: '#038b94' }}>
-                        Courses Legends:
-                    </Row>
-
-                    <Row  gutter={[20, 0]} justify="center">
-                        <Col>
-                            <LegendItem>
-                                <ColorSwatch color="#06c2bf" border="1px solid "/>
-                                <span>Passed</span>
-                            </LegendItem>
-                        </Col>
-                        <Col>
-                            <LegendItem>
-                                <ColorSwatch color="#defeff" border="1px solid #038b94" />
-                                <span>Registered</span>
-                            </LegendItem>
-                        </Col>  <Col>
-                            <LegendItem>
-                                <ColorSwatch color="#f8fab4" border="1px solid #000000" />
-                                <span>Can Register</span>
-                            </LegendItem>
-                        </Col>   <Col>
-                            <LegendItem>
-                                <ColorSwatch color="#ffebee" border="1px solid #b71c1c" />
-                                <span>Cannot Register</span>
-                            </LegendItem>
-                        </Col>
-
-                        <Col>
-                            <LegendItem>
-                                <SolidLine />
-                                <span>{t("pos.prerequisites")}</span>
-                            </LegendItem>
-                        </Col>   <Col>
-                            <LegendItem>
-                                <DashedLine />
-                                <span>{t("pos.corequisites")}</span>
-                            </LegendItem>
-                        </Col>
-                        <Col style={{ fontSize: '1rem', color: '#666', marginTop: '12px' }}>
-                            <div>● = {t("pos.source_course")}</div>
-
-                        </Col>
-                        <Col style={{ fontSize: '1rem', color: '#666', marginTop: '12px' }}>
-                            <div>&gt; = {t("pos.target_course")}</div>
-                        </Col>
-                    </Row>
-
-                </Col>
-            </Row >
-            <FlowchartContext.Provider value={{ showCorequisites, showCourseStatus, }}>
-
-                <div style={{ position: 'relative' }}>
-                    <Space style={{
-                        position: 'absolute',
-                        top: 10,
-                        right: mobileOnly ? 4 : 10,
-                        fontSize: mobileOnly ? "0.55rem" : "1rem",
-                        zIndex: 1000,
-                        background: 'white',
-                        padding: 8,
-                        borderRadius: 4,
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-                    }}>
-                        <Switch
-                            checkedChildren={<CheckOutlined />}
-                            unCheckedChildren={<CloseOutlined />}
-                            checked={showCourseStatus}
-                            onChange={setShowCourseStatus}
-                            style={{ marginRight: 8 }}
-                        />
-                        <span style={{ marginRight: "10px" }}>{t("pos.show")}</span>
-                        <Switch
-                            checkedChildren={<CheckOutlined />}
-                            unCheckedChildren={<CloseOutlined />}
-                            checked={showPrerequisites}
-                            onChange={setShowPrerequisites}
-                            style={{ marginRight: 8 }}
-                        />
-                        <span>{t("pos.prerequisites")}</span>
-
-                        <Switch
-                            checkedChildren={<CheckOutlined />}
-                            unCheckedChildren={<CloseOutlined />}
-                            checked={showCorequisites}
-                            onChange={setShowCorequisites}
-                            style={{ marginLeft: 16, marginRight: 8 }}
-                        />
-                        <span>{t("pos.corequisites")}</span>
-
-
-                    </Space>
-                    <FlowchartContainer ref={containerRef} />
-                    {activeTooltip && (
-                        <div className="tooltip-container"
-                            style={{
-                                position: 'fixed',
-                                left: mousePosition.x,
-                                top: mousePosition.y,
-                                background: '#038b94',
-                                color: 'white',
-                                padding: 12,
-                                borderRadius: 6,
-                                boxShadow: '0 3px 6px rgba(0,0,0,0.16)',
-                                zIndex: 100,
-                                minWidth: 150,
-                                pointerEvents: 'none',
-                                transition: 'transform 0.1s ease-out'
-                            }}
-                        >
-                            <h4 style={{ margin: 0, color: 'white', fontSize: "0.8rem" }}>
-                                {tooltip.content.name}
-                            </h4>
-                            <div style={{ marginTop: 8, fontSize: "0.8rem" }}>
-                                <div>{t("pos.prerequisites")}: {(tooltip.content.prerequisites || []).join(', ') || 'None'}</div>
-                                <div>{t("pos.corequisites")}: {(tooltip.content.corequisites || []).join(', ') || 'None'}</div>
+                                    </Typography.Text>
+                                </Space>
                             </div>
+                        </Col>
+                    </Row>
+                    <Row style={{ width: "100%" }}>
+                        <Col style={{ bottom: "5px", fontSize: mobileOnly ? "0.6rem" : "1rem", border: "2px solid #038b94", borderRadius: "18px", padding: "10px", width: "100%", boxShadow: "4px 2px 8px rgba(0,0,0,0.3)" }}>
+                            <Row style={{ fontWeight: '600', color: '#038b94' }}>
+                                Courses Legends:
+                            </Row>
+
+                            <Row gutter={[20, 0]} justify="center">
+                                <Col>
+                                    <LegendItem>
+                                        <ColorSwatch color="#06c2bf" border="1px solid " />
+                                        <span>Passed</span>
+                                    </LegendItem>
+                                </Col>
+                                <Col>
+                                    <LegendItem>
+                                        <ColorSwatch color="#defeff" border="1px solid #038b94" />
+                                        <span>Registered</span>
+                                    </LegendItem>
+                                </Col>  <Col>
+                                    <LegendItem>
+                                        <ColorSwatch color="#f8fab4" border="1px solid #000000" />
+                                        <span>Can Register</span>
+                                    </LegendItem>
+                                </Col>   <Col>
+                                    <LegendItem>
+                                        <ColorSwatch color="#ffebee" border="1px solid #b71c1c" />
+                                        <span>Cannot Register</span>
+                                    </LegendItem>
+                                </Col>
+
+                                <Col>
+                                    <LegendItem>
+                                        <SolidLine />
+                                        <span>{t("pos.prerequisites")}</span>
+                                    </LegendItem>
+                                </Col>   <Col>
+                                    <LegendItem>
+                                        <DashedLine />
+                                        <span>{t("pos.corequisites")}</span>
+                                    </LegendItem>
+                                </Col>
+                                <Col style={{ fontSize: '1rem', color: '#666', marginTop: '12px' }}>
+                                    <div>● = {t("pos.source_course")}</div>
+
+                                </Col>
+                                <Col style={{ fontSize: '1rem', color: '#666', marginTop: '12px' }}>
+                                    <div>&gt; = {t("pos.target_course")}</div>
+                                </Col>
+                            </Row>
+
+                        </Col>
+                    </Row >
+                    <FlowchartContext.Provider value={{ showCorequisites, showCourseStatus, }}>
+
+                        <div style={{ position: 'relative' }}>
+                            <Space style={{
+                                position: 'absolute',
+                                top: 10,
+                                right: mobileOnly ? 4 : 10,
+                                fontSize: mobileOnly ? "0.55rem" : "1rem",
+                                zIndex: 1000,
+                                background: 'white',
+                                padding: 8,
+                                borderRadius: 4,
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                            }}>
+                                <Switch
+                                    checkedChildren={<CheckOutlined />}
+                                    unCheckedChildren={<CloseOutlined />}
+                                    checked={showCourseStatus}
+                                    onChange={setShowCourseStatus}
+                                    style={{ marginRight: 8 }}
+                                />
+                                <span style={{ marginRight: "10px" }}>{t("pos.show")}</span>
+                                <Switch
+                                    checkedChildren={<CheckOutlined />}
+                                    unCheckedChildren={<CloseOutlined />}
+                                    checked={showPrerequisites}
+                                    onChange={setShowPrerequisites}
+                                    style={{ marginRight: 8 }}
+                                />
+                                <span>{t("pos.prerequisites")}</span>
+
+                                <Switch
+                                    checkedChildren={<CheckOutlined />}
+                                    unCheckedChildren={<CloseOutlined />}
+                                    checked={showCorequisites}
+                                    onChange={setShowCorequisites}
+                                    style={{ marginLeft: 16, marginRight: 8 }}
+                                />
+                                <span>{t("pos.corequisites")}</span>
+
+
+                            </Space>
+                            <FlowchartContainer ref={containerRef} />
+                            {activeTooltip && (
+                                <div className="tooltip-container"
+                                    style={{
+                                        position: 'fixed',
+                                        left: mousePosition.x,
+                                        top: mousePosition.y,
+                                        background: '#038b94',
+                                        color: 'white',
+                                        padding: 12,
+                                        borderRadius: 6,
+                                        boxShadow: '0 3px 6px rgba(0,0,0,0.16)',
+                                        zIndex: 100,
+                                        minWidth: 150,
+                                        pointerEvents: 'none',
+                                        transition: 'transform 0.1s ease-out'
+                                    }}
+                                >
+                                    <h4 style={{ margin: 0, color: 'white', fontSize: "0.8rem" }}>
+                                        {tooltip.content.name}
+                                    </h4>
+                                    <div style={{ marginTop: 8, fontSize: "0.8rem" }}>
+                                        <div>{t("pos.prerequisites")}: {(tooltip.content.prerequisites || []).join(', ') || 'None'}</div>
+                                        <div>{t("pos.corequisites")}: {(tooltip.content.corequisites || []).join(', ') || 'None'}</div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    )}
-                </div>
-            </FlowchartContext.Provider>
-         
+                    </FlowchartContext.Provider>
+                </>
+            )}
         </>
 
     );

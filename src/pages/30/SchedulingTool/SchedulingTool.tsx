@@ -1,6 +1,6 @@
-﻿import { Row, Col, Typography, Space, Card, Form, TimePicker, Switch } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
-import { CalendarOutlined, DownloadOutlined, ImportOutlined, ToolOutlined } from '@ant-design/icons';
+﻿import { Row, Col, Typography, Space, Card, Form, Checkbox, Collapse, Segmented, notification } from 'antd';
+import { useEffect, useRef, useState } from 'react';
+import { CalendarOutlined, CaretRightOutlined, DownloadOutlined, ImportOutlined, LoadingOutlined, SaveOutlined, ToolOutlined } from '@ant-design/icons';
 import { useResponsive } from '../../../hooks/useResponsive';
 import AcademicCalendar from '../../../components/AcademicCalendar';
 import PlannerTypeModal from '../../../components/ PlannerTypeModal';
@@ -10,15 +10,18 @@ import IconButton from '../../../components/IconButton';
 import Banner from '../../../components/Banner';
 import './SchedulingTool.styles.css';
 import EmptyCourseCard from '../../../components/EmptyCourseCard';
-import moment from 'moment';
 import { ConflictModal } from '../../../components/TimeConflictModal';
 import { AddBreakModal } from '../../../components/AddBreakModal';
 import BreaksCard from '../../../components/BreaksCard';
-import { CourseOpenedForRegistation } from '../CustomizedPOS/CustomizedPOS';
-
 import CourseCard from '../../../components/CourseOfferingCard';
 import styled from 'styled-components';
-import CourseCardOfferingSmart, { CourseSection } from '../../../components/CourseCardOfferingSmart';
+import { CourseScheduleOutput, CourseSchedulePreferences, GetSmartSchedule, ScheduleRequestInput, ScheduledSection, Section, postCourseSchedule } from '../../../apiMAG/scheduling_tool';
+import { useMutation } from 'react-query';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import Spin from 'antd/es/spin';
+import DaysButton from '../../../components/DaysButton';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 // ====================== Interfaces ======================
 /** 
  * Represents a calendar event with scheduling details
@@ -53,65 +56,66 @@ interface Course {
         instructor: string;
     }[];
 }
-const permanentCourses = [{
-    id: 'math151',
-    code: 'MATH 151',
-    name: 'Calculus I',
-    credits: 4,
-    sections: [{
-        id: 'section1',
-        name: 'Section 1',
-        schedule: 'Mon/Wed/Fri: 8:00-9:50',
-        daysOfWeek: [1, 3, 5], // Monday, Wednesday, Friday
-        startTime: '8:00',
-        endTime: '9:50',
-        instructor: 'Prof. Taylor'
-    },
-    {
-        id: 'section2',
-        name: 'Section 2',
-        schedule: 'Tue/Thu: 11:00-12:30',
-        daysOfWeek: [2, 4],
-        startTime: '11:00',
-        endTime: '12:30',
-        instructor: 'Prof. Smith'
-    },
-    {
-        id: 'section3',
-        name: 'Section 3',
-        schedule: 'Tue/Thu: 11:00-12:30',
-        daysOfWeek: [2, 4],
-        startTime: '11:00',
-        endTime: '12:30',
-        instructor: 'Prof. Ahmad'
-    }]
-}, {
-    id: 'math101',
-    code: 'MATH 101',
-    name: 'Calculus II',
-    credits: 4,
-    sections: [{
-        id: 'section1',
-        name: 'Section 1',
-        schedule: 'Mon/Wed/Fri: 12:00-13:50',
-        daysOfWeek: [1, 3, 5], // Monday, Wednesday, Friday
-        startTime: '12:00',
-        endTime: '13:50',
-        instructor: 'Prof. Taylor'
-    },
-    {
-        id: 'section2',
-        name: 'Section 2',
-        schedule: 'Tue/Thu: 16:00-16:50',
-        daysOfWeek: [2, 4],
-        startTime: '16:00',
-        endTime: '16:50',
-        instructor: 'Prof. Smith'
-    }]
-}];
 
-export default function SchedulingTool() {
-    const [showCourses, setShowCourses] = useState(false); // Default to showing courses
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnWindowFocus: false,  // Disable automatic refetch on window focus
+            retry: 3,                     // Retry failed queries 3 times
+            staleTime: 1000 * 60 * 5,     // Data becomes stale after 5 minutes
+        },
+    },
+});
+
+const SchedulingTool = () => {
+    const printRef =useRef(null);
+
+    const handleDownloadPdf = async () => {
+        const element = printRef.current;
+        if (!element) {
+            return;
+        }
+
+        const canvas = await html2canvas(element, {
+            scale: 2,
+        });
+        const data = canvas.toDataURL("image/png");
+
+        const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "px",
+            format: "a4",
+        });
+
+        const imgProperties = pdf.getImageProperties(data);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+
+        const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
+
+        pdf.addImage(data, "PNG", 0, 0, pdfWidth, pdfHeight);
+        pdf.save("examplepdf.pdf");
+    };
+    const [savedEvents, setSavedEvents] = useState<CalendarEvent[]>([]);
+
+    // 2. Load saved events on component mount
+    useEffect(() => {
+        const saved = localStorage.getItem('savedCalendarEvents');
+        if (saved) {
+            setSavedEvents(JSON.parse(saved));
+        }
+    }, []);
+
+    // 3. Save button handler
+    const handleSaveCalendar = () => {
+        const currentEvents = isGenerateSchedule
+            ? [...calendarEventsState, ...breaks]
+            : [...calendarEventsToBeAdded, ...breaks];
+
+        localStorage.setItem('savedCalendarEvents', JSON.stringify(currentEvents));
+        setSavedEvents(currentEvents);
+    };
+
+
     // ====================== State Management ======================
     // Schedule constraints and breaks
     const [breaks, setBreaks] = useState<CalendarEvent[]>([]);
@@ -119,11 +123,16 @@ export default function SchedulingTool() {
 
     // Modal visibility states
     const [isModalBreaksVisible, setIsModalBreaksVisible] = useState(false);
-    const [plannerTypeModalVisible, setPlannerTypeModalVisible] = useState(true);
+    const [plannerTypeModalVisible, setPlannerTypeModalVisible] =
+        useState<boolean>(false);
     const [courseModalVisible, setCourseModalVisible] = useState(false);
 
     // UI/UX states
-    const [plannerType, setPlannerType] = useState<"Manual" | "Smart" | "">("");
+    // 1) Grab whatever is in sessionStorage (or `""` if nothing)
+
+
+    // 2) Seed your two useStates
+    const [plannerType, setPlannerType] = useState<"Manual" | "Smart" | "">("Manual");
     const [editingPlanner, setEditingPlanner] = useState(false);
     const [shouldFlash, setShouldFlash] = useState(false);
     const [shouldFlashGenerate, setShouldFlashGenerate] = useState(false);
@@ -136,15 +145,16 @@ export default function SchedulingTool() {
 
     // Course selection state
     const [selectedSections, setSelectedSections] = useState<Record<string, string>>({});
+    const [courseOfferings, setCourseOfferings] = useState<CourseScheduleOutput[]>([]);
+    const [coursesOfferingsInput, setCoursesOfferingsInput] = useState<any[]>([]);
+    const [sourceType, setSourceType] = useState<"CUS" | "AUTO" | "">("");
 
-    const [SourceType, setSourceType] = useState<"CUS" | "AUTO" | "">("");
-    // ====================== Smart starts here Functionality ======================
-    const [selectedPrefferedSections, setSelectedPrefferedSections] = useState<CourseSection>();
     // ====================== Core Functionality ======================
+
     /** Convert course sections to calendar events */
-    const calendarEventsToBeAdded = permanentCourses.flatMap(course => {
+    const calendarEventsToBeAdded = coursesOfferingsInput.flatMap(course => {
         const selectedSectionId = selectedSections[course.id];
-        const section = course.sections.find(s => s.id === selectedSectionId);
+        const section = course.sections.find((s: any) => s.id === selectedSectionId);
         return section ? [{
             title: course.code,
             startTime: section.startTime,
@@ -154,6 +164,58 @@ export default function SchedulingTool() {
             color: 'rgba(185, 250, 227, 0.6)'
         }] : [];
     });
+    const {
+        mutate,
+        data: scheduleData,    // <-- this is CourseScheduleOutput[] | undefined
+        isSuccess,
+        isLoading,
+        isError,
+        error,
+    } = useMutation<CourseScheduleOutput[], Error, ScheduleRequestInput>(
+
+        payload => postCourseSchedule(payload),
+        {
+            mutationKey: ['courses-offerings'],  // 🚨 Add unique key
+            onSuccess: (data: CourseScheduleOutput[]) => {
+                setCourseOfferings(data);
+                sessionStorage.setItem('generatedSchedule', JSON.stringify(data));
+            },
+            onError: (error: Error) => {
+                console.error('Schedule generation failed:', error);
+                notification.error({
+                    message: t('common.error'),
+                    description: t('scheduling.generation_failed'),
+                });
+            }
+        }
+    );
+    useEffect(() => {
+        if (!scheduleData) return;
+
+        const transformed = scheduleData.map(course => ({
+            id: course.coursecode.toLowerCase(),
+            code: course.coursecode.replace(/^([A-Za-z]+)(\d+)$/, '$1 $2'),
+            name: course.coursename,
+            credits: course.credits,
+            sections: course.sections.map((section, indx) => {
+                const days = section.days.split(',').join('/');
+                return {
+                    id: `section${indx + 1}`,
+                    name: `Section ${indx + 1}`,
+                    schedule: `${days}: ${section.startTime.slice(0, 5)}–${section.endTime?.slice(0, 5)}`,
+                    daysOfWeek: section.daysOfWeek,
+                    startTime: section.startTime.slice(0, 5),
+                    endTime: section.endTime?.slice(0, 5),
+                    instructor: section.instructor,
+                };
+            }),
+        }));
+
+        setCoursesOfferingsInput(transformed);
+        console.log("coursesOfferings", transformed);
+    }, [scheduleData]);
+
+
     useEffect(() => {
         // Reset all scheduling-related states when planner type changes
         setSelectedSections({});
@@ -164,11 +226,12 @@ export default function SchedulingTool() {
             setShouldFlashGenerate(true);
             setTimeout(() => setShouldFlashGenerate(false), 3000);
         }
+
     }, [plannerType]);
     /** Handle section selection with conflict checking */
     const handleSectionChange = (courseId: string, sectionId: string) => {
-        const course = permanentCourses.find(c => c.id === courseId);
-        const section = course?.sections.find(s => s.id === sectionId);
+        const course = coursesOfferingsInput.find(c => c.id === courseId);
+        const section = course?.sections.find((s: any) => s.id === sectionId);
 
         if (!section) return;
 
@@ -195,6 +258,7 @@ export default function SchedulingTool() {
                 [courseId]: sectionId
             }));
         }
+
     };
 
     // ====================== Event Handlers ======================
@@ -206,11 +270,69 @@ export default function SchedulingTool() {
     const handlePlannerSelect = (type: "Manual" | "Smart") => {
         setPlannerType(type);
         setPlannerTypeModalVisible(false);
+        localStorage.removeItem('savedCalendarEvents');
+        setSavedEvents([]);
     };
-    const handleSourceSelect = (type: "CUS" | "AUTO") => {
+    const getStoredScheduleInput = (
+        type: 'CUS' | 'AUTO'
+    ): ScheduleRequestInput | null => {
+        const key =
+            type === 'CUS'
+                ? 'coursesRecommendedCustomized'
+                : 'coursesRecommendedDynamic';
+
+        const raw = sessionStorage.getItem(key);
+        if (!raw) return null;
+
+        try {
+            return JSON.parse(raw) as ScheduleRequestInput;
+        } catch (err) {
+            console.error('Could not parse stored schedule payload:', err);
+            return null;
+        }
+    };
+    function parseCourse(input: string) {
+        // Split the string at the colon
+        const [code, name] = input.split(':').map(str => str.trim());
+
+        // Extract the level from the course code (first digit after letters)
+        const levelDigit = code.match(/\d/);
+        const level = levelDigit ? parseInt(levelDigit[0]) * 100 : null;
+
+        // Return the structured object
+        return {
+            code: code,
+            level: level,
+            name: name
+        };
+    }
+    const handleSourceSelect = (type: 'CUS' | 'AUTO') => {
+        console.log("type", type);
         setSourceType(type);
+        const payload = getStoredScheduleInput(type);
+        console.log("payload", payload);
+        if (payload) {
+            mutate({
+                courseids: payload.courses.flatMap
+                    ((course: any) => (
+                        [{
+                            courseid: course.courseid,
+                            coursename: parseCourse(course.coursename).name,
+                            coursecode: parseCourse(course.coursename).code,
+                            coursetype: course.coursetype,
+                            credits: course.credits
+                        }]
+                    )),
+                semester: payload.semester,
+                year: payload.year
+            });
+
+
+            console.log("payload", payload);
+        }
         setCourseModalVisible(false);
     };
+
 
     /** Break management functions */
     const handleAddBreak = () => {
@@ -302,7 +424,197 @@ export default function SchedulingTool() {
     const [form] = Form.useForm();
     const { mobileOnly, isTablet } = useResponsive();
     const { t } = useTranslation();
+    ////////////////////////////////////SMART OFFERING SELECTION STUFF
+    const [activeKey, setActiveKey] = useState<string | string[]>([]);
+    const [selectedTabs, setSelectedTabs] = useState<{ [courseId: string]: string }>({});
 
+    const [courseProfessors, setCourseProfessors] = useState<Record<number, string[]>>(() => {
+        const init: Record<number, string[]> = {};
+        coursesOfferingsInput.forEach(c => {
+            init[c.courseid] = [];
+        });
+        return init;
+    });
+
+
+    const [selectedSectionsSmart, setSelectedSectionsSmart] = useState<Record<number, string[]>>(() => {
+        const init: Record<number, string[]> = {};
+        coursesOfferingsInput.forEach(c => {
+            init[c.courseid] = [];
+        });
+        return init;
+    });
+    const handleProfessorToggle = (
+        courseId: number,
+        professor: string,
+        checked: boolean
+    ) => {
+        // 1) Update the professor-map
+        setCourseProfessors(prevProfMap => {
+            const current = prevProfMap[courseId] || [];
+            const updatedProfs = checked
+                ? [...current, professor]
+                : current.filter(p => p !== professor);
+
+            // 2) Prune/reset selectedSectionsSmart *for this course only*
+            setSelectedSectionsSmart(prevSectionsMap => {
+                // find this course's full offering
+                const course = coursesOfferingsInput.find(c => c.id === courseId)!;
+                const allIds = course.sections.map((s: Section) => s.id);
+
+                // compute the new list for this course:
+                let newSectionList: string[];
+                if (updatedProfs.length === 0) {
+                    // no profs selected → select ALL sections
+                    newSectionList = allIds;
+                } else {
+                    // keep only sections taught by a still-selected prof
+                    newSectionList = allIds.filter((id: number) => {
+                        const sec = course.sections.find((s: Section) => s.id === id)!;
+                        return updatedProfs.includes(sec.instructor);
+                    });
+                }
+
+                // return a brand-new map, updating only this course's bucket
+                return {
+                    ...prevSectionsMap,
+                    [courseId]: newSectionList
+                };
+            });
+
+            // finally, return the updated prof-map
+            return { ...prevProfMap, [courseId]: updatedProfs };
+        });
+    };
+
+
+
+    const handleSectionToggle = (
+        courseId: number,
+        sectionId: string,
+        checked: boolean
+    ) => {
+        setSelectedSectionsSmart(prev => {
+            const currentSections = prev[courseId] ?? [];
+
+            const updatedSections = checked
+                ? Array.from(new Set([...currentSections, sectionId]))
+                : currentSections.filter(id => id !== sectionId);
+
+            return {
+                ...prev,
+                [courseId]: updatedSections
+            };
+        });
+    };
+
+    // 3) Debug logging when it changes
+    useEffect(() => {
+        console.log("selectedSectionsSmart:", selectedSectionsSmart);
+    }, [selectedSectionsSmart]);
+
+    const isSectionDisabled = (courseId: number, section: Section) => {
+        const selectedProfessors = courseProfessors[courseId] || [];
+        return selectedProfessors.length > 0 &&
+            !selectedProfessors.includes(section.instructor);
+    };
+
+    const [isGenerateSchedule, setIsGeneratedSchedule] = useState<boolean>(false);
+    const [generatedSchedule, setGeneratedSchedule] = useState<ScheduledSection[]>([]);
+    const generateSchedule = useMutation<
+        ScheduledSection[],               // the “data” type returned
+        Error,                            // the “error” type thrown
+        CourseSchedulePreferences         // the variables you pass to mutate()
+    >(
+        (payload) => GetSmartSchedule(payload),  // your axios wrapper
+        {
+            // 2) on success, add events to calendar & invalidate any queries
+            onSuccess: (sections) => {
+                setIsGeneratedSchedule(true);
+
+                setGeneratedSchedule(sections);
+
+                // 3) if you have a “mySchedules” GET‐query, you can invalidate it:
+                queryClient.invalidateQueries(['smartSchedule']);
+            },
+            onError: (err) => {
+                //notification.error(err.message);
+            }
+        }
+    );
+    const [calendarEventsState, setCalendarEventsState] = useState<CalendarEvent[]>([]);
+
+    // 2) whenever `generatedSchedule` changes, recalc events
+    useEffect(() => {
+        if (!generatedSchedule.length) return;
+
+        const events = generatedSchedule.map(section => {
+            // Extract HH:mm from ISO datetime strings
+            const startTime = section.startTime.includes('T')
+                ? section.startTime.split('T')[1].slice(0, 5)
+                : section.startTime.slice(0, 5);
+
+            const endTime = section.endTime.includes('T')
+                ? section.endTime.split('T')[1].slice(0, 5)
+                : section.endTime.slice(0, 5);
+
+            return {
+                title: `${section.coursecode} ${section.coursename}`,
+                professor: section.instructor,
+                daysOfWeek: section.daysOfWeek,
+                startTime: startTime,  // e.g. "12:30"
+                endTime: endTime,       // e.g. "14:00"
+                color: "#52fae180"
+            };
+        });
+
+        console.log("setCalendarEventsState", events);
+        setCalendarEventsState(events);
+    }, [generatedSchedule]);
+    const DAY_ABBR: Record<number, string> = {
+        1: "Mon",
+        2: "Tue",
+        3: "Wed",
+        4: "Thu",
+        5: "Fri",
+        6: "Sat",
+        7: "Sun",
+    };
+    const handleGenerateSchedule = () => {
+        // 1) Build up course-preference objects
+        const coursePrefs = coursesOfferingsInput.map(course => ({
+            courseid: Number(course.id.replace(/\D+/g, '')) || 0, // ✅ Fixed bracket here
+            coursecode: course.code.split(" ").join("").toUpperCase(),
+            coursename: `${course.code}: ${course.name}`,
+            coursetype: course.type || "Major",
+            credits: course.credits,
+            sections: (selectedSectionsSmart[course.id] ?? []).map(sectionId => {
+                const s = course.sections.find((s: any) => s.id === sectionId)!;
+                return {
+                    id: Number(s.id.toString().replace(/\D+/g, '')) || 0, // ✅ Consistent conversion
+                    days: s.daysOfWeek?.map((d: any) => DAY_ABBR[d]).join(',') || "",
+                    daysOfWeek: s.daysOfWeek || [],
+                    startTime: s.startTime.includes(':') ? s.startTime : `${s.startTime}:00`,
+                    endTime: s.endTime.includes(':') ? s.endTime : `${s.endTime}:00`,
+                    instructor: s.instructor
+                };
+            })
+        }));
+
+        // 2) Build final payload
+        const payload = {
+            CourseOfferingsPreferencesIDs: coursePrefs,
+            Breaks: breaks.map(br => ({
+                days: br.daysOfWeek.map(d => DAY_ABBR[d]).join(','),
+                starttime: br.startTime.includes(':') ? br.startTime : `${br.startTime}:00`,
+                endtime: br.endTime.includes(':') ? br.endTime : `${br.endTime}:00`,
+                description: br.title || "Break"
+            }))
+        };
+
+        console.log("Last Payload to be submitted", payload);
+        generateSchedule.mutate(payload);
+    };
     return (
         <>
             <PageTitle>{t('common.Scheduling_Tool')}</PageTitle>
@@ -376,7 +688,15 @@ export default function SchedulingTool() {
                                             <IconButton icon={<CalendarOutlined />} text="Switch Planner Type" onClick={() => { setPlannerTypeModalVisible(prev => !prev); setEditingPlanner(true); }} />
 
                                             <IconButton icon={<ImportOutlined />} className={`${shouldFlash ? 'flash-highlight' : ''}`} text="Import Courses" onClick={() => { setCourseModalVisible(prev => !prev); }} />
-                                            {plannerType != "Manual" && <IconButton className={`${shouldFlashGenerate ? 'flash-highlight' : ''}`}  icon={<DownloadOutlined />} text={'Generate Schedule'} onClick={() => console.log("doNothing")} />}
+                                            {plannerType !== "Manual" && (
+                                                <IconButton
+                                                    className={`${shouldFlashGenerate ? 'flash-highlight' : ''}`}
+                                                    icon={generateSchedule.isLoading ? <Spin indicator={<LoadingOutlined spin />} /> : <DownloadOutlined />}
+                                                    text={generateSchedule.isLoading ? '' : 'Generate Schedule'}
+                                                    onClick={handleGenerateSchedule}
+                                                    disabled={generateSchedule.isLoading}
+                                                />
+                                            )}
                                         </Space >
                                     </Col>
                                 </Row>)}
@@ -425,18 +745,24 @@ export default function SchedulingTool() {
                                                 }
                                                 style={{ width: "100%", borderLeft: "4px solid #038b94" }}
                                             >
-                                                {showCourses ? (
-                                                    permanentCourses.map((course: Course) => (
-                                                        <CourseCard
-                                                            key={course.id}
-                                                            course={course}
-                                                            selectedSectionId={selectedSections[course.id]}
-                                                            onSectionChange={handleSectionChange}
-                                                        />
-                                                    ))
-                                                ) : (
-                                                    <EmptyCourseCard onClick={handleFlashButton} />
-                                                )}
+                                                {
+                                                    isLoading ? (
+                                                        <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                                            <Spin size="large" tip="Loading..." />
+                                                        </div>
+                                                    ) : sourceType !== "" ? (
+                                                        coursesOfferingsInput?.map(course => (
+                                                            <CourseCard
+                                                                key={course.id}
+                                                                course={course}
+                                                                selectedSectionId={selectedSections[course.id]}
+                                                                onSectionChange={handleSectionChange}
+                                                            />
+                                                        ))
+                                                    ) : (
+                                                        <EmptyCourseCard onClick={handleFlashButton} />
+                                                    )
+                                                }
                                             </Card>
                                         </HoverableDiv>
                                     </Col>
@@ -471,14 +797,209 @@ export default function SchedulingTool() {
                                             }
                                             style={{ width: "100%", borderLeft: "4px solid #038b94" }}
                                         >
-                                            {showCourses ? (
-                                                permanentCourses.map((course: Course) => (
-                                                    <CourseCardOfferingSmart
-                                                        key={course.id}
-                                                        course={course}
-                                                        selectedSectionId={selectedSections[course.id]}
-                                                    />
-                                                ))
+                                            {isLoading ? (
+                                                <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                                    <Spin size="large" tip="Loading..." />
+                                                </div>
+                                            ) : sourceType !== "" ? (
+                                                coursesOfferingsInput.map((course: any) => {
+
+                                                    const professorsCurrentCourse = Array.from(
+                                                        new Set(course.sections.map((s: Section) => s.instructor))
+                                                    );
+
+
+
+                                                    const selectedForThisCourse = courseProfessors[course.id] ?? []; const getProfessorSectionsCount = (professor: string) => {
+                                                        return course.sections.filter(
+                                                            (s: any) => s.instructor === professor
+                                                        ).length;
+                                                    };
+
+
+
+                                                    return (
+                                                        <HoverableDiv key={course.id}> {/* Added key */}
+                                                            <div style={{ marginBottom: 16, borderRadius: 12, border: "1px solid #f4dbff", paddingBlock: 8, width: "100%" }}>
+                                                                <Row justify="space-between" style={{ height: "auto", marginBottom: "8px", paddingInline: 8 }} gutter={[0, 16]} >
+                                                                    <Col>
+                                                                        <Typography.Text style={{ marginBottom: "8px", height: "auto", fontFamily: "monospace" }}>
+                                                                            {course.code} - {course.name}
+                                                                        </Typography.Text>
+                                                                    </Col>
+                                                                    <Col>
+                                                                        <DaysButton text={`${course.credits} credits`} onClick={() => console.log("HI")} />
+                                                                    </Col>
+                                                                </Row>
+
+                                                                <Collapse
+                                                                    key={course.id}
+                                                                    bordered={false}
+                                                                    activeKey={activeKey}
+                                                                    onChange={setActiveKey}
+                                                                    expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+                                                                    style={{ backgroundColor: "transparent", padding: "0px", minWidth: "100%" }}
+                                                                >
+                                                                    <Collapse.Panel header="Offering Preferences" key={course.id} style={{ padding: 0, backgroundColor: "transparent", minWidth: "100%" }}>
+                                                                        <Segmented
+                                                                            key={course.id}
+                                                                            options={["Sections", "Professors"]}
+                                                                            value={selectedTabs[course.id] || "Sections"}
+                                                                            onChange={(value) =>
+                                                                                setSelectedTabs(prev => ({ ...prev, [course.id]: value as string }))
+                                                                            }
+                                                                            block
+                                                                            style={{ marginBottom: 8 }}
+                                                                        />
+
+                                                                        {selectedTabs[course.id] === "Professors" ? (
+                                                                            <Row style={{ padding: 8 }}>
+                                                                                <Typography.Text style={{ marginBottom: 8 }}>Offerings Preference</Typography.Text>
+                                                                                {professorsCurrentCourse.map((professor: any) => {
+                                                                                    const isChecked = selectedForThisCourse.includes(professor);
+                                                                                    const hasSelections = selectedForThisCourse.length > 0;
+
+                                                                                    return (
+                                                                                        <Row
+                                                                                            key={professor}
+                                                                                            style={{
+                                                                                                border: hasSelections
+                                                                                                    ? isChecked
+                                                                                                        ? "1px solid #f2dbfe"
+                                                                                                        : "1px solid #f7a3a3"
+                                                                                                    : "1px solid #e0e0e0",
+                                                                                                width: "100%",
+                                                                                                padding: 8,
+                                                                                                marginBottom: "10px",
+                                                                                                backgroundColor: hasSelections
+                                                                                                    ? isChecked
+                                                                                                        ? "#e3faf8"
+                                                                                                        : "#faf2f3"
+                                                                                                    : "#ffffff",
+                                                                                                borderRadius: "12px"
+                                                                                            }}
+                                                                                        >
+                                                                                            <Col style={{ padding: "8px", width: "100%" }}>
+                                                                                                <Row justify="space-between" style={{ marginBottom: "10px" }}>
+                                                                                                    <Col>
+                                                                                                        <Space>
+                                                                                                            <Checkbox
+                                                                                                                checked={courseProfessors[course.id]?.includes(professor) ?? false}
+                                                                                                                onChange={e => {
+                                                                                                                    handleProfessorToggle(
+                                                                                                                        course.id,
+                                                                                                                        professor,
+                                                                                                                        e.target.checked
+                                                                                                                    );
+
+                                                                                                                }
+                                                                                                                }
+
+                                                                                                            />
+                                                                                                            <Typography.Text>{professor}</Typography.Text>
+                                                                                                        </Space>
+                                                                                                    </Col>
+                                                                                                    <Col>
+                                                                                                        <Typography.Text style={{ fontSize: "0.85rem", color: "#585859" }}>
+                                                                                                            {getProfessorSectionsCount(professor)} section(s)
+                                                                                                        </Typography.Text>
+                                                                                                    </Col>
+                                                                                                </Row>
+                                                                                                <Row justify="end">
+                                                                                                    <Col>
+                                                                                                        <Typography.Text
+                                                                                                            style={{
+                                                                                                                fontSize: "0.85rem",
+                                                                                                                color: hasSelections && !isChecked ? "#ff0000" : "#565657",
+                                                                                                                cursor: "pointer"
+                                                                                                            }}
+                                                                                                            onClick={() => handleProfessorToggle(course, professor, !isChecked)}
+                                                                                                        >
+                                                                                                            {!isChecked ? "Add to preference" : "Remove from preference"}
+                                                                                                        </Typography.Text>
+                                                                                                    </Col>
+                                                                                                </Row>
+                                                                                                {hasSelections && !isChecked && (
+                                                                                                    <Row style={{ marginTop: 8 }}>
+                                                                                                        <Col>
+                                                                                                            <Typography.Text type="secondary" style={{ fontSize: "0.75rem", color: "#ff4d4f" }}>
+                                                                                                                Deselected due to {courseProfessors[course.id].join(", ")} preference
+                                                                                                            </Typography.Text>
+                                                                                                        </Col>
+                                                                                                    </Row>
+                                                                                                )}
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                    );
+                                                                                })}
+                                                                            </Row>
+                                                                        ) : (
+                                                                            <div style={{ padding: 8 }}>
+                                                                                {course.sections.map((section: any) => (
+                                                                                    <Row
+                                                                                        key={section.id}
+                                                                                        style={{
+                                                                                            marginBottom: 8,
+                                                                                            width: "100%",
+                                                                                            border: "1px solid #94f7d3",
+                                                                                            padding: "8px",
+                                                                                            borderRadius: 8,
+                                                                                            backgroundColor: "#e3faf8"
+                                                                                        }}
+                                                                                        align="top"
+                                                                                    >
+                                                                                        {/* checkbox column */}
+                                                                                        <Col flex="none" style={{ paddingRight: 12 }}>
+                                                                                            <Checkbox
+                                                                                                key={`${course.id}-${section.id}`}
+                                                                                                checked={selectedSectionsSmart[course.id]?.includes(section.id) ?? false}
+                                                                                                onChange={e =>
+                                                                                                    handleSectionToggle(
+                                                                                                        course.id,
+                                                                                                        section.id,
+                                                                                                        e.target.checked
+                                                                                                    )
+                                                                                                }
+                                                                                                disabled={isSectionDisabled(course.id, section)}
+                                                                                                style={{
+                                                                                                    opacity: isSectionDisabled(course.id, section) ? 0.6 : 1,
+                                                                                                    cursor: isSectionDisabled(course.id, section) ? "not-allowed" : "pointer",
+                                                                                                }}
+                                                                                            />
+
+                                                                                        </Col>
+
+                                                                                        {/* content column */}
+                                                                                        <Col flex="auto">
+                                                                                            {/* row 1: section name */}
+                                                                                            <Row>
+                                                                                                <Typography.Text strong>{section.name}</Typography.Text>
+                                                                                            </Row>
+
+                                                                                            {/* row 2: schedule on the left, professor on the right */}
+                                                                                            <Row justify="space-between" align="middle" style={{ marginTop: 4 }}>
+                                                                                                <Typography.Text style={{ fontSize: "0.85rem", color: "#8c8c8c" }}>{section.schedule}</Typography.Text>
+                                                                                                <Typography.Text style={{ fontSize: "0.85rem", color: "#8c8c8c" }}>{section.instructor}</Typography.Text>
+                                                                                            </Row>
+
+                                                                                            {/* optional disabled note */}
+                                                                                            {isSectionDisabled(course.id, section) && (
+                                                                                                <Typography.Text type="secondary" style={{ fontSize: "0.75rem", color: "#ff4d4f", marginTop: 4, display: "block" }}>
+                                                                                                    Professor not selected in preferences
+                                                                                                </Typography.Text>
+                                                                                            )}
+                                                                                        </Col>
+                                                                                    </Row>
+
+                                                                                ))}
+                                                                            </div>
+                                                                        )}
+                                                                    </Collapse.Panel>
+                                                                </Collapse>
+                                                            </div>
+                                                        </HoverableDiv>
+                                                    );
+                                                })
                                             ) : (
                                                 <EmptyCourseCard onClick={handleFlashButton} />
                                             )}
@@ -519,7 +1040,15 @@ export default function SchedulingTool() {
                                     <Col flex="none" >
                                         <Space size={8}>
 
-                                            {plannerType != "Manual" && <IconButton icon={<DownloadOutlined />} className={`${shouldFlashGenerate ? 'flash-highlight' : ''}`}  text={'Generate Schedule'} onClick={() => console.log("doNothing")} />}
+                                            {plannerType !== "Manual" && (
+                                                <IconButton
+                                                    className={`${shouldFlashGenerate ? 'flash-highlight' : ''}`}
+                                                    icon={generateSchedule.isLoading ? <Spin indicator={<LoadingOutlined spin />} /> : <DownloadOutlined />}
+                                                    text={generateSchedule.isLoading ? "" : 'Generate Schedule'}
+                                                    onClick={handleGenerateSchedule}
+                                                    disabled={generateSchedule.isLoading}
+                                                />
+                                            )}
                                             <IconButton
                                                 icon={<CalendarOutlined />}
                                                 text="Switch Planner Type"
@@ -540,18 +1069,37 @@ export default function SchedulingTool() {
                             </Row>
                             <Row justify="end" align="top">
                                 <Col>
-                                    <AcademicCalendar
-                                        mobileOnly={mobileOnly}
-                                        events={[...calendarEventsToBeAdded, ...breaks]}
-                                    />
-                                    <Switch
-                                        checked={showCourses}
-                                        onChange={setShowCourses}
-                                        checkedChildren="Visible"
-                                        unCheckedChildren="Hidden"
-                                    />
+                                    <Row justify="end" align="top">
+                                        <AcademicCalendar
+                                            mobileOnly={mobileOnly}
+                                            events={savedEvents.length > 0 ? savedEvents :
+                                                (isGenerateSchedule
+                                                    ? [...calendarEventsState, ...breaks]
+                                                    : [...calendarEventsToBeAdded, ...breaks])
+                                            }
+                                            ref={printRef }
+                                        />
+                                    </Row>
+                                    <Row justify="end" align="top" style={{ marginTop: "8px" }} gutter={[16,9] }>
+                                        <Col>
+                                            <IconButton
+                                            icon={<SaveOutlined />}
+                                            text={'Save Schedule'}
+                                            onClick={handleSaveCalendar}
+                                            disabled={generateSchedule.isLoading}
+                                            />
+                                        </Col>
+                                        <Col>
+                                            <IconButton
+                                                icon={<DownloadOutlined />}
+                                                text={'Download Schedule'}
+                                                onClick={handleDownloadPdf}
+                                             
+                                            />
+                                        </Col>
+                                    </Row>
                                 </Col>
-
+                               
                             </Row>
                         </Col>
                     </Row>
@@ -571,7 +1119,7 @@ export default function SchedulingTool() {
             }
         </>
     )
-} const HoverableDiv = styled.div`
+}; const HoverableDiv = styled.div`
   transition: all 0.3s ease;
   border-radius:12px;
   box-shadow: none;
@@ -580,3 +1128,10 @@ export default function SchedulingTool() {
     box-shadow: 0 10px 20px rgba(3, 139, 148, 0.3);
   }
 `;
+const App = () => (
+    <QueryClientProvider client={queryClient}>
+        <SchedulingTool />
+    </QueryClientProvider>
+);
+
+export default App;

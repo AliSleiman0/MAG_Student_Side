@@ -35,16 +35,16 @@ export const AddBreakModal: React.FC<AddBreakModalProps> = ({
         // Disable hours before 8AM (0-7)
         for (let i = 0; i < 8; i++) hours.push(i);
         // Disable hours after 5PM (17-23)
-        for (let i = 18; i < 24; i++) hours.push(i);
+        for (let i = 19; i < 24; i++) hours.push(i);
         return hours;
     }, []);
 
     // Memoize static times
     const minTime = useMemo(() => moment().set({ hour: 7, minute: 59 }), []);
-    const maxTime = useMemo(() => moment().set({ hour: 17, minute: 0 }), []);
+    const maxTime = useMemo(() => moment().set({ hour: 18, minute: 0 }), []);
     return (
         <Modal
-            style={{ zIndex: 1000 }}
+            zIndex = {10} 
             title="Add Break"
             open={isModalBreaksVisible}
             onOk={handleAddBreak}

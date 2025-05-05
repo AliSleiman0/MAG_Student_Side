@@ -42,7 +42,7 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
 }) => {
     return (
         <Modal
-            style={{ zIndex: 1001 }}
+            zIndex={20} 
             title={null}
             open={showConflictModal}
             onOk={() => {

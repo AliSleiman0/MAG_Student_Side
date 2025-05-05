@@ -33,7 +33,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
     const [activeKey, setActiveKey] = useState<string | string[]>([]);
     const [selectedTab, setSelectedTab] = useState<string>("Sections");
     const [selectedProfessors, setSelectedProfessors] = useState<string[]>([]);
-    const allUnchecked = selectedProfessors.length === 0;
+  
 
     const professors = useMemo(() =>
         Array.from(new Set(course.sections.map(s => s.instructor))),

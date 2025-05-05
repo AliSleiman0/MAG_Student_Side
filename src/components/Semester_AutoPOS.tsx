@@ -3,9 +3,9 @@ import React from 'react';
 import { Col, Row, Collapse, Space, Tag, Typography, Divider } from 'antd';
 import { BookOutlined, CalendarOutlined, LinkOutlined, NumberOutlined } from '@ant-design/icons';
 import { useResponsive } from '@app/hooks/useResponsive';
-import { Course } from '../pages/30/DyanmicPOS/DynamicPOS';
 import { BREAKPOINTS } from '../styles/themes/constants';
 import { useTranslation } from 'react-i18next';
+import { Course } from '../apiMAG/automated_pos';
 
 export interface CourseData {
     title?: string;
@@ -13,6 +13,7 @@ export interface CourseData {
     courseList?: Array<Course>;
     Upcoming?: string;
     extraInfo?: React.ReactNode;
+    height?: string;
 }
 
 export const Semester_AutoPOS = ({ courseData }: { courseData: CourseData }) => {
@@ -115,7 +116,7 @@ export const Semester_AutoPOS = ({ courseData }: { courseData: CourseData }) => 
                 borderLeft: "4px solid #038b94",
                 margin: "0px 0px",
                 width: "100%",
-              
+                
                
               
             }}
@@ -126,7 +127,7 @@ export const Semester_AutoPOS = ({ courseData }: { courseData: CourseData }) => 
                 style={{
                     borderBottom: '1px solid #038b94',
                     padding:'16px',
-
+                    height: courseData.height ? "fit-content" : "800px"
                 }}
             >
                 {( courseData.credits == 0 && courseData.courseList?.length == 0) && (
