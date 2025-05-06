@@ -25,6 +25,7 @@ import CustomizedPOS from '../../pages/30/CustomizedPOS/CustomizedPOS';
 import { Chat } from '../../firebase/Chat';
 import AdvisorsList from '../../pages/30/AdvisorsPage';
 import SchedulingTool from '@app/pages/30/SchedulingTool/SchedulingTool';
+import Messager from '../../pages/30/Messager/Messager';
 
 
 
@@ -145,7 +146,7 @@ export const AppRouter: React.FC = () => {
                     <Route path={"/CustomizedPOS"} element={<CustomizedPOS />} />
                     <Route path={"/DynamicPOS"} element={<DynamicPOS />} />
                     <Route path="/POS" element={<GraphComponent />} />
-                    <Route path="/chat/:advisorId" element={<Chat />} />
+                    <Route path="/Messager" element={<Messager />} />
                     <Route path="/advisors" element={<AdvisorsList />} />
                     <Route path="/Scheduling_Tool" element={< SchedulingTool />} />/
                     <Route path="apps">
