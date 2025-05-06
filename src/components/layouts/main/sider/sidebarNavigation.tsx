@@ -75,7 +75,7 @@ export const sidebarNavigation: SidebarNavigationItem[] = [
     {
         title: 'sider.chat',
         key: 'chat',
-        url: '/chat',
+        url: '/Messager',
         icon: <MessageOutlined />,
 
 

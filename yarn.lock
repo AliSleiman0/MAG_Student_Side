@@ -24,10 +24,67 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ant-design/colors@npm:^7.0.0, @ant-design/colors@npm:^7.1.0":
+  version: 7.2.0
+  resolution: "@ant-design/colors@npm:7.2.0"
+  dependencies:
+    "@ant-design/fast-color": ^2.0.6
+  checksum: a2b1e82b98b7258154869e554c1afa160cd9db6f637fee274d74917c4c61acb5c7fc05674f4d7158cb70dc1a978d36de76c4a2c90543c99caad0b092ac2a0e00
+  languageName: node
+  linkType: hard
+
+"@ant-design/cssinjs-utils@npm:^1.1.0":
+  version: 1.1.3
+  resolution: "@ant-design/cssinjs-utils@npm:1.1.3"
+  dependencies:
+    "@ant-design/cssinjs": ^1.21.0
+    "@babel/runtime": ^7.23.2
+    rc-util: ^5.38.0
+  peerDependencies:
+    react: ">=16.9.0"
+    react-dom: ">=16.9.0"
+  checksum: 9f84d068e0fbcb74a80232cc712f5f56f2ec353a584c88a7b3d436711151d0c2157b6361577c73e25789da5590d467b83b17f433ad73666ad22d87fc430de1ef
+  languageName: node
+  linkType: hard
+
+"@ant-design/cssinjs@npm:^1.21.0, @ant-design/cssinjs@npm:^1.21.1":
+  version: 1.23.0
+  resolution: "@ant-design/cssinjs@npm:1.23.0"
+  dependencies:
+    "@babel/runtime": ^7.11.1
+    "@emotion/hash": ^0.8.0
+    "@emotion/unitless": ^0.7.5
+    classnames: ^2.3.1
+    csstype: ^3.1.3
+    rc-util: ^5.35.0
+    stylis: ^4.3.4
+  peerDependencies:
+    react: ">=16.0.0"
+    react-dom: ">=16.0.0"
+  checksum: 45461c9caa8043e4f6061ea72921ff00d0c5c8e5fd8420b2abc2576f799c758f4590a44c69c10e666c918b248fb6a318a5cf1b1429fd5bdd31dfde32ae764e9f
+  languageName: node
+  linkType: hard
+
+"@ant-design/fast-color@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "@ant-design/fast-color@npm:2.0.6"
+  dependencies:
+    "@babel/runtime": ^7.24.7
+  checksum: 01f81ff5901ee13b3b6dab3884cc07e4fbd82e412404179ad053828f7f218acd0b6ced89ab28440e96e9c51177d90c17020095627b78ebb2468ecb98294287de
+  languageName: node
+  linkType: hard
+
 "@ant-design/icons-svg@npm:^4.2.1":
   version: 4.2.1
   resolution: "@ant-design/icons-svg@npm:4.2.1"
   checksum: c1fa1bbeb0c58209e2c5d49ce001543823ae2d8326e1c7aafb992deac7aaa901a44f9a16151ad919d2628dbe3d783b325ed2b9440436002225801332323296d4
+  languageName: node
+  linkType: hard
+
+"@ant-design/icons-svg@npm:^4.4.0":
+  version: 4.4.2
+  resolution: "@ant-design/icons-svg@npm:4.4.2"
+  checksum: c66cda4533ec2f86162a9adda04be2aba5674d5c758ba886bd9d8de89dc45473ef3124eb755b4cfbd09121d3bdc34e075ee931e47dd0f8a7fdc01be0cb3d6c40
   languageName: node
   linkType: hard
 
@@ -47,6 +104,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ant-design/icons@npm:^5.4.0":
+  version: 5.6.1
+  resolution: "@ant-design/icons@npm:5.6.1"
+  dependencies:
+    "@ant-design/colors": ^7.0.0
+    "@ant-design/icons-svg": ^4.4.0
+    "@babel/runtime": ^7.24.8
+    classnames: ^2.2.6
+    rc-util: ^5.31.1
+  peerDependencies:
+    react: ">=16.0.0"
+    react-dom: ">=16.0.0"
+  checksum: a278939e24d71ed5dfb857cb6659a46e1a14d1441247bc0fe81d642263f2eeb4dfdc4c944fcb4f26467b87a484976ddf2c188106d025e1af4a636c27ee265417
+  languageName: node
+  linkType: hard
+
 "@ant-design/react-slick@npm:~0.29.1":
   version: 0.29.2
   resolution: "@ant-design/react-slick@npm:0.29.2"
@@ -59,6 +132,27 @@ __metadata:
   peerDependencies:
     react: ">=16.9.0"
   checksum: a7031466714303d123321cac56fb7fc00ba7702bedbfdac1c7f9dda177dd8a4c34757c4e2d5a9dc7dd118e362e9b8b6f5b6c33557bc1234215336d5eb69081c0
+  languageName: node
+  linkType: hard
+
+"@ant-design/x@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@ant-design/x@npm:1.2.0"
+  dependencies:
+    "@ant-design/colors": ^7.1.0
+    "@ant-design/cssinjs": ^1.21.1
+    "@ant-design/cssinjs-utils": ^1.1.0
+    "@ant-design/fast-color": ^2.0.6
+    "@ant-design/icons": ^5.4.0
+    "@babel/runtime": ^7.25.6
+    classnames: ^2.5.1
+    rc-motion: ^2.9.2
+    rc-util: ^5.43.0
+  peerDependencies:
+    antd: ^5.20.3
+    react: ">=18.0.0"
+    react-dom: ">=18.0.0"
+  checksum: 7a01d03eca4dc0e34b7a1f75d02ebc8cbdd970be5ce7086bd3986f603b77f2cb91bcc714e5db9577a763061a33cbf8284db7d7551f5e3dafa72b1b22d33108e8
   languageName: node
   linkType: hard
 
@@ -1858,19 +1952,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.24.7, @babel/runtime@npm:^7.24.8, @babel/runtime@npm:^7.25.6, @babel/runtime@npm:^7.26.7":
+  version: 7.27.1
+  resolution: "@babel/runtime@npm:7.27.1"
+  checksum: 11339838a54783e5b14e04d94d7a4d032e9965c5823f3f687e41556fa40344ae7aeb57c535720b7a74ab3e8217def7834a6f1a665ee55bbb3befede141419913
+  languageName: node
+  linkType: hard
+
 "@babel/runtime@npm:^7.23.8, @babel/runtime@npm:^7.6.2, @babel/runtime@npm:^7.7.2":
   version: 7.27.0
   resolution: "@babel/runtime@npm:7.27.0"
   dependencies:
     regenerator-runtime: ^0.14.0
   checksum: 3e73d9e65f76fad8f99802b5364c941f4a60c693b3eca66147bb0bfa54cf0fbe017232155e16e3fd83c0a049b51b8d7239efbd73626534abe8b54a6dd57dcb1b
-  languageName: node
-  linkType: hard
-
-"@babel/runtime@npm:^7.26.7":
-  version: 7.27.1
-  resolution: "@babel/runtime@npm:7.27.1"
-  checksum: 11339838a54783e5b14e04d94d7a4d032e9965c5823f3f687e41556fa40344ae7aeb57c535720b7a74ab3e8217def7834a6f1a665ee55bbb3befede141419913
   languageName: node
   linkType: hard
 
@@ -2013,6 +2107,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@emotion/hash@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "@emotion/hash@npm:0.8.0"
+  checksum: 4b35d88a97e67275c1d990c96d3b0450451d089d1508619488fc0acb882cb1ac91e93246d471346ebd1b5402215941ef4162efe5b51534859b39d8b3a0e3ffaa
+  languageName: node
+  linkType: hard
+
 "@emotion/is-prop-valid@npm:^1.1.0":
   version: 1.2.0
   resolution: "@emotion/is-prop-valid@npm:1.2.0"
@@ -2036,7 +2137,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emotion/unitless@npm:^0.7.4":
+"@emotion/unitless@npm:^0.7.4, @emotion/unitless@npm:^0.7.5":
   version: 0.7.5
   resolution: "@emotion/unitless@npm:0.7.5"
   checksum: f976e5345b53fae9414a7b2e7a949aa6b52f8bdbcc84458b1ddc0729e77ba1d1dfdff9960e0da60183877873d3a631fa24d9695dd714ed94bcd3ba5196586a6b
@@ -2821,6 +2922,22 @@ __metadata:
   dependencies:
     "@hapi/hoek": ^8.3.0
   checksum: 34278bc13b4023d6d0d7c913605a254b2d728dc6489cd465269eebaa7d8d2d81cda3f2157398dca87d3cb9e1a8aa8a1158ce2564c71a8e289b807c144e3b4c1e
+  languageName: node
+  linkType: hard
+
+"@hugeicons/core-free-icons@npm:^1.0.13":
+  version: 1.0.14
+  resolution: "@hugeicons/core-free-icons@npm:1.0.14"
+  checksum: aa38df00d28eef1be46b8c2c1736c0ded9ce1aecaefb705700ee62a165e9f4bd1aca2f691173cf78e9e3a55274bc3402c1d537acf48511e32a557b0312a7f5bb
+  languageName: node
+  linkType: hard
+
+"@hugeicons/react@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "@hugeicons/react@npm:1.0.5"
+  peerDependencies:
+    react: ">=16.0.0"
+  checksum: 8c140a84b6cf43b3b3d40246664a0d3d410f3c642808c49bbd18cff3082604f17f3e6aeebcb462154d9da48f18712d73ec6e9b574ce5b68997ad7d75d0141803
   languageName: node
   linkType: hard
 
@@ -4911,6 +5028,7 @@ __metadata:
   resolution: "MAG@workspace:."
   dependencies:
     "@ant-design/icons": ^4.6.2
+    "@ant-design/x": ^1.2.0
     "@antv/g2plot": 2.4.32
     "@antv/layout": ^1.2.14-beta.8
     "@antv/x6": ^2.18.1
@@ -4970,6 +5088,7 @@ __metadata:
     pigeon-maps: ^0.19.7
     prettier: ^2.3.1
     react: ^18.2.0
+    react-chat-elements: ^12.0.18
     react-country-flag: ^3.0.2
     react-dom: ^18.2.0
     react-firebase-hooks: ^5.1.1
@@ -7298,6 +7417,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"classnames@npm:^2.5.1":
+  version: 2.5.1
+  resolution: "classnames@npm:2.5.1"
+  checksum: da424a8a6f3a96a2e87d01a432ba19315503294ac7e025f9fece656db6b6a0f7b5003bb1fbb51cbb0d9624d964f1b9bb35a51c73af9b2434c7b292c42231c1e5
+  languageName: node
+  linkType: hard
+
 "clean-css@npm:^3.0.1":
   version: 3.4.28
   resolution: "clean-css@npm:3.4.28"
@@ -8538,7 +8664,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"csstype@npm:^3.0.8":
+"csstype@npm:^3.0.8, csstype@npm:^3.1.3":
   version: 3.1.3
   resolution: "csstype@npm:3.1.3"
   checksum: 8db785cc92d259102725b3c694ec0c823f5619a84741b5c7991b8ad135dfaa66093038a1cc63e03361a6cd28d122be48f2106ae72334e067dd619a51f49eddf7
@@ -11490,6 +11616,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fsevents@npm:^2.3.2":
+  version: 2.3.3
+  resolution: "fsevents@npm:2.3.3"
+  dependencies:
+    node-gyp: latest
+  checksum: 11e6ea6fea15e42461fc55b4b0e4a0a3c654faa567f1877dbd353f39156f69def97a69936d1746619d656c4b93de2238bf731f6085a03a50cabf287c9d024317
+  conditions: os=darwin
+  languageName: node
+  linkType: hard
+
 "fsevents@patch:fsevents@^1.2.7#~builtin<compat/fsevents>":
   version: 1.2.13
   resolution: "fsevents@patch:fsevents@npm%3A1.2.13#~builtin<compat/fsevents>::version=1.2.13&hash=18f3a7"
@@ -11503,6 +11639,15 @@ __metadata:
 "fsevents@patch:fsevents@^2.1.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@^2.1.3#~builtin<compat/fsevents>, fsevents@patch:fsevents@~2.3.2#~builtin<compat/fsevents>":
   version: 2.3.2
   resolution: "fsevents@patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=18f3a7"
+  dependencies:
+    node-gyp: latest
+  conditions: os=darwin
+  languageName: node
+  linkType: hard
+
+"fsevents@patch:fsevents@^2.3.2#~builtin<compat/fsevents>":
+  version: 2.3.3
+  resolution: "fsevents@patch:fsevents@npm%3A2.3.3#~builtin<compat/fsevents>::version=2.3.3&hash=18f3a7"
   dependencies:
     node-gyp: latest
   conditions: os=darwin
@@ -15333,6 +15478,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"loaders.css@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "loaders.css@npm:0.1.2"
+  checksum: e1a8ee3b02f92e75cc9b20d7a391f145dbdb21efcd08713a2b94b8ded2bc250f7e21df3f4a8d675ac93a6351f0c43b6c43529d9002c683a19f6599751a29500a
+  languageName: node
+  linkType: hard
+
 "locate-path@npm:^3.0.0":
   version: 3.0.0
   resolution: "locate-path@npm:3.0.0"
@@ -18980,6 +19132,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"progressbar.js@npm:^1.1.0":
+  version: 1.1.1
+  resolution: "progressbar.js@npm:1.1.1"
+  dependencies:
+    lodash.merge: ^4.6.2
+    shifty: ^2.8.3
+  checksum: 40cd6f65f78b744b124e8e8d30df748c8665c5b3f4434e4f7a4f6033a34f1b1558f37c282c87f991ce17aa8bfb04cb21f6f7964d05be9a41ff32ba443e1d65f6
+  languageName: node
+  linkType: hard
+
 "promise-breaker@npm:^6.0.0":
   version: 6.0.0
   resolution: "promise-breaker@npm:6.0.0"
@@ -19033,7 +19195,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.6.1, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
+"prop-types@npm:^15.5.8, prop-types@npm:^15.6.1, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -19587,6 +19749,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rc-motion@npm:^2.9.2":
+  version: 2.9.5
+  resolution: "rc-motion@npm:2.9.5"
+  dependencies:
+    "@babel/runtime": ^7.11.1
+    classnames: ^2.2.1
+    rc-util: ^5.44.0
+  peerDependencies:
+    react: ">=16.9.0"
+    react-dom: ">=16.9.0"
+  checksum: ba97a671d017c4befbd0543cd0c9d8c788938b152555e4396274d3f416d4f67dff67ebc77c67e98da18486c0f316bafb0e0153c0bdb6cb74db7711799ec0d911
+  languageName: node
+  linkType: hard
+
 "rc-notification@npm:~4.6.0":
   version: 4.6.1
   resolution: "rc-notification@npm:4.6.1"
@@ -19907,6 +20083,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rc-util@npm:^5.31.1, rc-util@npm:^5.35.0, rc-util@npm:^5.38.0, rc-util@npm:^5.43.0, rc-util@npm:^5.44.0":
+  version: 5.44.4
+  resolution: "rc-util@npm:5.44.4"
+  dependencies:
+    "@babel/runtime": ^7.18.3
+    react-is: ^18.2.0
+  peerDependencies:
+    react: ">=16.9.0"
+    react-dom: ">=16.9.0"
+  checksum: 28d8597b54b6f713a2f0345569f37abe6e8ccf68d42190d9cc494c26790e474ad13eaa6948c6a1f410112392b082a51d4e6e3d9e3deb3132bfbf6dda267ce322
+  languageName: node
+  linkType: hard
+
 "rc-virtual-list@npm:^3.2.0, rc-virtual-list@npm:^3.4.8":
   version: 3.4.13
   resolution: "rc-virtual-list@npm:3.4.13"
@@ -19958,6 +20147,23 @@ __metadata:
     regenerator-runtime: ^0.13.7
     whatwg-fetch: ^3.4.1
   checksum: 99e52a6b2229c7ca730cfd44ac95640f955be71d144225bd6c24fa47922a742658a371d0a2f0876d732533f1055b7cd7e9d534c89c29f8ca889ecd1b8d15f065
+  languageName: node
+  linkType: hard
+
+"react-chat-elements@npm:^12.0.18":
+  version: 12.0.18
+  resolution: "react-chat-elements@npm:12.0.18"
+  dependencies:
+    "@hugeicons/core-free-icons": ^1.0.13
+    "@hugeicons/react": ^1.0.5
+    classnames: ^2.2.5
+    progressbar.js: ^1.1.0
+    react-spinkit: ^3.0.0
+    timeago.js: ^4.0.2
+  peerDependencies:
+    react: ^18.2.0
+    react-dom: 18.2.0
+  checksum: 5cd4d61f48f91fb41451ce6d3440246ba57b0e082647f0687bf4bc39c2a20dc5a053ed640b953371d145e49d7a1bcc0759cca3f56693af0c3d735a3c98504816
   languageName: node
   linkType: hard
 
@@ -20103,6 +20309,13 @@ __metadata:
   version: 17.0.2
   resolution: "react-is@npm:17.0.2"
   checksum: 9d6d111d8990dc98bc5402c1266a808b0459b5d54830bbea24c12d908b536df7883f268a7868cfaedde3dd9d4e0d574db456f84d2e6df9c4526f99bb4b5344d8
+  languageName: node
+  linkType: hard
+
+"react-is@npm:^18.2.0":
+  version: 18.3.1
+  resolution: "react-is@npm:18.3.1"
+  checksum: e20fe84c86ff172fc8d898251b7cc2c43645d108bf96d0b8edf39b98f9a2cae97b40520ee7ed8ee0085ccc94736c4886294456033304151c3f94978cec03df21
   languageName: node
   linkType: hard
 
@@ -20338,6 +20551,18 @@ __metadata:
     react: ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0
     react-dom: ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0
   checksum: 399ad43b9e10dfd66a000dd00faf1f476428ff8b9e70705d253056d279a9297b441d08fe7255b5ffea6f6e05ce63fb6c36f86fddcdffd453ee8f47ca9d958f72
+  languageName: node
+  linkType: hard
+
+"react-spinkit@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "react-spinkit@npm:3.0.0"
+  dependencies:
+    classnames: ^2.2.3
+    loaders.css: ^0.1.2
+    object-assign: ^4.1.0
+    prop-types: ^15.5.8
+  checksum: 78235ee3b37c21d0f34e8c76d2d87de3a0bb4fbcc50d47995345cc5cc28ed8f3ba13cb6314768f06f23acd72d60fc8ec0018c52baa08a7c323096445bc47c90f
   languageName: node
   linkType: hard
 
@@ -21761,6 +21986,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"shifty@npm:^2.8.3":
+  version: 2.20.4
+  resolution: "shifty@npm:2.20.4"
+  dependencies:
+    fsevents: ^2.3.2
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  checksum: f007d4359b396901f67146fc44a386aec81e86617410b3a3a37267d1f393f412eb2eeada638461b86725732351a399dbcc18c76e4e38627d7543c59dc7165504
+  languageName: node
+  linkType: hard
+
 "side-channel-list@npm:^1.0.0":
   version: 1.0.0
   resolution: "side-channel-list@npm:1.0.0"
@@ -22879,6 +23116,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"stylis@npm:^4.3.4":
+  version: 4.3.6
+  resolution: "stylis@npm:4.3.6"
+  checksum: 4f56a087caace85b34c3a163cf9d662f58f42dc865b2447af5c3ee3588eebaffe90875fe294578cce26f172ff527cad2b01433f6e1ae156400ec38c37c79fd61
+  languageName: node
+  linkType: hard
+
 "sugarss@npm:^2.0.0":
   version: 2.0.0
   resolution: "sugarss@npm:2.0.0"
@@ -23346,6 +23590,13 @@ __metadata:
   version: 1.1.0
   resolution: "thunky@npm:1.1.0"
   checksum: 993096c472b6b8f30e29dc777a8d17720e4cab448375041f20c0cb802a09a7fb2217f2a3e8cdc11851faa71c957e2db309357367fc9d7af3cb7a4d00f4b66034
+  languageName: node
+  linkType: hard
+
+"timeago.js@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "timeago.js@npm:4.0.2"
+  checksum: c785a06988717cb5a00bb96b00ebaa56e83f4b5ed5d87c4c3931fb1bb2591a0e13a7ddc4b6c12c6ee7de64b440ed903c7bd4e0edddb37aade9bfc9ceab5d0db3
   languageName: node
   linkType: hard
 

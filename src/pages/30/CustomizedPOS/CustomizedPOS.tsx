@@ -12,9 +12,9 @@ import { useResponsive } from '../../../hooks/useResponsive';
 import MobileSiderMenu from '../../../components/sider_DPOS_xs';
 import { Checkbox } from '../../../components/common/BaseCheckbox/BaseCheckbox.styles';
 import { useTranslation } from 'react-i18next';
-import { QueryClient, QueryClientProvider, useMutation } from 'react-query';
+import { QueryClient, QueryClientProvider, useMutation, useQuery } from 'react-query';
 import { ChosenCourse, Course, submitSelectedCourses } from '../../../apiMAG/customized_pos';
-import { RegistrationData, SemesterInfo } from '../../../apiMAG/automated_pos';
+import { RegistrationData, SemesterInfo, getDynamicPOS } from '../../../apiMAG/automated_pos';
 import Banner from '../../../components/Banner';
 const { Content, Sider } = Layout;
 /*****************************
@@ -31,10 +31,8 @@ const queryClient = new QueryClient({
     },
 });
 
-const savedCourses = sessionStorage.getItem("coursesRecommendedDynamic");
-const semInfo: SemesterInfo = savedCourses ? JSON.parse(savedCourses) : {};
-const parsedCourses = semInfo.courses;
-console.log("parsedCourses", parsedCourses);
+
+
 //create priorities based on score
 const calculatePriorities = (courses: Course[]): Course[] => {
     // 1. Clone and sort by score (descending) and courseid (ascending for tie-breaker)
@@ -75,9 +73,32 @@ function parseCourse(input: string) {
         name: name
     };
 }
-
+const DEFAULT_SEM_INFO: SemesterInfo = {
+    semester: "",
+    year: "",
+    courses: [],
+    totalCredits: 0,
+};
 const CustomizedPOS: React.FC = () => {
     const { t } = useTranslation();
+   
+    const { data } = useQuery(
+        'Dynamic POS',
+        getDynamicPOS,
+        {
+            useErrorBoundary: true,
+           
+            onSuccess: (apiData) => {
+               
+            }
+        }
+    );
+    const parsedCourses = useMemo(() => {
+        return data?.offeredCourses[0]?.courses || [];
+    }, [ data]);
+
+
+
     const getSemesterTranslation = (semester: string) => {
         switch (semester) {
             case "Fall":
@@ -270,20 +291,22 @@ const CustomizedPOS: React.FC = () => {
     const isFirstSemester = selectedSemester === semesters[0];
     const { isTablet, mobileOnly, tabletOnly, desktopOnly, isDesktop } = useResponsive();
     const totalCreditsSelected = selectedCourses.reduce((sum, c) => sum + c.credits, 0);
-    const dataWithPrioirities = useMemo(() => {
-        if (!parsedCourses) return [];
-
-        return calculatePriorities(parsedCourses)?.map((course: Course) => ({ ...course, key: course.courseid }));
-    }, [parsedCourses]); // <-- Only recalculates when courses change
+    const dataWithPriorities = useMemo(() => {
+        if (!parsedCourses || isLoading) return [];
+        return calculatePriorities(parsedCourses)?.map((course: Course) => ({
+            ...course,
+            key: course.courseid
+        }));
+    }, [parsedCourses, isLoading]);
 
     const processedData = useMemo(() => {
-        return dataWithPrioirities?.map((course: Course) =>
+        return dataWithPriorities?.map((course: Course) =>
         ({
             ...course,
             coursename: parseCourse(course.coursename).name,
             coursecode: parseCourse(course.coursename).code,
         }));
-    }, [dataWithPrioirities]);
+    }, [dataWithPriorities]);
 
 
     return (
