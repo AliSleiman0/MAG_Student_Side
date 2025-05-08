@@ -208,7 +208,7 @@ const CourseLists: React.FC<CoursesListProps> = ({ data }) => {
                                             semester={getCombinedSemesterTrans(course.semester.toUpperCase(), t)}
                                             credits={course.credits}
                                             textBottom={course.canregister ? t("courses.register_status.can_register") : t("courses.register_status.cannot_register")}
-                                            iconBottom={course.canregister ? <UnlockOutlined /> : <LockOutlined />}
+                                            iconBottom={course.canregister ? <UnlockOutlined style={{ color: "green" }} /> : <LockOutlined style={{ color: "red" }} />}
                                             canRegister={course.canregister}
                                         />)
                                 })}
