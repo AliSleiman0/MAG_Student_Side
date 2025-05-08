@@ -1,8 +1,19 @@
+// api.ts
 import axios from 'axios';
 
 const API_URL = 'http://127.0.0.1:8000/api';
-localStorage.setItem('authToken', "bearer 15|culA8B7kCzbnAM7sst5up4qYJN85ipof4R6mSKEU3245671d");
-// Create axios instance with custom config
+
+// In-memory token storage
+let authToken: string | null = null;
+
+/**
+ * Call this from your Context after login/logout to keep the axios
+ * instance in sync with your in-memory token.
+ */
+export const setAuthToken = (token: string | null) => {
+    authToken = token;
+};
+
 const api = axios.create({
     baseURL: API_URL,
     headers: {
@@ -13,23 +24,23 @@ const api = axios.create({
     timeout: 20000,
 });
 
-// Add request interceptor for auth token
+// Attach token from memory on every request
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+    if (authToken) {
+        config.headers = config.headers ?? {};
+        config.headers.Authorization = `Bearer ${authToken}`;
     }
     return config;
 });
 
-// Add response interceptor for error handling
+// Global 401 handler
 api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Handle unauthorized access
-            localStorage.removeItem('authToken');
-            window.location.href = '/login';
+            // Optionally clear our in-memory token & redirect
+            authToken = null;
+            window.location.href = '/auth/login';
         }
         return Promise.reject(error);
     }

@@ -1,4 +1,4 @@
-import { ChatList, MessageBox, SystemMessage, IMessageBoxProps, I } from "react-chat-elements"
+import { ChatList, MessageBox, SystemMessage, IMessageBoxProps,  } from "react-chat-elements"
 import { Input } from 'react-chat-elements'
 
 import './Messager.styles.css'
