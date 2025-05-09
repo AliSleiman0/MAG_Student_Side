@@ -1,21 +1,27 @@
 // ProtectedRoute.tsx
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useUser } from '../../Context/UserContext';
 import { Spin } from 'antd';
 
-interface ProtectedRouteProps {
-    children: ReactNode;
-}
+export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { token, loading, initialized } = useUser();
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-    const { token, loading } = useUser();
+  // 1) Still restoring session? show spinner (or return null)
+  if (!initialized) {
+    return <Spin />;
+  }
 
-    if (loading) return <Spin />; // or a spinner
+  // 2) API calls in flight? show spinner
+  if (loading) {
+    return <Spin />;
+  }
 
-    if (!token) {
-        return <Navigate to="/auth/login" replace />;
-    }
+  // 3) Once init + loading are done, redirect if no token
+  if (!token) {
+    return <Navigate to="/auth/login" replace />;
+  }
 
-    return <>{children}</>;
+  // 4) You’re good to go
+  return <>{children}</>;
 };

@@ -27,8 +27,10 @@ export const LoginForm: React.FC = () => {
     const handleSubmit = async (values: LoginFormData) => {
         setLoading(true);
         try {
-            await loginUser({ userid: values.userid, password: values.password });
-            navigate('/');
+            const loginResponse = await loginUser({ userid: values.userid, password: values.password });
+            console.log("loginResponse", loginResponse);
+            loginResponse.usertype === "Professor" ? navigate('/Messager') : navigate('/')
+
         } catch (err: any) {
             notificationController.error({ message: err.message });
         } finally {

@@ -1,317 +1,244 @@
-import { ChatList, MessageBox, SystemMessage, IMessageBoxProps,  } from "react-chat-elements"
-import { Input } from 'react-chat-elements'
+﻿import { useEffect, useRef, useState } from "react";
+import { MessageBox, SystemMessage } from "react-chat-elements";
+import { List } from "antd";
+import { useUser } from "../../../Context/UserContext";
 
-import './Messager.styles.css'
-import 'react-chat-elements/dist/main.css';
-import { Row, Col, List } from "antd";
-import { useEffect, useRef, useState } from "react";
+import { subscribeToMessages, updateMessageStatus, sendMessage, Message } from "../../../firebase/firebase";
 import ChatComposer from "./Input";
+import { Timestamp } from "firebase/firestore";
+import { UserProfile, showProfile } from "../../../apiMAG/user";
+import { useQuery } from "react-query/types/react/useQuery";
+import { QueryClientProvider } from "react-query/types/react/QueryClientProvider";
+import { QueryClient } from "react-query/types/core/queryClient";
+
+
+
+interface ChatInterfaceProps {
+    receiverId: string;
+}
+
 interface ChatMessage {
-    // ensure `id` and `text` are present
     id: string;
     text: string;
-    position: string;
-    type: string,
-
-    date: Date,
-    title: string,
-    status: string,
-    notch: boolean,
-    retracted: boolean,
-    removeButton: boolean,
-    replyButton: boolean,
-    forwarded: boolean,
-    titleColor: string,
+    position: 'left' | 'right';
+    type: 'text' | 'file';
+    date: Date;
+    title: string;
+    status: 'waiting' | 'sent' | 'delivered' | 'read';
+    notch: boolean;
+    retracted: boolean;
+    removeButton: boolean;
+    replyButton: boolean;
+    forwarded: boolean;
+    titleColor: string;
+    data?: {
+        uri: string;
+        status: { click: boolean; loading: number };
+        name?: string;
+    };
+}
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnWindowFocus: false,
+            retry: 2,
+            staleTime: 1000 * 60 * 5 // 5 minutes cache
+        }
+    }
+});
+const useReceiverProfile = (receiverId: string) => {
+    return useQuery({
+        queryKey: ['receiverProfile', receiverId],
+        queryFn: () => getUserProfile(receiverId),
+        enabled: !!receiverId, // Only fetch when receiverId exists
+        staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+        retry: 2,
+    });
 };
-const App: React.FC = () => {
-    const [messages, setMessages] = useState<ChatMessage[]>([]);
+
+const ChatInterface: React.FC<ChatInterfaceProps> = () => {
     const listRef = useRef<HTMLDivElement>(null);
+    const { profile, usertype } = useUser();
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [isSending, setIsSending] = useState(false);
+    const currentUserId = localStorage.getItem('userId') ?? '';
+    
+    const receiverId = currentUserId === '1' ? '8' : '1';
+    const receiverProfile = useReceiverProfile(receiverId);
+
+    useEffect(() => {
+        if (!currentUserId) return;
+
+        const unsubscribe = subscribeToMessages(
+            currentUserId,
+            receiverId,
+            (firestoreMessages: any) => {
+                const formattedMessages = firestoreMessages.map((msg: Message) =>
+                    mapFirestoreToChatMessage(msg, currentUserId)
+                );
+                setMessages(formattedMessages);
+            }
+        );
+
+        return () => unsubscribe();
+    }, [currentUserId, receiverId]);
+
+    useEffect(() => {
+        // Mark messages as read
+        messages.forEach(async (msg) => {
+            if (!currentUserId) return
+            if (msg.position === 'left' && msg.status !== 'read') {
+                await updateMessageStatus(msg.id, receiverId, currentUserId, 'read');
+                setMessages(prev => prev.map(m =>
+                    m.id === msg.id ? { ...m, status: 'read' } : m
+                ));
+            }
+        });
+    }, [messages]);
+
     useEffect(() => {
         const el = listRef.current;
         if (el) {
-            // Option A: scroll the container
-            el.scrollTop = el.scrollHeight;                                                     // :contentReference[oaicite:0]{index=0}
-            // Option B: or scroll the last child into view:
-            // el.lastElementChild?.scrollIntoView({ behavior: 'smooth' });                     // :contentReference[oaicite:1]{index=1}
+            el.scrollTo({
+                top: el.scrollHeight,
+                behavior: 'smooth'
+            });
         }
     }, [messages]);
-    const handleSend = (msg: string, file?: File) => {
-        const newId = (messages.length + 1).toString();
-        if (file) {
-            const fileUrl = URL.createObjectURL(file);             // createObjectURL API 
-            setMessages([
-                ...messages,
-                {
-                    id: newId,
-                    position: 'right',
-                    type: 'text',
-                    text: msg,
-                    date: new Date(),
-                    title: 'You',
-                    status: 'sent',
-                    notch: false,
-                    retracted: false,
-                    removeButton: false,
-                    replyButton: false,
-                    forwarded: false,
-                    titleColor: '#000',
-                    // file-specific props:
 
+    const handleSend = async (text: string, file?: File) => {
+        if (!currentUserId || isSending) return;
 
-                    // Optional: Use `fileUrl` to enable download link in a custom renderer
-                    // you could extend MessageBoxProps to include it
-                },
-            ]);
-        } else {
-            setMessages([
-                ...messages,
-                {
-                    id: newId,
-                    position: 'right',
-                    type: 'text',
-                    text: msg,
-                    date: new Date(),
-                    title: 'You',
-                    status: 'read',
-                    notch: false,
-                    retracted: false,
-                    removeButton: false,
-                    replyButton: false,
-                    forwarded: false,
-                    titleColor: '#000',
-                },
-            ]);
+        const tempId = `temp-${Date.now()}`;
+        setIsSending(true);
+
+        // Optimistic update
+        setMessages(prev => [...prev, createTempMessage(tempId, text)]);
+
+        try {
+            const newMessage = await sendMessage(currentUserId, receiverId, text);
+
+          
+            setMessages(prev => prev.map(msg => {
+                //console.log(msg.id === currentUserId ? 'right' : 'left');
+                   return msg.id === tempId ? mapFirestoreToChatMessage(newMessage, currentUserId) : msg
+            } ));
+        } catch (error) {
+            //console.error("Failed to send message:", error);
+            setMessages(prev => prev.filter(msg => msg.id !== tempId));
+            alert('Failed to send message. Please try again.');
+        } finally {
+            setIsSending(false);
         }
     };
+
+   
+
+    const createTempMessage = (tempId: string, text: string): ChatMessage => ({
+        id: tempId,
+        position: 'right',
+        type: 'text',
+        text,
+        date: new Date(),
+        title: 'You',
+        status: 'waiting',
+        notch: false,
+        retracted: false,
+        removeButton: false,
+        replyButton: false,
+        forwarded: false,
+        titleColor: '#000'
+    });
+    const mapFirestoreToChatMessage = (
+        msg: Message,
+        currentUserId: string
+    ): ChatMessage => {
+        // compute & log position
+        const position = msg.senderId === currentUserId ? 'right' : 'left';
+      
+
+        // build and return ChatMessage
+        return {
+            id: msg.id,
+            position,                     // use the computed value
+            type: msg.contentType,
+            text: msg.content,
+            date: msg.createdAt
+                ? typeof (msg.createdAt as any).toDate === 'function'
+                    ? (msg.createdAt as Timestamp).toDate()
+                    : (msg.createdAt as unknown as Date)
+                : new Date(),
+            title: msg.senderId === currentUserId ? 'You' : `Advisor ${profile?.fullname}`,
+            status: msg.status,
+            notch: false,
+            retracted: false,
+            removeButton: false,
+            replyButton: false,
+            forwarded: false,
+            titleColor: '#000',
+            ...(msg.contentType === 'file' && {
+                data: {
+                    uri: msg.fileUrl || '',
+                    status: { click: false, loading: 0 },
+                    name: msg.fileName,
+                },
+            }),
+        };
+    };
+
+    
+
     return (
-        <Row>
-            <Col lg={8} xl={8}>
-                <ChatList
-                    id="helloThere"
-                    lazyLoadingImage="www.com"
-                    className='chat-list'
-                    dataSource={[
-                        {
-                            id: "hi",
-                            avatar: 'https://avatars.githubusercontent.com/u/80540635?v=4',
-                            alt: 'kursat_avatar',
-                            title: 'Kursat',
-                            subtitle: "Why don't we go to the No Way Home movie this weekend ?",
-                            date: new Date(),
-                            unread: 3,
-                        },
-                        {
-                            id: "hi",
-                            avatar: 'https://avatars.githubusercontent.com/u/80540635?v=4',
-                            alt: 'kursat_avatar',
-                            title: 'Kursat',
-                            subtitle: "Why don't we go to the No Way Home movie this weekend ?",
-                            date: new Date(),
-                            unread: 3,
-                        },
-                        {
-                            id: "hi",
-                            avatar: 'https://avatars.githubusercontent.com/u/80540635?v=4',
-                            alt: 'kursat_avatar',
-                            title: 'Kursat',
-                            subtitle: "Why don't we go to the No Way Home movie this weekend ?",
-                            date: new Date(),
-                            unread: 3,
-                        },
-                        {
-                            id: "hi",
-                            avatar: 'https://avatars.githubusercontent.com/u/80540635?v=4',
-                            alt: 'kursat_avatar',
-                            title: 'Kursat',
-                            subtitle: "Why don't we go to the No Way Home movie this weekend ?",
-                            date: new Date(),
-                            unread: 3,
-                        },
-                        {
-                            id: "hi",
-                            avatar: 'https://avatars.githubusercontent.com/u/80540635?v=4',
-                            alt: 'kursat_avatar',
-                            title: 'Kursat',
-                            subtitle: "Why don't we go to the No Way Home movie this weekend ?",
-                            date: new Date(),
-                            unread: 3,
-                        },
-                        {
-                            id: "hi",
-                            avatar: 'https://avatars.githubusercontent.com/u/80540635?v=4',
-                            alt: 'kursat_avatar',
-                            title: 'Kursat',
-                            subtitle: "Why don't we go to the No Way Home movie this weekend ?",
-                            date: new Date(),
-                            unread: 3,
-                        }
-
-                    ]} /></Col>
-            <Col style={{ width: "100%" }} lg={16} xl={16}>
-                <div
-                    ref={listRef}
-                    style={{
-                        height: "75vh",
-                        overflowY: 'auto',
-                        border: '1px solid #eee',
-                        padding: 8,
-                        //position:"relative"
-                    }}
-                >
-                    <MessageBox
-
-                        className="custom-message-box"
-                        position={"right"}
-                        type={"text"}
-                        title={"Me"}
-                        text="Here is a text type message box"
-                        id="unique-id-123"
-                        focus={false}
-                        date={new Date()}
-                        status="waiting"
-                        titleColor="#000000"
-                        forwarded={false}
-                        replyButton={false}
-                        removeButton={false}
-                        onClick={() => { }}
-                        onOpen={() => { }}
-
-                        // Add these required props
-                        notch={false}       // Controls message bubble notch visibility
-                        retracted={false}   // Marks message as deleted/retracted
-                    />
-                    <br></br>
-                    <MessageBox
-
-                        notch={false}        // Required boolean
-                        retracted={false}    // Required boolean
-                        status="received"
-                        date={new Date()}
-                        titleColor="#000000"
-                        forwarded={false}
-                        id="audio-message-3"
-                        focus={false}
-                        replyButton={false}  // Required boolean
-                        removeButton={false} // Required boolean
-                        reply={{
-                            title: "Emre",
-                            titleColor: "#8717ae",
-                            borderLeft: "4px solid purple",
-                            message: "Nice to meet you",
-
-                        }}
-                        position={"left"}
-                        type={"text"}
-                        title="Esra"
-                        text={
-                            "Nice to meet you too !"
-                        }
-                    />
-                    <br></br>
-                    <MessageBox
-
-                        position={"right"}
-                        type={"audio"}
-                        title={"Me"}
-                        id="audio-message-1"  // Required unique identifier
-                        text=""  // Optional subtitle
-                        focus={false}        // Required boolean
-                        date={new Date()}    // Required Date object
-                        status="sent"
-                        titleColor="#000000" // Required color string
-                        forwarded={false}    // Required boolean
-                        replyButton={false}  // Required boolean
-                        removeButton={false} // Required boolean
-                        notch={false}        // Required boolean
-                        retracted={false}    // Required boolean
-
-                        // Required audio data
-                        data={{
-
-                            audioURL: "https://www.sample-videos.com/audio/mp3/crowd-cheering.mp3",
-                            duration: 30, // Required duration in seconds
-
-                        }}
-
-                        // Optional but recommended
-                        onClick={() => { }}
-                        onOpen={() => { }}
-                    />
-                    <br></br>
-                    <MessageBox
-
-                        notch={false}        // Required boolean
-                        retracted={false}    // Required boolean
-                        status="read"
-                        title={"Emre"}
-                        forwarded={false}
-                        id="audio-message-3"  // Required unique identifier
-                        date={new Date()}
-                        focus={false}        // Required boolean
-                        position={"left"}
-                        replyButton={false}  // Required boolean
-                        removeButton={false} // Required boolean
-                        type={"file"}
-                        titleColor="#000000"
-                        text="Sample PDF"
-                        data={{
-                            uri: "https://www.sample-videos.com/pdf/Sample-pdf-5mb.pdf",
-                            status: {
-                                click: false,
-                                loading: 0,
-                            },
-                        }}
-                    />
-                    <br></br>
-                    <MessageBox
-                        replyButton={false}  // Required boolean
-                        removeButton={false} // Required boolean
-                        notch={false}        // Required boolean
-                        retracted={false}    // Required boolean
-                        status="read"
-                        title={"Me"}
-                        forwarded={false}
-                        id="audio-message-s3"  // Required unique identifier
-                        date={new Date()}
-                        focus={false}        // Required boolean
-                        position="right"
-                        titleColor="#000000"
-                        type="meetingLink"
-                        text="Click to join the meeting"
-                    />
-                    <br></br>
-                 
-                    <List
-                        split={false}
-                        locale={{ emptyText: <SystemMessage text="End of Conversation"/> }}  
-                        style={{ width: "100%" }}
-                        bordered={false}
-                        dataSource={messages}
-                        renderItem={(item) => (
-                            <List.Item
-                                key={item.id}
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: item.position === 'right'
-                                        ? 'flex-end'
-                                        : 'flex-start',
-                                }}
-                            >
-                                <MessageBox {...item} />
-                            </List.Item>
-                        )}
-
-                    />
-                    <br></br>
-                    <ChatComposer onSend={handleSend} />
-                </div>
+        <div className="chat-container">
+            <div ref={listRef} style={{
+                height: "75vh",
+                overflowY: 'auto',
+                padding: 8,
+                scrollBehavior: 'smooth'
+            }}>
+                <List
+                    split={false}
+                    locale={{ emptyText: <SystemMessage text="Start a conversation" /> }}
+                    style={{ width: "100%" }}
+                    bordered={false}
+                    dataSource={messages}
+                    renderItem={(item) => (
+                        <List.Item
+                            key={item.id}
+                            style={{
+                                display: 'flex',
+                                justifyContent: item.position === 'right'
+                                    ? 'flex-end'
+                                    : 'flex-start',
+                                padding: '8px 0'
+                            }}
+                        >
+                            <MessageBox
+                                {...item}
+                                notch={item.position === 'right'}
+                                retracted={false}
+                                onTitleClick={() => {/* Handle profile click */ }}
+                            />
+                        </List.Item>
+                    )}
+                />
+            </div>
+            <ChatComposer
+                onSend={handleSend}
+                
                
-               
-              
-            </Col>
-         
-        </Row>
-    )
+            />
+        </div>
+    );
+};
+interface ChatInterfaceWrapperProps {
+    receiverId: string;
 }
-
-export default App;
+const ChatInterfaceWrapper: React.FC<ChatInterfaceWrapperProps> = ({ receiverId }) => {
+    return (
+        <QueryClientProvider client={queryClient}>
+            <ChatInterface receiverId={receiverId} />
+        </QueryClientProvider>
+    );
+};
+export default ChatInterfaceWrapper
