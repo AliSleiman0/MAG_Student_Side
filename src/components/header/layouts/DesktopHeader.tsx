@@ -7,6 +7,7 @@ import { HeaderFullscreen } from '../components/HeaderFullscreen/HeaderFullscree
 import * as S from '../Header.styles';
 import { BaseRow } from '@app/components/common/BaseRow/BaseRow';
 import { BaseCol } from '@app/components/common/BaseCol/BaseCol';
+import { useUser } from '../../../Context/UserContext';
 
 interface DesktopHeaderProps {
   isTwoColumnsLayout: boolean;

@@ -14,9 +14,10 @@ import { useAppSelector } from '@app/hooks/reduxHooks';
 import { BaseRow } from '../common/BaseRow/BaseRow';
 import { BaseCol } from '../common/BaseCol/BaseCol';
 import { Row } from 'antd';
+import { useUser } from '../../Context/UserContext';
 
 const ProfileLayout: React.FC = () => {
-    const user = useAppSelector((state) => state.user.user);
+     const { profile:user, usertype } = useUser();
 
     const { t } = useTranslation();
     const { isTablet: isTabletOrHigher, mobileOnly, isDesktop } = useResponsive();

@@ -1,6 +1,6 @@
 ﻿// firebase.ts
 import { initializeApp } from 'firebase/app';
-import { Unsubscribe, addDoc, collection, doc, getFirestore, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { DocumentData, Unsubscribe, addDoc, collection, doc, getFirestore, increment, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
 import { browserLocalPersistence, getAuth, setPersistence, signInAnonymously } from 'firebase/auth';
 import { Timestamp } from "firebase/firestore";
 
@@ -30,7 +30,16 @@ export interface Room {
     /** Last message timestamp for ordering rooms */
     lastMessageAt: Timestamp;
 }
-
+export interface RoomWithLastMsg {
+    id: string;
+    participants: string[];
+    lastMessageAt: Timestamp;
+    lastMessage: {
+        content: string;
+        status: string;
+    };
+    unreadCount: { [userId: string]: number };
+}
 export type MessageStatus = "waiting" | "sent" | "delivered" | "read";
 
 export type ContentType = "text" | "file"; //later voice
@@ -67,7 +76,7 @@ function getRoomId(user1: string, user2: string): string {
     const sortedIds = [user1, user2].sort();
     console.log("roomid", sortedIds.join('-'));
     return sortedIds.join('-');
-    
+
 }
 
 // 2️⃣ Send a plain-text message from sender → receiver
@@ -78,32 +87,37 @@ export async function sendMessage(
 ): Promise<any> {
     const roomId = getRoomId(senderId, receiverId);
     const roomRef = doc(db, "rooms", roomId);
-
     const participants = [senderId, receiverId].sort();
 
     await setDoc(
         roomRef,
         {
-            participants: participants,
+            participants,
             lastMessageAt: serverTimestamp(),
+            lastMessage: {
+                content,
+                status: "sent",
+            },
+            // <-- bump unread for the other user:
+            [`unreadCount.${receiverId}`]: increment(1),
         },
         { merge: true }
     );
 
     const messagesCol = collection(db, "rooms", roomId, "messages");
-
-    const messageData = {
-        senderId,
-        content,
-        contentType: "text",
-        status: "sent",
-        createdAt: serverTimestamp(), // still unresolved at this point
-    };
-
+    const messageData = { senderId, content, contentType: "text", status: "sent", createdAt: serverTimestamp() };
     await addDoc(messagesCol, messageData);
-    //console.log("messagefirebase", senderId,
-    //    messageData.senderId, content);
-    return  messageData;
+    return messageData;
+}
+export async function resetUnreadCount(
+    userId: string,
+    otherId: string
+): Promise<void> {
+    const roomId = getRoomId(userId, otherId);
+    const roomRef = doc(db, "rooms", roomId);
+    await updateDoc(roomRef, {
+        [`unreadCount.${userId}`]: 0
+    });
 }
 // 3️⃣ Subscribe to text messages in that room (ordered by time)
 export function subscribeToMessages(
@@ -122,6 +136,40 @@ export function subscribeToMessages(
             ...doc.data(),
         })) as Message[];
         onUpdate(msgs);
+    });
+}
+/**
+ * Subscribe to *all* rooms that `userId` participates in,
+ * ordered by lastMessageAt descending.
+ */
+export function subscribeToUserRooms(
+    userId: string,
+    onUpdate: (rooms: RoomWithLastMsg[]) => void
+): Unsubscribe {
+    const roomsQ = query(
+        collection(db, "rooms"),
+        where("participants", "array-contains", userId),
+        orderBy("lastMessageAt", "desc")
+    );
+
+    return onSnapshot(roomsQ, (snap) => {
+        const rooms: RoomWithLastMsg[] = snap.docs.map((doc) => {
+            const data = doc.data() as DocumentData;
+
+            return {
+                id: doc.id,
+                participants: data.participants as string[],
+                lastMessageAt: data.lastMessageAt as Timestamp,
+                // these two must exist on the room doc:
+                lastMessage: {
+                    content: (data.lastMessage?.content as string) || "",
+                    status: (data.lastMessage?.status as string) || "sent",
+                },
+                unreadCount: (data.unreadCount as { [userId: string]: number }) || {},
+            };
+        });
+
+        onUpdate(rooms);
     });
 }
 export async function updateMessageStatus(

@@ -57,7 +57,7 @@ const AdvisorCard = ({ advisor }: { advisor: Advisor }) => {
 
     const handleChatStart = () => {
         if (!advisor?.userid) return;
-        navigate(`/chat/${advisor.userid}`);
+        navigate(`/Messager/${advisor.userid}`);
     };
     const handleHover = useCallback((state: boolean) => () => {
         setIsHovered(state);

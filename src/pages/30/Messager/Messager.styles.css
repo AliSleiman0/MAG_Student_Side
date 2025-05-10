@@ -2,3 +2,8 @@
 .custom-message-box .rce-mbox {
     background-color: #ebfffc !important;
 }
+.chat-room-selected {
+  
+    font-weight: bold;
+    border-left: 2px solid #00918f; /* Ant Design primary color */
+}

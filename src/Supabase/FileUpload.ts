@@ -1,6 +1,4 @@
 import { supabase } from "./supabaseClient";
-
-
 export const uploadImage = async (file: File): Promise<string> => {
     // Generate a unique file name
     const timestamp = Date.now();

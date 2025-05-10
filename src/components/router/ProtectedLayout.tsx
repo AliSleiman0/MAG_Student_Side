@@ -6,7 +6,7 @@ import { Spin } from 'antd';
 
 export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { token, loading, initialized } = useUser();
-
+    
   // 1) Still restoring session? show spinner (or return null)
   if (!initialized) {
     return <Spin />;

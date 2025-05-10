@@ -17,7 +17,7 @@ interface UserContextState {
     logoutUser: () => Promise<void>;
     refreshProfile: () => Promise<void>;
     updatePassword: (input: UpdatePasswordInput) => Promise<string>;
-    uploadImage: (input: AddImageInput) => Promise<string>;
+    uploadImage: (input: string) => Promise<string>;
     removeImage: () => Promise<string>;
 }
 
@@ -109,7 +109,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         setLoading(true);
         setError(null);
         try {
-            const res = await resetPassword(input);
+            const res = await resetPassword(input, Number(userId));
             return res ?? 'Error';
         } catch (err: any) {
             setError(err.message);
@@ -120,11 +120,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     };
 
     // Add profile image
-    const uploadImage = async (input: AddImageInput): Promise<string> => {
+    const uploadImage = async (input: string): Promise<string> => {
         setLoading(true);
         setError(null);
         try {
-            const res = await addImage(input);
+            const res = await addImage({ image: input },Number(userId));
             await refreshProfile();
             return res ?? 'Error';
         } catch (err: any) {
@@ -140,7 +140,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         setLoading(true);
         setError(null);
         try {
-            const res = await deleteImage();
+            const res = await deleteImage(Number(userId));
             await refreshProfile();
             return res ?? 'Error';
         } catch (err: any) {
