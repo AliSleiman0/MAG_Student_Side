@@ -2,82 +2,61 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BaseButtonsForm } from '@app/components/common/forms/BaseButtonsForm/BaseButtonsForm';
 import { BaseCard } from '@app/components/common/BaseCard/BaseCard';
-
-import { useAppSelector } from '@app/hooks/reduxHooks';
 import { notificationController } from '@app/controllers/notificationController';
-import { PaymentCard } from '@app/interfaces/interfaces';
 import { BaseRow } from '@app/components/common/BaseRow/BaseRow';
 import { InputDisplay } from '../../../../../InputDisplay';
-import { BaseUpload } from '../../../../../common/BaseUpload/BaseUpload';
 import styled from 'styled-components';
 import { FONT_SIZE, FONT_WEIGHT } from '../../../../../../styles/themes/constants';
-import { InboxOutlined } from '@ant-design/icons';
+import { UploadOutlined } from '@ant-design/icons';
 import { BaseCol } from '@app/components/common/BaseCol/BaseCol';
-export const PersonalInfo: React.FC = () => {
+import { useUser } from '../../../../../../Context/UserContext';
+import { updateImage, getImageUrl } from '../../../../../../Supabase/FileUpload';
+import { Avatar, Button, Form, Space, Typography, Upload } from 'antd';
 
-    const DraggerIconWrapper = styled.div`
-  font-size: 4rem;
-  color: var(--primary-color);
-`;
-    const DraggerTitle = styled.div`
-  font-size: ${FONT_SIZE.xl};
-  font-weight: ${FONT_WEIGHT.bold};
-`;
-    const DraggerDescription = styled.div`
-  font-size: ${FONT_SIZE.md};
-  padding: 0 1rem;
-`;
-   
-    const user = useAppSelector((state) => state.user.user);
+export const PersonalInfo: React.FC = () => {
+    const { profile: user, removeImage, uploadImage: uploadImageDatabase } = useUser();
 
     const [isFieldsChanged, setFieldsChanged] = useState(false);
-    const [isLoading, setLoading] = useState(false);
-
-    //usememo for updating
+  
     const [form] = BaseButtonsForm.useForm();
-
+    const [file, setFile] = useState<File>();
+    const [preview, setPreview] = useState<string | null>(null);
     const { t } = useTranslation();
 
-    const onFinish = useCallback(
-        (values: PaymentCard) => {
-            // todo dispatch an action here
-            setLoading(true);
-            setTimeout(() => {
-                setLoading(false);
-                setFieldsChanged(false);
-                notificationController.success({ message: t('common.success') });
-                console.log(values);
-            }, 1000);
-        },
-        [t],
-    );
-    const uploadProps = {
-        name: 'file',
-
-        action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-        onChange: (info: any) => {
-            const { status } = info.file;
-            if (status !== 'uploading') {
-                console.log(info.file, info.fileList);
-            }
-            if (status === 'done') {
-                notificationController.success({ message: t('profile.successUpload', { name: info.file.name }) });
-            } else if (status === 'error') {
-                notificationController.error({ message: t('profile.failedUpload', { name: info.file.name }) });
-            }
-        },
+    const loadImage = (file: File) => {
+        setFile(file);
+        setPreview(URL.createObjectURL(file));
     };
+
+    const customUpload = async (e: React.MouseEvent<HTMLElement>) => {
+
+        e.preventDefault();
+
+        try {
+            const filePath = await updateImage(user?.image ?? 's', file);
+            const imgSrc = getImageUrl(filePath);
+            await removeImage();
+            await uploadImageDatabase(imgSrc);
+            notificationController.success({ message: t('common.success') });
+        } catch (error) {
+            notificationController.error({ message: t('common.failed') });
+        }
+    };
+
+ 
+
     return (
         <BaseCard>
             <BaseButtonsForm
+                onSubmitCapture={(e) =>  e.preventDefault()}
+               
                 form={form}
                 name="info"
-                loading={isLoading}
-                /*initialValues={userFormValues}*/
+              
                 isFieldsChanged={isFieldsChanged}
                 setFieldsChanged={setFieldsChanged}
                 onFieldsChange={() => setFieldsChanged(true)}
-                onFinish={onFinish}
+               
             >
                 <BaseRow gutter={{ xs: 10, md: 15, xl: 30 }}>
                     <BaseCol span={24}>
@@ -87,34 +66,43 @@ export const PersonalInfo: React.FC = () => {
                     </BaseCol>
 
                     <BaseCol xs={24} md={12}>
-                        
-                        <InputDisplay title={t('profile.full_name')}  />
-                        
+                        <InputDisplay title={t('profile.full_name')} />
                     </BaseCol>
                     <BaseCol xs={24} md={12}>
                         <InputDisplay title={t('profile.id')} />
-                         </BaseCol>
+                    </BaseCol>
                     <BaseCol xs={24} md={12}>
                         <InputDisplay title={t('profile.email')} />
-                         </BaseCol>
-
+                    </BaseCol>
                     <BaseCol xs={24} md={12}>
                         <InputDisplay title={t('profile.campus')} />
-                          </BaseCol>
-                    <BaseCol xs={24} md={24} lg={24} style={{ paddingBottom: "30px" }}>
-                        <h4 style={{ color: "#038b94" }}>{t('profile.update_profile_image')}</h4>
-                        <BaseUpload.Dragger {...uploadProps}>
-                            <DraggerIconWrapper>
-                                <InboxOutlined />
-                            </DraggerIconWrapper>
-                            <DraggerTitle>{t('profile.dragUpload')}</DraggerTitle>
-                            <DraggerDescription>{t('profile.bulkUpload')}</DraggerDescription>
-                        </BaseUpload.Dragger>
                     </BaseCol>
-
-
                 </BaseRow>
             </BaseButtonsForm>
+            <Form layout="vertical">
+                <Form.Item label="Change Profile">
+                    <Upload
+                        accept="image/*"
+                        showUploadList={true}
+                        beforeUpload={(file) => {
+                            loadImage(file as File);
+                            return false;
+                        }}
+                    >
+                        <Button icon={<UploadOutlined />}>Select Image</Button>
+                    </Upload>
+                </Form.Item>
+
+                {preview && (
+                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                        <Typography.Text>Image Preview</Typography.Text>
+                        <Avatar shape="square" size={128} src={preview} />
+                        <Button type="primary" onClick={customUpload}>
+                            Submit
+                        </Button>
+                    </Space>
+                )}
+            </Form>
         </BaseCard>
     );
 };

@@ -2,3 +2,17 @@
 .custom-message-box .rce-mbox {
     background-color: #ebfffc !important;
 }
+.chat-room-selected {
+  
+    font-weight: bold;
+    border-left: 2px solid #00918f; /* Ant Design primary color */
+}
+.rce-chatitem-status-badge {
+    background-color: black !important; 
+color: #fff !important;
+font-size: 0.75rem !important;
+padding: 0.2rem 0.4rem !important;
+top: 8px !important; /* fine-tune position */
+right: 12px !important;
+border-radius: 50% !important;
+}

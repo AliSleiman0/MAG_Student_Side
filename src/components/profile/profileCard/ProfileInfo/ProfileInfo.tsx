@@ -4,9 +4,10 @@ import { UserModel } from '@app/domain/UserModel';
 import * as S from './ProfileInfo.styles';
 import { BaseAvatar } from '@app/components/common/BaseAvatar/BaseAvatar';
 import styled from 'styled-components';
+import { UserProfile } from '../../../../apiMAG/user';
 
 interface ProfileInfoProps {
-    profileData: UserModel | null;
+    profileData: UserProfile | null;
 }
 
 export const ProfileInfo: React.FC<ProfileInfoProps> = ({ profileData }) => {
@@ -18,10 +19,10 @@ export const ProfileInfo: React.FC<ProfileInfoProps> = ({ profileData }) => {
         <S.Wrapper>
 
             <S.ImgWrapper>
-                <BaseAvatar shape="circle" src={profileData?.imgUrl} alt="Profile" />
+                <BaseAvatar shape="circle" src={profileData.image} alt="Profile" />
             </S.ImgWrapper>
-            <S.Title>{`${profileData?.firstName} ${profileData?.lastName}`}</S.Title>
-            <S.Subtitle>ID : 72230341</S.Subtitle>
+            <S.Title>{`${profileData?.fullname}`}</S.Title>
+            {/*<S.Subtitle>{`${profileData?.userid}` }</S.Subtitle>*/}
 
         </S.Wrapper>
     ) : null;

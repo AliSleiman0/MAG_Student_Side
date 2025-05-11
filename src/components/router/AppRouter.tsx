@@ -1,10 +1,10 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // no lazy loading for auth pages to avoid flickering
 const AuthLayout = React.lazy(() => import('@app/components/layouts/AuthLayout/AuthLayout'));
 import LoginPage from '@app/pages/LoginPage';
-import SignUpPage from '@app/pages/SignUpPage';
+
 import ForgotPasswordPage from '@app/pages/ForgotPasswordPage';
 import SecurityCodePage from '@app/pages/SecurityCodePage';
 import NewPasswordPage from '@app/pages/NewPasswordPage';
@@ -70,7 +70,11 @@ export const AppRouter: React.FC = () => {
                         <Route path={"/CustomizedPOS"} element={<CustomizedPOS />} />
                         <Route path={"/DynamicPOS"} element={<DynamicPOS />} />
                         <Route path="/POS" element={<GraphComponent />} />
-                        <Route path="/Messager" element={<Messager />} />
+                       
+                        <Route path="/Messager/:receiverId" element={<Messager />} />
+                        <Route path="/Messager/*" element={<Navigate to="/Messager/1" replace />} />
+
+
                         <Route path="/advisors" element={<AdvisorsList />} />
                         <Route path="/Scheduling_Tool" element={< SchedulingTool />} />/
 
@@ -87,7 +91,7 @@ export const AppRouter: React.FC = () => {
                     </Route>
                     <Route path="/auth" element={<AuthLayoutFallback />}>
                         <Route path="login" element={<LoginPage />} />
-                        <Route path="sign-up" element={<SignUpPage />} />
+
                         <Route
                             path="lock"
                             element={

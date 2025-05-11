@@ -27,14 +27,21 @@ export interface UserProfile {
     schoolname: string;
     image: string;
 }
-
+export interface ReceiverProfile {
+    userid: number;
+    fullname: string;
+    email: string;
+    campusname: string;
+    usertype: string;
+    image: string;
+}
 export interface UpdatePasswordInput {
     password: string;
     password_confirmation: string;
 }
 
 export interface AddImageInput {
-    imagepath: string;
+    image: string;
 }
 
 // API Functions
@@ -68,9 +75,10 @@ export const showProfile = async (): Promise<UserProfile> => {
     }
 };
 
-export const deleteImage = async (): Promise<string> => {
+export const deleteImage = async (Userid: number): Promise<string> => {
     try {
-        const response = await api.put('/profile/deleteimage');
+        const response = await api.put(`/profile/deleteimage/${Userid}`);
+
         return response.data.message;
     } catch (error: any) {
         const errorMessage = error.response?.data?.message || 'Failed to delete image';
@@ -78,9 +86,9 @@ export const deleteImage = async (): Promise<string> => {
     }
 };
 
-export const addImage = async (data: AddImageInput): Promise<string> => {
+export const addImage = async (data: AddImageInput, Userid:number): Promise<string> => {
     try {
-        const response = await api.put('/profile/addimage/', data);
+        const response = await api.put(`/profile/addimage/${Userid}`, data);
         return response.data.message;
     } catch (error: any) {
         const errorMessage = error.response?.data?.message || 'Failed to add image';
@@ -88,9 +96,9 @@ export const addImage = async (data: AddImageInput): Promise<string> => {
     }
 };
 
-export const resetPassword = async (data: UpdatePasswordInput): Promise<string> => {
+export const resetPassword = async (data: UpdatePasswordInput, Userid: number): Promise<string> => {
     try {
-        const response = await api.put('/profile/updatepassword/', data);
+        const response = await api.put(`/profile/updatepassword/${Userid}`, data);
         return response.data.message;
     } catch (error: any) {
         const errorMessage = error.response?.data?.message || 'Password reset failed';
@@ -107,3 +115,12 @@ export const getRespectiveAdvisors = async (): Promise<Advisor[]> => {
         throw new Error(errorMessage);
     }
 };
+export const getUserProfile = async (id: number): Promise<ReceiverProfile> => {
+    try {
+        const response = await api.get(`/getProfileById/${id}`);
+        return response.data;
+    } catch (error: any) {
+        const errorMessage = error.response?.data?.message || 'Failed to fetch User';
+        throw new Error(errorMessage);
+    }
+}; 

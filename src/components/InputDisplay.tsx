@@ -4,6 +4,7 @@ import { isValidPhoneNumber } from 'react-phone-number-input';
 import { BaseButtonsForm } from '@app/components/common/forms/BaseButtonsForm/BaseButtonsForm';
 import * as S from './PhoneItem.styles';
 import styled from 'styled-components';
+import { useUser } from '../Context/UserContext';
 
 interface InputDisplayItemsProps {
     title?: string;
@@ -12,7 +13,8 @@ interface InputDisplayItemsProps {
 
 export const InputDisplay: React.FC<InputDisplayItemsProps> = ({ title }) => {
     const { t } = useTranslation();
-    const value = title == "Full Name" ? "Doaa Khashab" : title == "ID" ? "72230341" : title == "Campus" ? "Tyre" : "72230341@student.liu.edu.lb";
+    const { profile: user, usertype } = useUser();
+    const value = title == "Full Name" ? user?.fullname : title == "ID" ? user?.userid : title == "Campus" ? user?.campusname : user?.email;
     return (
        
         <BaseButtonsForm.Item

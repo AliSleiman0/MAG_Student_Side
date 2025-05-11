@@ -63,8 +63,7 @@ interface CoursesListProps {
 }
 const CourseLists: React.FC<CoursesListProps> = ({ data }) => {
     useEffect(() => {
-        console.log('Full Data:', data);
-        console.log('Distribution Data:', data?.courses_destribution_by_status);
+       
     }, [data]);
     const [loading] = useState<boolean>(true);
     const { t } = useTranslation();
@@ -194,7 +193,7 @@ const CourseLists: React.FC<CoursesListProps> = ({ data }) => {
                         >
                             <Divider orientation="left" style={{ borderColor: '#038b94' }}>{t("courses.credits.remaining")}</Divider>
                             <div style={{
-                                maxHeight: '250px',  // Adjust this value based on your card height (4 cards * card height)
+                                maxHeight: '300px',  // Adjust this value based on your card height (4 cards * card height)
                                 overflowY: 'auto',
                                 paddingRight: '8px', // Prevents scrollbar from overlapping content
                                 marginBottom: "20px"
@@ -217,7 +216,7 @@ const CourseLists: React.FC<CoursesListProps> = ({ data }) => {
                             </div>
                             <Divider orientation="left" style={{ borderColor: '#038b94' }}>{t("courses.credits.failed_withdrawn")}</Divider>
                             <div style={{
-                                maxHeight: '250',  // Adjust this value based on your card height (4 cards * card height)
+                                maxHeight: '300px', // Adjust this value based on your card height (4 cards * card height)
                                 overflowY: 'auto',
                                 paddingRight: '8px'  // Prevents scrollbar from overlapping content
                             }}>
