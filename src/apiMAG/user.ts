@@ -98,7 +98,7 @@ export const addImage = async (data: AddImageInput, Userid:number): Promise<stri
 
 export const resetPassword = async (data: UpdatePasswordInput, Userid: number): Promise<string> => {
     try {
-        const response = await api.put(`/profile/updatepassword/${Userid}`, data);
+        const response = await api.put(`/profile/resetpassword/${Userid}`, data);
         return response.data.message;
     } catch (error: any) {
         const errorMessage = error.response?.data?.message || 'Password reset failed';
