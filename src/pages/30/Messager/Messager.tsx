@@ -1,19 +1,35 @@
-﻿import { useEffect, useRef, useState } from "react";
+﻿// Messager.tsx
+// ---------------------------
+// 1. IMPORTS & DEPENDENCIES
+// ---------------------------
+// React Core
+import { useEffect, useRef, useState } from "react";
+import { useParams, useNavigate } from 'react-router-dom';
+
+// Third-party Components
 import { ChatList, IChatListProps, MessageBox, SystemMessage } from "react-chat-elements";
 import { Col, List, Row } from "antd";
-import { useUser } from "../../../Context/UserContext";
-import { useParams, useNavigate } from 'react-router-dom';
-import { subscribeToMessages, updateMessageStatus, sendMessage, Message, RoomWithLastMsg, subscribeToUserRooms, resetUnreadCount } from "../../../firebase/firebase";
-import ChatComposer from "./Input";
-import { Timestamp } from "firebase/firestore";
-import { ReceiverProfile, UserProfile, getUserProfile, showProfile } from "../../../apiMAG/user";
-import "./Messager.styles.css"
-
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+
+// Firebase & Types
+import { Timestamp } from "firebase/firestore";
+import {
+    subscribeToMessages, updateMessageStatus, sendMessage,
+    Message, RoomWithLastMsg, subscribeToUserRooms, resetUnreadCount
+} from "../../../firebase/firebase";
+
+// Context & Hooks
+import { useUser } from "../../../Context/UserContext";
 import { useResponsive } from "../../../hooks/useResponsive";
 
+// API & Utilities
+import { getUserProfile } from "../../../apiMAG/user";
+import "./Messager.styles.css"
+import ChatComposer from "./Input";
 
-
+// ---------------------------
+// 2. TYPE DEFINITIONS
+// ---------------------------
 interface ChatInterfaceProps {
     receiverId: string;
     onSelectRoom: (receiverId: string) => void;
@@ -26,118 +42,160 @@ interface ChatMessage {
     type: 'text' | 'file';
     date: Date;
     title?: string;
-    status: 'waiting' | 'sent' | 'delivered' | 'read';
+    status: 'waiting' | 'sent' | 'received' | 'read';
     notch: boolean;
     retracted: boolean;
     removeButton: boolean;
     replyButton: boolean;
     forwarded: boolean;
     titleColor: string;
-    senderId: string,
+    senderId: string;
+    statusColorType: string;
     data?: {
         uri: string;
         status: { click: boolean; loading: number };
         name?: string;
     };
 }
+
+// ---------------------------
+// 3. QUERY CLIENT CONFIG
+// ---------------------------
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            refetchOnWindowFocus: false,
-            retry: 2,
-            staleTime: 1000 * 60 * 5 // 5 minutes cache
+            refetchOnWindowFocus: false,  // Prevent refetch on window focus
+            retry: 2,                     // Retry failed queries twice
+            staleTime: 1000 * 60 * 5      // 5 minutes cache lifetime
         }
     }
 });
+
+// ---------------------------
+// 4. CUSTOM HOOKS
+// ---------------------------
 const useReceiverProfile = (receiverId: string) => {
     return useQuery({
         queryKey: ['receiverProfile', receiverId],
         queryFn: () => getUserProfile(Number(receiverId)),
-        enabled: !!receiverId, // Only fetch when receiverId exists
-        staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-        retry: 2,
+        enabled: !!receiverId,            // Only fetch when ID exists
+        staleTime: 1000 * 60 * 5,         // 5 minute cache
+        retry: 2,                         // Retry twice on failure
     });
 };
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId="1", onSelectRoom }) => {
-   
+// ---------------------------
+// 5. MAIN COMPONENT
+// ---------------------------
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId = "1", onSelectRoom }) => {
+    // ---------------------------
+    // 5.1 COMPONENT STATE & REFS
+    // ---------------------------
     const { mobileOnly } = useResponsive();
-    const listRef = useRef<HTMLDivElement>(null);
-    const { profile, usertype } = useUser();
-    const [messages, setMessages] = useState<ChatMessage[]>([]);
-    const [isSending, setIsSending] = useState(false);
-    const currentUserId = localStorage.getItem('userId') ?? '';
- 
-   
-    const { data: receiverProfile, isLoading, error } = useReceiverProfile(receiverId);
+    const listRef = useRef<HTMLDivElement>(null);  // Reference to messages container
+    const { profile, usertype } = useUser();       // User context data
+    const [messages, setMessages] = useState<ChatMessage[]>([]);//messages
+    const [isSending, setIsSending] = useState(false); //message is sending?
+    const currentUserId = localStorage.getItem('userId') ?? ''; //Current userid
+    const [chatRooms, setChatRooms] = useState<IChatListProps['dataSource']>([]); // rooms associated with the current user
+    const { data: receiverProfile, isLoading, error } = useReceiverProfile(receiverId); //gets the receiver profile from its id
 
-    const [chatRooms, setChatRooms] = useState<IChatListProps['dataSource']>([]);
-    const navigate = useNavigate();
+    // ---------------------------
+    // 5.2 CHAT ROOM SUBSCRIPTION
+    // ---------------------------
     useEffect(() => {
-        console.log("currentUserId", currentUserId);
         if (!currentUserId) return;
-        const unsub = subscribeToUserRooms(String(currentUserId), async (rooms: RoomWithLastMsg[]) => {
-            console.log("▶️ Firestore rooms snapshot:", rooms);
-            const ds = await Promise.all(
-                rooms.map(async (room) => {
-                    const otherId = room.participants.find((id) => Number(id) !== Number(currentUserId))!;
-                    const other = await getUserProfile(Number(otherId));
-                    console.log("room", room);
-                    return {
-                        id: other.userid,
-                        avatar: other.image,
-                        alt: other.fullname,
-                        title: other.fullname,
-                        subtitle: room.lastMessage.content || "debugging starts",
-                        date: room.lastMessageAt
-                            ? room.lastMessageAt.toDate()
-                            : new Date(),
-                        unread: room.unreadCount[currentUserId] || 0,
-                        onClick: () => onSelectRoom(String(other.userid)),
-                     
-                    };
-                })
-            );
-            console.log("ds", ds);
-            setChatRooms(ds);
-        }
+
+        const unsub = subscribeToUserRooms(
+            String(currentUserId),
+            async (rooms: RoomWithLastMsg[]) => {
+                const ds = await Promise.all(
+                    rooms.map(async (room) => {
+                        // find the “other” participant
+                        const otherId = room.participants.find(
+                            (id) => id !== String(currentUserId)
+                        )!;
+
+                        // load their profile
+                        const other = await getUserProfile(Number(otherId));
+
+                        // determine slots A/B for this room
+                        const [userA, userB] = [...room.participants].sort();
+
+                        // pick the right unread count for currentUser
+                        const unread =
+                            String(currentUserId) === userA
+                                ? room.unreadCountA
+                                : room.unreadCountB;
+
+                        return {
+                            id: other.userid,
+                            avatar: other.image,
+                            alt: other.fullname,
+                            title: other.fullname,
+                            subtitle: room.lastMessage.content || "New chat",
+                            date: room.lastMessageAt?.toDate() || new Date(),
+                            unread,
+                            statusColorType:"badge",
+                            onClick: async () => {
+                                onSelectRoom(String(other.userid));
+                                await resetUnreadCount(currentUserId, String(other.userid));
+                            },
+                        };
+                    })
+                );
+
+                setChatRooms(ds);
+            }
         );
+
         return () => unsub();
     }, [currentUserId]);
+    // ---------------------------
+    // 5.3 MESSAGE SUBSCRIPTION
+    // ---------------------------
     useEffect(() => {
         if (!currentUserId || !receiverId) return;
 
-        // reset my unread count for this room
+        // Reset unread count when opening chat
         resetUnreadCount(currentUserId, receiverId).catch(console.error);
 
+        // Subscribe to real-time messages
         const unsubscribe = subscribeToMessages(
             currentUserId,
             receiverId,
-            (firestoreMessages: any) => {
-                const formattedMessages = firestoreMessages.map((msg: Message) =>
+            (firestoreMessages: Message[]) => {
+                const formattedMessages = firestoreMessages.map(msg =>
                     mapFirestoreToChatMessage(msg, currentUserId)
                 );
                 setMessages(formattedMessages);
             }
         );
 
-        return () => unsubscribe();
+        return () => unsubscribe();  // Cleanup on unmount
     }, [currentUserId, receiverId]);
 
+    // ---------------------------
+    // 5.4 MESSAGE STATUS UPDATES
+    // ---------------------------
     useEffect(() => {
-        // Mark messages as read
+        // Mark received messages as read
         messages.forEach(async (msg) => {
-            if (!currentUserId) return
-            if (msg.position === 'left' && msg.status !== 'read') {
-                await updateMessageStatus(msg.id, receiverId, currentUserId, 'read');
+            if (!currentUserId) return;
+            if (msg.position === 'left' && msg.status !== 'read') { //check for received messages that are unread
+                await updateMessageStatus(msg.id, receiverId, currentUserId, 'read');// change status of unread to red messages in firebase
                 setMessages(prev => prev.map(m =>
                     m.id === msg.id ? { ...m, status: 'read' } : m
-                ));
+                ));// change status of unread to red messages in local code
             }
         });
     }, [messages]);
 
+    // ---------------------------
+    // 5.5 UI EFFECTS
+    // ---------------------------
     useEffect(() => {
+        // Auto-scroll to bottom on new messages
         const el = listRef.current;
         if (el) {
             el.scrollTo({
@@ -147,25 +205,27 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId="1", onSelectR
         }
     }, [messages]);
 
+    // ---------------------------
+    // 5.6 MESSAGE HANDLING
+    // ---------------------------
     const handleSend = async (text: string, file?: File) => {
         if (!currentUserId || isSending) return;
 
-        const tempId = `temp-${Date.now()}`;
+        const tempId = `temp-${Date.now()}`;  // Temporary ID for optimistic update
         setIsSending(true);
 
-        // Optimistic update
+        // Optimistic UI update
         setMessages(prev => [...prev, createTempMessage(tempId, text)]);
 
         try {
             const newMessage = await sendMessage(currentUserId, receiverId, text);
 
-
-            setMessages(prev => prev.map(msg => {
-                //console.log(msg.id === currentUserId ? 'right' : 'left');
-                return msg.id === tempId ? mapFirestoreToChatMessage(newMessage, currentUserId) : msg
-            }));
+            // Replace temporary message with actual Firestore message
+            setMessages(prev => prev.map(msg =>
+                msg.id === tempId ? mapFirestoreToChatMessage(newMessage, currentUserId) : msg
+            ));
         } catch (error) {
-            //console.error("Failed to send message:", error);
+            // Rollback optimistic update on error
             setMessages(prev => prev.filter(msg => msg.id !== tempId));
             alert('Failed to send message. Please try again.');
         } finally {
@@ -173,8 +233,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId="1", onSelectR
         }
     };
 
-
-
+    // ---------------------------
+    // 5.7 HELPER FUNCTIONS
+    // ---------------------------
     const createTempMessage = (tempId: string, text: string): ChatMessage => ({
         id: tempId,
         position: 'right',
@@ -189,27 +250,22 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId="1", onSelectR
         replyButton: false,
         forwarded: false,
         titleColor: '#000',
-        senderId: "1232"
+        statusColorType: "badge",
+        senderId: "temp-user"
     });
+
     const mapFirestoreToChatMessage = (
         msg: Message,
         currentUserId: string
     ): ChatMessage => {
-        // compute & log position
         const position = msg.senderId === currentUserId ? 'right' : 'left';
 
-
-        // build and return ChatMessage
         return {
             id: msg.id,
-            position,                     // use the computed value
+            position,
             type: msg.contentType,
             text: msg.content,
-            date: msg.createdAt
-                ? typeof (msg.createdAt as any).toDate === 'function'
-                    ? (msg.createdAt as Timestamp).toDate()
-                    : (msg.createdAt as unknown as Date)
-                : new Date(),
+            date: msg.createdAt?.toDate() || new Date(),
             senderId: msg.senderId,
             status: msg.status,
             notch: false,
@@ -218,6 +274,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId="1", onSelectR
             replyButton: false,
             forwarded: false,
             titleColor: '#000',
+            statusColorType: "badge",
             ...(msg.contentType === 'file' && {
                 data: {
                     uri: msg.fileUrl || '',
@@ -228,13 +285,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId="1", onSelectR
         };
     };
 
-    //id: 432,
-    //    avatar: 'https://avatars.githubusercontent.com/u/80540635?v=4',
-    //        alt: 'kursat_avatar',
-    //            title: 'Kursat',
-    //                subtitle: "Why don't we go to the No Way Home movie this weekend ?",
-    //                    date: new Date(),
-    //                        unread: 3,
+ 
 
     return (
 
@@ -303,7 +354,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId="1", onSelectR
                                         retracted={false}
                                         onTitleClick={() => {/* Handle profile click */ }}
                                         // only show the status ticks on your own sent messages
-                                        status={item.position === 'right' ? item.status : undefined}
+                                        status={item.position === 'right' ? item.status : undefined }
                                     />
                                 </List.Item>
                             )}
