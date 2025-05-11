@@ -16,10 +16,11 @@ export const PasswordForm: React.FC = () => {
     const [isLoading, setLoading] = useState(false);
     const { t } = useTranslation();
     const { updatePassword } = useUser();
-    const onFinish = async (values: UpdatePasswordInput) => {
+    const onFinish = async (values: any) => {
         try {
             setLoading(true);
-            const message = await updatePassword(values);
+       
+            const message = await updatePassword({password:values.newPassword, password_confirmation:values.confirmPassword});
             notificationController.success({ message: message || t('profile.successPasswordUpdate') });
             setFieldsChanged(false);
         } catch (error: any) {

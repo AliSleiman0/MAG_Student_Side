@@ -2,13 +2,14 @@
 // ---------------------------
 // 1. IMPORTS & DEPENDENCIES
 // ---------------------------
+import whatsappImg from 'assets/wtsp5.jpg'; 
 // React Core
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from 'react-router-dom';
 
 // Third-party Components
 import { ChatList, IChatListProps, MessageBox, SystemMessage } from "react-chat-elements";
-import { Col, List, Row } from "antd";
+import { Avatar, Badge, Col, List, Row, Space, Tag } from "antd";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 
 // Firebase & Types
@@ -26,6 +27,12 @@ import { useResponsive } from "../../../hooks/useResponsive";
 import { getUserProfile } from "../../../apiMAG/user";
 import "./Messager.styles.css"
 import ChatComposer from "./Input";
+import { EnvironmentOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import image from 'antd/lib/image';
+
+import { Typography } from 'antd';
+
+
 
 // ---------------------------
 // 2. TYPE DEFINITIONS
@@ -136,7 +143,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId = "1", onSelec
                             subtitle: room.lastMessage.content || "New chat",
                             date: room.lastMessageAt?.toDate() || new Date(),
                             unread,
-                            statusColorType:"badge",
+                            statusColorType: "badge",
                             onClick: async () => {
                                 onSelectRoom(String(other.userid));
                                 await resetUnreadCount(currentUserId, String(other.userid));
@@ -285,11 +292,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId = "1", onSelec
         };
     };
 
- 
+
 
     return (
 
-        <Row gutter={[16, 16]}>
+        <Row  style={{  padding: 0, marginTop:"-30px" } }>
             {/* Chat List Column */}
             <Col xs={0} sm={0} md={24} lg={6} xl={6} style={{ backgroundColor: "#ffffff", padding: "8px" }}>
                 <ChatList
@@ -310,69 +317,124 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId = "1", onSelec
 
             {/* Chat Messages Column */}
             <Col xs={24} sm={24} md={24} lg={18} xl={18}>
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: mobileOnly ? '100vh' : '80vh',
-                    width: '100%'
-                }}>
-                    {/* Messages Container */}
-                    <div ref={listRef} style={{
-                        flex: 1,
-                        overflowY: 'auto',
-                        padding: 8,
-                        scrollBehavior: 'smooth',
-                        minHeight: mobileOnly ? '60vh' : 'auto'
-                    }}>
-                        <List
-                            split={false}
-                            locale={{ emptyText: <SystemMessage text="Start a conversation" /> }}
-                            style={{ width: "100%", backgroundColor: "#f5fdff" }}
-                            bordered={false}
-                            dataSource={messages}
+                <Row>
+                    <Col md={24} lg={24} style={{ width: "100%", paddingInline: "8px", paddingTop: "8px", borderRadius:"8px" }}>
+                        
+                        <Row
+                            align="middle"
+                            gutter={16}
+                            style={{
+                                backgroundColor: '#fff',
+                                padding: '6px 12px',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                borderRadius: '8px 8px 0 0',
+                            }}
+                        >
+                            {/* Avatar */}
+                            <Col>
+                                <Avatar
+                                    size={64}
+                                    src={receiverProfile?.image}
+                                    shape="circle"
+                                    style={{ border: '2px solid #fafafa' }}
+                                />
+                            </Col>
 
-                            renderItem={(item) => (
-                                <List.Item
-                                    key={item.id}
-                                    style={{
-                                        width: "100%",
-                                        display: 'flex',
-                                        justifyContent: item.position === 'right'
-                                            ? 'flex-end'
-                                            : 'flex-start',
-                                        padding: '8px 0'
-                                    }}
-                                >
-                                    <MessageBox
-                                        {...item}
-                                        title={
-                                            item.position === 'right'
-                                                ? 'You'
-                                                : `Advisor ${receiverProfile?.fullname}`
-                                        }
-                                        notch={item.position === 'right'}
-                                        retracted={false}
-                                        onTitleClick={() => {/* Handle profile click */ }}
-                                        // only show the status ticks on your own sent messages
-                                        status={item.position === 'right' ? item.status : undefined }
-                                    />
-                                </List.Item>
-                            )}
-                        />
-                    </div>
+                            {/* Name & Email */}
+                            <Col flex="auto">
+                                <Space direction="vertical" size={0}>
+                                    <Typography.Title level={5} style={{ margin: 0 }}>
+                                        {receiverProfile?.fullname}
+                                    </Typography.Title>
+                                    <Typography.Text>{receiverProfile?.email}</Typography.Text>
+                                </Space>
+                            </Col>
 
-                    {/* Composer */}
-                    <div style={{
-                        padding: 16,
-                        borderTop: '1px solid #f0f0f0',
-                        position: mobileOnly ? 'fixed' : 'relative',
-                        bottom: 0,
-                        width: '100%',
-                        background: 'white'
-                    }}>
-                        <ChatComposer onSend={handleSend} />
-                    </div>
-                </div>
+                            {/* User Type & Campus */}
+                            <Col>
+                                <Space direction="vertical" align="end">
+                                    <Tag style={{ backgroundColor: "#ccfff3", color:"#169173"} }>{receiverProfile?.usertype}</Tag>
+                                    <Typography.Text>
+                                        <EnvironmentOutlined style={{ marginRight: 4 }} />
+                                        {receiverProfile?.campusname}
+                                    </Typography.Text>
+                                </Space>
+                            </Col>
+                        </Row>
+                     
+
+                    </Col>
+                    <Col md={24} lg={24}>
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            height: mobileOnly ? '90vh' : '70vh',
+                            width: '100%',
+                            backgroundImage: `url(${whatsappImg})`,
+                            backgroundSize: 'cover',          // scale to cover the container
+                            backgroundPosition: 'center',     // center the image
+                        }}>
+                            {/* Messages Container */}
+                            <div ref={listRef} style={{
+                                flex: 1,
+                                overflowY: 'auto',
+                                padding: 8,
+                                scrollBehavior: 'smooth',
+                                minHeight: mobileOnly ? '60vh' : 'auto',
+                               
+                            }}>
+                                <List
+                                    split={false}
+                                    locale={{ emptyText: <SystemMessage text="Start a conversation" /> }}
+                                    style={{ width: "100%", }}
+                                    bordered={false}
+                                    dataSource={messages}
+
+                                    renderItem={(item) => (
+                                        <List.Item
+                                            key={item.id}
+                                            style={{
+                                                width: "100%",
+                                                display: 'flex',
+                                                justifyContent: item.position === 'right'
+                                                    ? 'flex-end'
+                                                    : 'flex-start',
+                                                padding: '8px 0'
+                                            }}
+                                        >
+                                            <MessageBox
+                                                {...item}
+                                                title={
+                                                    item.position === 'right'
+                                                        ? 'You'
+                                                        : `Advisor ${receiverProfile?.fullname}`
+                                                }
+                                                notch={item.position === 'right'}
+                                                retracted={false}
+                                                onTitleClick={() => {/* Handle profile click */ }}
+                                                // only show the status ticks on your own sent messages
+                                                status={item.position === 'right' ? item.status : undefined}
+                                            />
+                                        </List.Item>
+                                    )}
+                                />
+                            </div>
+
+                            {/* Composer */}
+                            <div style={{
+                                padding: 16,
+                                borderTop: '1px solid #f0f0f0',
+                                position: mobileOnly ? 'fixed' : 'relative',
+                                bottom: 0,
+                                width: '100%',
+                                background: 'white'
+                            }}>
+                                <ChatComposer onSend={handleSend} />
+                            </div>
+                        </div>
+                    </Col>
+                </Row>
+
             </Col>
         </Row>
 
