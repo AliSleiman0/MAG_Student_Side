@@ -402,19 +402,23 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId = "1", onSelec
                                                 padding: '8px 0'
                                             }}
                                         >
-                                            <MessageBox
-                                                {...item}
-                                                title={
-                                                    item.position === 'right'
-                                                        ? 'You'
-                                                        : `Advisor ${receiverProfile?.fullname}`
-                                                }
-                                                notch={item.position === 'right'}
-                                                retracted={false}
-                                                onTitleClick={() => {/* Handle profile click */ }}
-                                                // only show the status ticks on your own sent messages
-                                                status={item.position === 'right' ? item.status : undefined}
-                                            />
+                                            {
+                                                item.position === 'right'
+                                                    ? <MessageBox
+                                                        {...item}
+                                                        title="You"
+                                                        notch
+                                                        retracted={false}
+                                                        onTitleClick={() => { }}
+                                                        status={item.status} // always defined
+                                                    />
+                                                    : <MessageBox
+                                                        {...item}
+                                                        title={`Advisor ${receiverProfile?.fullname}`}
+                                                        retracted={false}
+                                                        onTitleClick={() => { }}
+                                                    />
+                                            }
                                         </List.Item>
                                     )}
                                 />

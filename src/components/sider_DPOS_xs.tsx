@@ -2,15 +2,16 @@ import { useState } from 'react';
 import { Layout, Menu, Button } from 'antd';
 import { AppstoreOutlined, MenuFoldOutlined, MenuUnfoldOutlined, ScheduleOutlined } from '@ant-design/icons';
 import { useResponsive } from '@app/hooks/useResponsive';
-import { Semester } from '../pages/30/DyanmicPOS/DynamicPOS';
+
 import SubMenu from 'antd/lib/menu/SubMenu';
 import { useTranslation } from 'react-i18next';
+import { SemesterInfo } from '../apiMAG/automated_pos';
 
 const { Sider } = Layout;
 
 interface SiderProps {
-    semesters: Semester[];
-    handleSemesterSelect: (semester: Semester) => void;
+    semesters: SemesterInfo[];
+    handleSemesterSelect: (semester: SemesterInfo) => void;
     isGeneratedSemesters: boolean;
     shouldFlash: boolean;
     title: string;

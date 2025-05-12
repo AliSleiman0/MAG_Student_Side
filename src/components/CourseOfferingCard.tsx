@@ -93,7 +93,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                         style={{ width: '100%', backgroundColor: "transparent", padding: "0px" }}
                         placeholder="Select an offering"
                        
-                        onChange={(value) => onSectionChange(course.id, value)}
+                        onChange={(value) => onSectionChange((String(course.id) ?? ""), value)}
                     >
                         {course.sections.map(section => (
                             <Option key={section.id} value={section.id}>

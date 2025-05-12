@@ -6,13 +6,11 @@ const AuthLayout = React.lazy(() => import('@app/components/layouts/AuthLayout/A
 import LoginPage from '@app/pages/LoginPage';
 
 import ForgotPasswordPage from '@app/pages/ForgotPasswordPage';
-import SecurityCodePage from '@app/pages/SecurityCodePage';
-import NewPasswordPage from '@app/pages/NewPasswordPage';
-import LockPage from '@app/pages/LockPage';
+
 
 import MainLayout from '@app/components/layouts/main/MainLayout/MainLayout';
 import ProfileLayout from '@app/components/profile/ProfileLayout';
-import RequireAuth from '@app/components/router/RequireAuth';
+
 import { withLoading } from '@app/hocs/withLoading.hoc';
 
 import Dashboard from '../../pages/30/Dashboard';
@@ -92,17 +90,9 @@ export const AppRouter: React.FC = () => {
                     <Route path="/auth" element={<AuthLayoutFallback />}>
                         <Route path="login" element={<LoginPage />} />
 
-                        <Route
-                            path="lock"
-                            element={
-                                <RequireAuth>
-                                    <LockPage />
-                                </RequireAuth>
-                            }
-                        />
+                        
                         <Route path="forgot-password" element={<ForgotPasswordPage />} />
-                        <Route path="security-code" element={<SecurityCodePage />} />
-                        <Route path="new-password" element={<NewPasswordPage />} />
+                       
                     </Route>
                     <Route path="auth/logout" element={<LogoutFallback />} />
 

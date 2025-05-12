@@ -11,13 +11,13 @@ import { UploadOutlined } from '@ant-design/icons';
 import { BaseCol } from '@app/components/common/BaseCol/BaseCol';
 import { useUser } from '../../../../../../Context/UserContext';
 import { updateImage, getImageUrl } from '../../../../../../Supabase/FileUpload';
-import { Avatar, Button, Form, Space, Typography, Upload } from 'antd';
+import { Avatar, Button, Form, Space, Spin, Typography, Upload } from 'antd';
 
 export const PersonalInfo: React.FC = () => {
     const { profile: user, removeImage, uploadImage: uploadImageDatabase } = useUser();
 
     const [isFieldsChanged, setFieldsChanged] = useState(false);
-  
+    const [submitting, setSubmitting] = useState(false);
     const [form] = BaseButtonsForm.useForm();
     const [file, setFile] = useState<File>();
     const [preview, setPreview] = useState<string | null>(null);
@@ -31,13 +31,18 @@ export const PersonalInfo: React.FC = () => {
     const customUpload = async (e: React.MouseEvent<HTMLElement>) => {
 
         e.preventDefault();
-
+        setSubmitting(true);
+        if (!file) {
+            notificationController.error({ message: t('common.pleaseSelectAnImage') });
+            return;
+        }
         try {
             const filePath = await updateImage(user?.image ?? 's', file);
             const imgSrc = getImageUrl(filePath);
             await removeImage();
             await uploadImageDatabase(imgSrc);
             notificationController.success({ message: t('common.success') });
+            setSubmitting(false);
         } catch (error) {
             notificationController.error({ message: t('common.failed') });
         }
@@ -97,10 +102,10 @@ export const PersonalInfo: React.FC = () => {
                     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                         <Typography.Text>Image Preview</Typography.Text>
                         <Avatar shape="square" size={128} src={preview} />
-                        <Button type="primary" onClick={customUpload}>
-                            Submit
+                        <Button type="primary" onClick={customUpload} disabled={submitting} >
+                            {submitting ? <Spin /> : "Submit"} 
                         </Button>
-                    </Space>
+                    </Space> 
                 )}
             </Form>
         </BaseCard>

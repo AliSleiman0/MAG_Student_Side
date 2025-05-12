@@ -19,18 +19,19 @@ const DonutChart: React.FC<DonutChartProps> = ({
     kkey ="something"
 }) => {
     const { t } = useTranslation();
-    const containerId = `donut-chart-${Math.random().toString(36).substr(2, 9)}`;
+    const containerId = `donut-chart-${Math.random().toString(36).slice(2, 11)}`;
+
 
     useEffect(() => {
         const data = kkey==="percentage" ? [
             { type: t("courses.passed_percentage.passed"), value: completed },
-            { type: t("courses.passed_percentage.failed"), value: total - completed },
+            { type: t("courses.passed_percentage.failed"), value: (Number(total) ?? 0) - (completed ?? 0) },
         ] :
             [
                 { type: t("courses.completed_vs_required.completed"), value: completed },
-                { type: t("courses.completed_vs_required.remaining"), value: total - completed },
+                { type: t("courses.completed_vs_required.remaining"), value: (Number(total) ?? 0) - (completed ?? 0) },
             ];
-        const percentagePassed = (completed / total - completed);
+        const percentagePassed = ((completed ?? 0) / (Number(total) ?? 0) - (completed ?? 0));
         const donutPlot = new Pie(containerId, {
          
             data,
@@ -63,7 +64,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
                 },
                 content: {
                     content: kkey === "percentage"
-                        ? `${((completed / total) * 100).toFixed(1)}%`  // Fixed percentage calculation
+                        ? `${(((completed ?? 0) / (Number(total) ?? 0)) * 100).toFixed(1)}%`  // Fixed percentage calculation
                         : `${completed}/${total}`,
                     style: { fontSize: '20px' }
                 }
