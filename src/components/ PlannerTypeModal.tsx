@@ -3,6 +3,7 @@ import { Modal, Row, Col, Typography, ModalProps } from 'antd';
 import { EditOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import Banner from './Banner';
 import { Model } from 'echarts';
+import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
 
@@ -40,6 +41,12 @@ const PlannerTypeModal: React.FC<PlannerTypeModalProps> = ({
 
     ...modalProps
 }) => {
+    const { t } = useTranslation();
+    titleText = titleText != 'Select Planner Type' ? titleText : t("sched_tool.choose_plan");
+    manualTitle = manualTitle != 'Custom Plan' ? manualTitle : t("sched_tool.cus_plan_title");
+    manualDescription = manualDescription != 'Manually create and adjust your academic schedule' ? manualDescription : t("sched_tool.cus_plan_body");
+    smartTitle = smartTitle != 'Smart Planner' ? smartTitle : t("sched_tool.smart_modal_title");
+    smartDescription = smartDescription != 'Automatically generate optimized schedules' ? smartDescription : t("sched_tool.smart_modal_body");
     const cardBaseStyle: React.CSSProperties = {
         background: modalCoursesSource ? 'linear-gradient(135deg, #038b94 0%, #010f0f 100%)' : 'linear-gradient(135deg, #f0fafa 0%, #ffffff 100%)',
         borderRadius: '12px',
@@ -55,8 +62,8 @@ const PlannerTypeModal: React.FC<PlannerTypeModalProps> = ({
     };
 
     const effectiveBannerText = modalCoursesSource
-        ? 'Choose the courses you want to make a schedule with.'
-        : 'Changing the current plan will delete all unsaved changes';
+        ? t("sched_tool.choose_courses_source_banner")
+        : t("sched_tool.choose_plan_banner");
 
     return (
         <Modal

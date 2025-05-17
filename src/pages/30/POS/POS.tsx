@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useRef, useState } from 'react';
 import { Graph, Edge, Node } from '@antv/x6';
 import { register } from '@antv/x6-react-shape';
-import { Alert, Col, Row, Space, Spin, Switch, Typography } from 'antd';
+import {  Col, Row, Space, Spin, Switch, Typography } from 'antd';
 import { CheckOutlined, CloseOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useResponsive } from '../../../hooks/useResponsive';
@@ -12,7 +12,7 @@ import {
     FlowchartContainer,
     CourseNodeContainer,
     CourseCode,
-    LegendContainer,
+  
     LegendItem,
     ColorSwatch,
     SolidLine,
@@ -75,12 +75,12 @@ const CourseNodeComponent = ({ node }: { node?: any }) => {
                 case 'Can Register':
                     return {
                         background: '#f8fab4',         // light cyan
-                        border: '1px dashed #00acc1',  // dashed medium cyan
+                        border: '1px solid black',  // dashed medium cyan
                     };
                 case 'Cannot Register':
                     return {
                         background: '#ffebee',         // light red
-                        border: '1px dashed #e53935',  // dashed dark red
+                        border: '1px solid #e53935',  // dashed dark red
                     };
                 default:
                     return {
@@ -500,30 +500,30 @@ export const Flowchart = () => {
                     <Row style={{ width: "100%" }}>
                         <Col style={{ bottom: "5px", fontSize: mobileOnly ? "0.6rem" : "1rem", border: "2px solid #038b94", borderRadius: "18px", padding: "10px", width: "100%", boxShadow: "4px 2px 8px rgba(0,0,0,0.3)" }}>
                             <Row style={{ fontWeight: '600', color: '#038b94' }}>
-                                Courses Legends:
+                                    {t("pos.legends")}
                             </Row>
 
                             <Row gutter={[20, 0]} justify="center">
                                 <Col>
                                     <LegendItem>
                                         <ColorSwatch color="#06c2bf" border="1px solid " />
-                                        <span>Passed</span>
+                                            <span>{t("pos.passed_course")}</span>
                                     </LegendItem>
                                 </Col>
                                 <Col>
                                     <LegendItem>
                                         <ColorSwatch color="#defeff" border="1px solid #038b94" />
-                                        <span>Registered</span>
+                                            <span>{t("pos.registered_course")}</span>
                                     </LegendItem>
                                 </Col>  <Col>
                                     <LegendItem>
                                         <ColorSwatch color="#f8fab4" border="1px solid #000000" />
-                                        <span>Can Register</span>
+                                            <span>{t("pos.can_register_course")}</span>
                                     </LegendItem>
                                 </Col>   <Col>
                                     <LegendItem>
                                         <ColorSwatch color="#ffebee" border="1px solid #b71c1c" />
-                                        <span>Cannot Register</span>
+                                            <span>{t("pos.cannot_register_course")}</span>
                                     </LegendItem>
                                 </Col>
 

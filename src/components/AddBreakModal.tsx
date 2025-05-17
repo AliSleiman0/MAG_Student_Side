@@ -6,6 +6,8 @@ import type { RangeValue } from 'rc-picker/lib/interface';
 import moment, { Moment } from 'moment';
 
 import DaysButton from './DaysButton';
+import { useTranslation } from 'react-i18next';
+import { dayNumberToKey } from './BreaksCard';
 
 
 
@@ -23,11 +25,11 @@ export const AddBreakModal: React.FC<AddBreakModalProps> = ({
     isModalBreaksVisible,
     selectedDays,
     form,
- 
     setIsModalBreaksVisible,
     setSelectedDays,
     handleAddBreak,
 }) => {
+    const { t } = useTranslation();
     const { RangePicker } = TimePicker;
     // Memoize disabled hours calculation
     const disabledHours = useMemo(() => {
@@ -45,11 +47,12 @@ export const AddBreakModal: React.FC<AddBreakModalProps> = ({
     return (
         <Modal
             zIndex = {10} 
-            title="Add Break"
+            title={t("sched_tool.add_break") }
             open={isModalBreaksVisible}
             onOk={handleAddBreak}
             onCancel={() => setIsModalBreaksVisible(false)}
-            
+            okText={t("common.confirm")}
+            cancelText={t("common.back")}
         >
             <Form
                 form={form}
@@ -62,7 +65,7 @@ export const AddBreakModal: React.FC<AddBreakModalProps> = ({
             >
                 <Form.Item
                     name="description"
-                    label="Description"
+                    label={t("sched_tool.description")}
                     rules={[{ required: true, message: 'Please enter a description' }]}
                 >
                     <Input />
@@ -70,15 +73,15 @@ export const AddBreakModal: React.FC<AddBreakModalProps> = ({
 
                 <Form.Item
                     name="days"
-                    label="Select Days"
-                    rules={[{ required: true, message: 'Please select at least one day' }]}
+                    label={t("sched_tool.select_days")}
+                    rules={[{ required: true, message: t("sched_tool.one_day")  }]}
                     initialValue={[]}
                 >
                     <Row gutter={[8, 8]}>
                         {[1, 2, 3, 4, 5].map((day) => (
                             <Col key={day}>
                                 <DaysButton
-                                    text={moment().day(day).format("ddd")}
+                                    text={t(`days.${dayNumberToKey[day]}`)}
                                     onClick={() => {
                                         const currentDays = form.getFieldValue('days') || [];
                                         const newDays = currentDays.includes(day)
@@ -97,24 +100,24 @@ export const AddBreakModal: React.FC<AddBreakModalProps> = ({
 
                 <Form.Item
                     name="timeRange"
-                    label="Time Range"
+                    label={t("sched_tool.time")}
                     rules={[
-                        { required: true, message: 'Please select time range' },
+                        { required: true, message: t("sched_tool.one_range")  },
                         ({ getFieldValue }) => ({
                             validator(_, value: RangeValue<Moment>) {
                                 if (!value?.[0] || !value?.[1]) {
-                                    return Promise.reject(new Error('Please select both start and end times'));
+                                    return Promise.reject(new Error(t("sched_tool.one_start_end")));
                                 }
 
                                 const [start, end] = value;
                                 if (start.isBefore(minTime)) {
-                                    return Promise.reject(new Error('Start time cannot be before 8:00 AM'));
+                                    return Promise.reject(new Error(t("sched_tool.one_before")));
                                 }
                                 if (end.isAfter(maxTime)) {
-                                    return Promise.reject(new Error('End time cannot be after 5:00 PM'));
+                                    return Promise.reject(new Error(t("sched_tool.one_after")));
                                 }
                                 if (!start.isBefore(end)) {
-                                    return Promise.reject(new Error('End time must be after start time'));
+                                    return Promise.reject(new Error(t("sched_tool.one_order")));
                                 }
                                 return Promise.resolve();
                             },

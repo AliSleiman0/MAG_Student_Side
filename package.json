@@ -41,6 +41,7 @@
     "elt-react-credit-cards": "^0.0.1",
     "firebase": "^11.6.0",
     "firebase-tools": "^14.2.0",
+    "framer-motion": "^12.12.1",
     "html2canvas": "^1.4.1",
     "i18next": "^20.4.0",
     "jspdf": "^3.0.1",

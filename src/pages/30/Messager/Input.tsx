@@ -6,6 +6,7 @@ import {
     SendOutlined,
 } from '@ant-design/icons';
 import 'react-chat-elements/dist/main.css';   // core chat CSS
+import { useTranslation } from 'react-i18next';
 
 // 1. Auto-resizing TextArea
 const { TextArea } = Input;
@@ -25,7 +26,7 @@ const ChatComposer: FC<{
         onSend(value.trim(), file);
         setValue('');
     };
-
+    const { t } = useTranslation();
     return (
         <>
             <Space.Compact
@@ -65,7 +66,7 @@ const ChatComposer: FC<{
                 {/* 3. Auto-resizing TextArea */}
                 <TextArea
                     autoSize={{ minRows: 1, maxRows: 6 }}    // autosize docs :contentReference[oaicite:6]{index=6}
-                    placeholder="Type your message..."
+                    placeholder={t("chats.type")} 
                     style={{ flex: 1, border: 'none', outline: 'none' }}
                     value={value}
                     onChange={e => setValue(e.target.value)}

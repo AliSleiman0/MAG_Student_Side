@@ -33,3 +33,10 @@ export const Text = styled(BaseTypography.Text)`
   display: block;
   text-align: center;
 `;
+export const TimeStamp = styled.span`
+  display: block;
+  font-size: 0.75rem;
+  color: ${(props) => props.theme.colors.text.main};
+  opacity: 0.65;
+  margin-top: 0.25rem;
+`;

@@ -119,13 +119,8 @@ const Dashboard: React.FC = () => {
                             <Typography.Text
                                 style={{ ...bannerStyles.text, ...bannerStyles.responsiveText }}
                             >
-                                {t('welcome.title')}{' '}{t('welcome.semester_fall')}{'. '}{t('welcome.registration')} {' '}
-                                <span style={{
-                                    color: true ? '#038b94' : '#cf1322', // Ant Design success/danger colors
-                                    fontWeight: 500
-                                }}>
-                                    {true ? t('welcome.reg_status_open') : t('welcome.reg_status_closed')}
-                                </span>
+                                {t('welcome.title')}{' '}{t('welcome.semester_fall')}
+                               
                                 {t('welcome.contact')}
                             </Typography.Text>
                         </Space>

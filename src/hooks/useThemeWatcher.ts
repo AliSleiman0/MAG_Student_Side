@@ -11,7 +11,7 @@ export const useThemeWatcher = (): void => {
     const html = root.current;
     if (html) {
       html.setAttribute('data-no-transition', '');
-      html.setAttribute('data-theme', theme);
+      html.setAttribute('data-theme', "light");
       // remove transition after layout update
       requestAnimationFrame(() => {
         html.removeAttribute('data-no-transition');
@@ -20,11 +20,11 @@ export const useThemeWatcher = (): void => {
 
     ConfigProvider.config({
       theme: {
-        primaryColor: themeObject[theme].primary,
-        infoColor: themeObject[theme].primary,
-        successColor: themeObject[theme].success,
-        errorColor: themeObject[theme].error,
-        warningColor: themeObject[theme].warning,
+            primaryColor: themeObject["light"].primary,
+            infoColor: themeObject["light"].primary,
+            successColor: themeObject["light"].success,
+            errorColor: themeObject["light"].error,
+            warningColor: themeObject["light"].warning,
       },
     });
   }, [theme]);

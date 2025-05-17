@@ -13,7 +13,7 @@ export const ProfileOverlay: React.FC = ({ ...props }) => {
       </S.Text>
       <S.ItemsDivider />
       <S.Text>
-              <Link to="/logout">{t('sider.logout')}</Link>
+              <Link to="/auth/logout">{t('sider.logout')}</Link>
       </S.Text>
     </div>
   );

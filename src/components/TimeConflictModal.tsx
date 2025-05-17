@@ -10,6 +10,8 @@ import {
 } from '@ant-design/icons';
 import moment from 'moment';
 import IconButton from './IconButton';
+import { useTranslation } from 'react-i18next';
+import { dayNumberToKey } from './BreaksCard';
 
 
 interface ConflictEvent {
@@ -40,6 +42,7 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
     setBreaks,
     setIsModalBreaksVisible,
 }) => {
+    const { t } = useTranslation();
     return (
         <Modal
             zIndex={20} 
@@ -60,6 +63,8 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
             footer={null}
             centered
             closable={false}
+            okText={t("common.confirm")}
+            cancelText={t("common.back")}
         >
             {/* Custom Header */}
             <div style={{
@@ -83,7 +88,7 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
                         fontWeight: 600
                     }}
                 >
-                    Schedule Conflict
+                    {t("sched_tool.schedule_conflict")}
                 </Typography.Title>
             </div>
 
@@ -98,7 +103,7 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
                         border: '1px solid rgba(4, 139, 148, 0.15)'
                     }}>
                         <Typography.Text strong style={{ color: '#4a8f94', display: 'block', marginBottom: 8 }}>
-                            ⚠️ Conflicting With:
+                            ⚠️ {t("sched_tool.conflicting_with")}:
                         </Typography.Text>
 
                         <div style={{
@@ -119,9 +124,12 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
 
                             <ScheduleOutlined style={{ color: '#4a8f94' }} />
                             <Typography.Text style={{ color: '#4a8f94' }}>
-                                {conflictingEvent.daysOfWeek
-                                    .map(day => moment().day(day).format('ddd'))
-                                    .join(', ')}
+                                {[1, 2, 3, 4, 5].every(d => conflictingEvent.daysOfWeek.includes(d))
+                                    ? t('days.all_week')
+                                    : conflictingEvent.daysOfWeek
+                                        .map(day => t(`days.${dayNumberToKey[day]}`))
+                                        .join(', ')
+                                }
                             </Typography.Text>
                         </div>
                     </div>
@@ -135,7 +143,8 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
                             fontWeight: 500
                         }}
                     >
-                        Available Options
+                        {t("sched_tool.available_options")}
+                      
                     </Typography.Title>
 
                     <div style={{
@@ -144,8 +153,8 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
                         marginBottom: 16
                     }}>
                         {[
-                            { icon: <EditOutlined />, text: 'Adjust new time constraint' },
-                            { icon: <DeleteOutlined />, text: 'Remove existing event first' },
+                            { icon: <EditOutlined />, text: t("sched_tool.adjust")  },
+                            { icon: <DeleteOutlined />, text: t("sched_tool.remove") },
                         ].map((option, index) => (
                             <div
                                 key={index}
@@ -188,7 +197,7 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
                                 setConflictingEvent(null);
                                 setPendingBreak(null);
                             }}
-                            text="Confirm"
+                            text={t("common.confirm")}
                         />
                     </div>
                 </div>

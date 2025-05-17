@@ -22,6 +22,7 @@ import Spin from 'antd/es/spin';
 import DaysButton from '../../../components/DaysButton';
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { translateSchedule } from '../../../constants/scheduleTranslations';
 // ====================== Interfaces ======================
 /** 
  * Represents a calendar event with scheduling details
@@ -41,21 +42,7 @@ export interface CalendarEvent {
  * Defines course structure with multiple section offerings
  * Contains core course information and available sections
  */
-interface Course {
-    id: string;
-    code: string;
-    name: string;
-    credits: number;
-    sections: {
-        id: string;
-        name: string;
-        schedule: string;
-        daysOfWeek: number[];
-        startTime: string;
-        endTime: string;
-        instructor: string;
-    }[];
-}
+
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -68,6 +55,7 @@ const queryClient = new QueryClient({
 });
 
 const SchedulingTool = () => {
+    const { t } = useTranslation();
     const printRef =useRef(null);
 
     const handleDownloadPdf = async () => {
@@ -167,15 +155,13 @@ const SchedulingTool = () => {
     const {
         mutate,
         data: scheduleData,    // <-- this is CourseScheduleOutput[] | undefined
-        isSuccess,
         isLoading,
-        isError,
-        error,
+       
     } = useMutation<CourseScheduleOutput[], Error, ScheduleRequestInput>(
 
         payload => postCourseSchedule(payload),
         {
-            mutationKey: ['courses-offerings'],  // 🚨 Add unique key
+            mutationKey: ['courses-offerings'],  //  Add unique key
             onSuccess: (data: CourseScheduleOutput[]) => {
                 setCourseOfferings(data);
                 sessionStorage.setItem('generatedSchedule', JSON.stringify(data));
@@ -193,8 +179,8 @@ const SchedulingTool = () => {
         if (!scheduleData) return;
 
         const transformed = scheduleData.map(course => ({
-            id: course.coursecode.toLowerCase(),
-            code: course.coursecode.replace(/^([A-Za-z]+)(\d+)$/, '$1 $2'),
+            id: parseCourse(course.coursename).code.toLowerCase(),
+            code: parseCourse(course.coursename).code.replace(/^([A-Za-z]+)(\d+)$/, '$1 $2'),
             name: course.coursename,
             credits: course.credits,
             sections: course.sections.map((section, indx) => {
@@ -212,6 +198,13 @@ const SchedulingTool = () => {
         }));
 
         setCoursesOfferingsInput(transformed);
+        const initialSelectedSections: Record<string, string[]> = {};
+        transformed.forEach(course => {
+            initialSelectedSections[course.id] = course.sections.map(section => section.id);
+        });
+        setSelectedSectionsSmart(initialSelectedSections);
+
+        console.log("coursesOfferings", transformed);
         console.log("coursesOfferings", transformed);
     }, [scheduleData]);
 
@@ -282,12 +275,23 @@ const SchedulingTool = () => {
                 : 'coursesRecommendedDynamic';
 
         const raw = sessionStorage.getItem(key);
-        if (!raw) return null;
+
+        if (!raw) {
+            notification.error({
+                message: `Could not find ${type === 'CUS' ? 'custom' : 'automated'} courses data. Make sure you generated a ${type === 'CUS' ? 'custom' : 'automated'} plan of study to continue with this choice`
+                
+            });
+            return null;
+        }
 
         try {
             return JSON.parse(raw) as ScheduleRequestInput;
         } catch (err) {
-            console.error('Could not parse stored schedule payload:', err);
+            console.error('Parsing error:', err);
+            notification.error({
+                message: 'Invalid Session Data',
+                description: `Failed to parse stored ${type === 'CUS' ? 'custom' : 'automated'} schedule data`,
+            });
             return null;
         }
     };
@@ -307,29 +311,34 @@ const SchedulingTool = () => {
         };
     }
     const handleSourceSelect = (type: 'CUS' | 'AUTO') => {
-        console.log("type", type);
         setSourceType(type);
         const payload = getStoredScheduleInput(type);
-        console.log("payload", payload);
-        if (payload) {
+        console.log("Scheudle Payload", payload);
+        if (!payload) {
+            // Optional: Add additional error handling here if needed
+            
+            return;
+        }
+
+        try {
             mutate({
-                courseids: payload.courses.flatMap
-                    ((course: any) => (
-                        [{
-                            courseid: course.courseid,
-                            coursename: parseCourse(course.coursename).name,
-                            coursecode: parseCourse(course.coursename).code,
-                            coursetype: course.coursetype,
-                            credits: course.credits
-                        }]
-                    )),
+                courseids: payload.courses.flatMap((course: any) => ([{
+                    courseid: course.courseid,
+                    coursename:course.coursename,
+                    coursecode: course.coursecode,
+                    coursetype: course.coursetype,
+                    credits: course.credits
+                }])),
                 semester: payload.semester,
                 year: payload.year
             });
-
-
-            console.log("payload", payload);
+        } catch (error) {
+            notification.error({
+                message: 'Submission Failed',
+                description: 'Failed to process schedule request',
+            });
         }
+
         setCourseModalVisible(false);
     };
 
@@ -423,7 +432,7 @@ const SchedulingTool = () => {
     };
     const [form] = Form.useForm();
     const { mobileOnly, isTablet } = useResponsive();
-    const { t } = useTranslation();
+
     ////////////////////////////////////SMART OFFERING SELECTION STUFF
     const [activeKey, setActiveKey] = useState<string | string[]>([]);
     const [selectedTabs, setSelectedTabs] = useState<{ [courseId: string]: string }>({});
@@ -436,14 +445,14 @@ const SchedulingTool = () => {
         return init;
     });
 
-
-    const [selectedSectionsSmart, setSelectedSectionsSmart] = useState<Record<number, string[]>>(() => {
-        const init: Record<number, string[]> = {};
-        coursesOfferingsInput.forEach(c => {
-            init[c.courseid] = [];
-        });
-        return init;
-    });
+    const [selectedSectionsSmart, setSelectedSectionsSmart] = useState<Record<string, string[]>>({});
+    //const [selectedSectionsSmart, setSelectedSectionsSmart] = useState<Record<number, string[]>>(() => {
+    //    const init: Record<number, string[]> = {};
+    //    coursesOfferingsInput.forEach(c => {
+    //        init[c.courseid] = [];
+    //    });
+    //    return init;
+    //});
     const handleProfessorToggle = (
         courseId: number,
         professor: string,
@@ -617,7 +626,7 @@ const SchedulingTool = () => {
     };
     return (
         <>
-            <PageTitle>{t('common.Scheduling_Tool')}</PageTitle>
+            <PageTitle>{t('sched_tool.title')}</PageTitle>
             {/* ====================== Modals ====================== */}
             {/* Offering Conflict Resolution Modal */}
             <ConflictModal
@@ -667,12 +676,12 @@ const SchedulingTool = () => {
                 mobileOnly={mobileOnly}
                 onCancel={() => setCourseModalVisible(false)}
                 onSourceSelect={handleSourceSelect}
-                titleText="Choose Courses Source"
-                bannerText="Choose the courses you want to make a schedule with."
-                manualTitle="Customized POS"
-                manualDescription="Take control and make a schedule with your own courses previouly planned for the upcoming semester"
-                smartTitle="Best POS"
-                smartDescription="Let the system craft the best path for you using the optimal plan for the upcoming semester"
+                titleText={t('sched_tool.choose_courses_source')}
+                bannerText={t('sched_tool.choose_courses_source_banner')}
+                manualTitle={t('sched_tool.cus_modal_title')}
+                manualDescription={t('sched_tool.cus_modal_body')}
+                smartTitle={t('sched_tool.best_modal_title')}
+                smartDescription={t('sched_tool.best_modal_body')}
                 modalCoursesSource={true}
             />
             {/* Main Content (only shown after selecting planner) */}
@@ -685,14 +694,14 @@ const SchedulingTool = () => {
                                 <Row style={{ marginBottom: "8px", marginTop: "8px", }} gutter={[4, 16]}>
                                     <Col flex="none">
                                         <Space size={8}>
-                                            <IconButton icon={<CalendarOutlined />} text="Switch Planner Type" onClick={() => { setPlannerTypeModalVisible(prev => !prev); setEditingPlanner(true); }} />
+                                            <IconButton icon={<CalendarOutlined />} text={t('sched_tool.switch_planner')} onClick={() => { setPlannerTypeModalVisible(prev => !prev); setEditingPlanner(true); }} />
 
-                                            <IconButton icon={<ImportOutlined />} className={`${shouldFlash ? 'flash-highlight' : ''}`} text="Import Courses" onClick={() => { setCourseModalVisible(prev => !prev); }} />
+                                            <IconButton icon={<ImportOutlined />} className={`${shouldFlash ? 'flash-highlight' : ''}`} text={t('sched_tool.import_courses')} onClick={() => { setCourseModalVisible(prev => !prev); }} />
                                             {plannerType !== "Manual" && (
                                                 <IconButton
                                                     className={`${shouldFlashGenerate ? 'flash-highlight' : ''}`}
                                                     icon={generateSchedule.isLoading ? <Spin indicator={<LoadingOutlined spin />} /> : <DownloadOutlined />}
-                                                    text={generateSchedule.isLoading ? '' : 'Generate Schedule'}
+                                                    text={generateSchedule.isLoading ? '' : t('sched_tool.generate_schedule') }
                                                     onClick={handleGenerateSchedule}
                                                     disabled={generateSchedule.isLoading}
                                                 />
@@ -706,8 +715,8 @@ const SchedulingTool = () => {
                                         color={{ background: '#e3faf8', icon: '#038b94' }}
                                         text={
                                             plannerType === "Manual"
-                                                ? "This is the manual schedule tool. You may select only one offering per course. Time conflicts will trigger warnings, and you may add descriptive breaks to customize your weekly schedule."
-                                                : "This is Smart Scheduling mode. It automatically optimizes your timetable based on your preferences. Mark sections (doctors, course offerings) as preferred or excluded, and the system will find the best combination with the fewest gaps between courses. Note that user-added breaks take top priority and will override course sections in case of time conflicts."
+                                                ? t('sched_tool.info_man') 
+                                                : t('sched_tool.info_smart') 
                                         }
                                     />
                                 </Col>
@@ -720,7 +729,7 @@ const SchedulingTool = () => {
                                                 title={
                                                     <>
                                                         <Row style={{ marginBottom: "7px" }}>
-                                                            <Typography.Text>Choose Courses Offerings</Typography.Text>
+                                                            <Typography.Text>{t('sched_tool.choose_off')}</Typography.Text>
                                                         </Row>
                                                         <Row>
                                                             <Space
@@ -738,7 +747,7 @@ const SchedulingTool = () => {
                                                                 }}
                                                             >
                                                                 <ToolOutlined style={{ fontSize: "12px" }} />
-                                                                Manual Selection Mode
+                                                                {t('sched_tool.mode_manual')}
                                                             </Space>
                                                         </Row>
                                                     </>
@@ -772,7 +781,7 @@ const SchedulingTool = () => {
                                             title={
                                                 <>
                                                     <Row style={{ marginBottom: "7px" }}>
-                                                        <Typography.Text>Choose Preferences</Typography.Text>
+                                                            <Typography.Text> {t('sched_tool.choose_pref')}</Typography.Text>
                                                     </Row>
                                                     <Row>
                                                         <Space
@@ -790,7 +799,7 @@ const SchedulingTool = () => {
                                                             }}
                                                         >
                                                             <ToolOutlined style={{ fontSize: "12px" }} />
-                                                            Smart Selection Mode
+                                                                {t('sched_tool.mode_smart')}
                                                         </Space>
                                                     </Row>
                                                 </>
@@ -799,7 +808,7 @@ const SchedulingTool = () => {
                                         >
                                             {isLoading ? (
                                                 <div style={{ textAlign: 'center', padding: '2rem' }}>
-                                                    <Spin size="large" tip="Loading..." />
+                                                        <Spin size="large" tip={t('common.loading')} />
                                                 </div>
                                             ) : sourceType !== "" ? (
                                                 coursesOfferingsInput.map((course: any) => {
@@ -824,11 +833,11 @@ const SchedulingTool = () => {
                                                                 <Row justify="space-between" style={{ height: "auto", marginBottom: "8px", paddingInline: 8 }} gutter={[0, 16]} >
                                                                     <Col>
                                                                         <Typography.Text style={{ marginBottom: "8px", height: "auto", fontFamily: "monospace" }}>
-                                                                            {course.code} - {course.name}
+                                                                         {course.name}
                                                                         </Typography.Text>
                                                                     </Col>
                                                                     <Col>
-                                                                        <DaysButton text={`${course.credits} credits`} onClick={() => console.log("HI")} />
+                                                                        <DaysButton text={`${course.credits}  ${t('sched_tool.credits')}`} onClick={() => console.log("HI")} />
                                                                     </Col>
                                                                 </Row>
 
@@ -840,10 +849,10 @@ const SchedulingTool = () => {
                                                                     expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
                                                                     style={{ backgroundColor: "transparent", padding: "0px", minWidth: "100%" }}
                                                                 >
-                                                                    <Collapse.Panel header="Offering Preferences" key={course.id} style={{ padding: 0, backgroundColor: "transparent", minWidth: "100%" }}>
+                                                                    <Collapse.Panel header={t('sched_tool.offering_preferences')} key={course.id} style={{ padding: 0, backgroundColor: "transparent", minWidth: "100%" }}>
                                                                         <Segmented
                                                                             key={course.id}
-                                                                            options={["Sections", "Professors"]}
+                                                                            options={[t('sched_tool.sections'), t('sched_tool.professors')]}
                                                                             value={selectedTabs[course.id] || "Sections"}
                                                                             onChange={(value) =>
                                                                                 setSelectedTabs(prev => ({ ...prev, [course.id]: value as string }))
@@ -852,9 +861,9 @@ const SchedulingTool = () => {
                                                                             style={{ marginBottom: 8 }}
                                                                         />
 
-                                                                        {selectedTabs[course.id] === "Professors" ? (
+                                                                        {selectedTabs[course.id] === t('sched_tool.professors') ? (
                                                                             <Row style={{ padding: 8 }}>
-                                                                                <Typography.Text style={{ marginBottom: 8 }}>Offerings Preference</Typography.Text>
+                                                                                <Typography.Text style={{ marginBottom: 8 }}> {t('sched_tool.offering_preferences')}</Typography.Text>
                                                                                 {professorsCurrentCourse.map((professor: any) => {
                                                                                     const isChecked = selectedForThisCourse.includes(professor);
                                                                                     const hasSelections = selectedForThisCourse.length > 0;
@@ -901,7 +910,7 @@ const SchedulingTool = () => {
                                                                                                     </Col>
                                                                                                     <Col>
                                                                                                         <Typography.Text style={{ fontSize: "0.85rem", color: "#585859" }}>
-                                                                                                            {getProfessorSectionsCount(professor)} section(s)
+                                                                                                            {getProfessorSectionsCount(professor)} {t('sched_tool.section')}(s)
                                                                                                         </Typography.Text>
                                                                                                     </Col>
                                                                                                 </Row>
@@ -915,7 +924,7 @@ const SchedulingTool = () => {
                                                                                                             }}
                                                                                                             onClick={() => handleProfessorToggle(course, professor, !isChecked)}
                                                                                                         >
-                                                                                                            {!isChecked ? "Add to preference" : "Remove from preference"}
+                                                                                                            {!isChecked ? t('sched_tool.add_preference') : t('sched_tool.remove_preference')}
                                                                                                         </Typography.Text>
                                                                                                     </Col>
                                                                                                 </Row>
@@ -923,7 +932,7 @@ const SchedulingTool = () => {
                                                                                                     <Row style={{ marginTop: 8 }}>
                                                                                                         <Col>
                                                                                                             <Typography.Text type="secondary" style={{ fontSize: "0.75rem", color: "#ff4d4f" }}>
-                                                                                                                Deselected due to {courseProfessors[course.id].join(", ")} preference
+                                                                                                                {t('sched_tool.add_preference')} {courseProfessors[course.id].join(", ")} {t('sched_tool.preference')}
                                                                                                             </Typography.Text>
                                                                                                         </Col>
                                                                                                     </Row>
@@ -973,19 +982,19 @@ const SchedulingTool = () => {
                                                                                         <Col flex="auto">
                                                                                             {/* row 1: section name */}
                                                                                             <Row>
-                                                                                                <Typography.Text strong>{section.name}</Typography.Text>
+                                                                                                <Typography.Text strong> {t("sched_tool.section")} {section.name.split(" ")[1]}</Typography.Text>
                                                                                             </Row>
 
                                                                                             {/* row 2: schedule on the left, professor on the right */}
                                                                                             <Row justify="space-between" align="middle" style={{ marginTop: 4 }}>
-                                                                                                <Typography.Text style={{ fontSize: "0.85rem", color: "#8c8c8c" }}>{section.schedule}</Typography.Text>
+                                                                                                <Typography.Text style={{ fontSize: "0.85rem", color: "#8c8c8c" }}>{translateSchedule(section.schedule, t)}</Typography.Text>
                                                                                                 <Typography.Text style={{ fontSize: "0.85rem", color: "#8c8c8c" }}>{section.instructor}</Typography.Text>
                                                                                             </Row>
 
                                                                                             {/* optional disabled note */}
                                                                                             {isSectionDisabled(course.id, section) && (
                                                                                                 <Typography.Text type="secondary" style={{ fontSize: "0.75rem", color: "#ff4d4f", marginTop: 4, display: "block" }}>
-                                                                                                    Professor not selected in preferences
+                                                                                                    {t('sched_tool.prof_no_selection')}
                                                                                                 </Typography.Text>
                                                                                             )}
                                                                                         </Col>
@@ -1031,7 +1040,7 @@ const SchedulingTool = () => {
                                             fontSize: mobileOnly ? 16 : 20,
                                         }}
                                     >
-                                        {plannerType} Weekly Schedule:
+                                        {t('sched_tool.title_cal')}
                                     </Typography.Text>
                                 </Col>
 
@@ -1044,14 +1053,14 @@ const SchedulingTool = () => {
                                                 <IconButton
                                                     className={`${shouldFlashGenerate ? 'flash-highlight' : ''}`}
                                                     icon={generateSchedule.isLoading ? <Spin indicator={<LoadingOutlined spin />} /> : <DownloadOutlined />}
-                                                    text={generateSchedule.isLoading ? "" : 'Generate Schedule'}
+                                                    text={generateSchedule.isLoading ? "" : t('sched_tool.generate_schedule') }
                                                     onClick={handleGenerateSchedule}
                                                     disabled={generateSchedule.isLoading}
                                                 />
                                             )}
                                             <IconButton
                                                 icon={<CalendarOutlined />}
-                                                text="Switch Planner Type"
+                                                text={t('sched_tool.switch_planner')}
                                                 onClick={() => {
                                                     setPlannerTypeModalVisible(v => !v);
                                                     setEditingPlanner(true);
@@ -1059,7 +1068,7 @@ const SchedulingTool = () => {
                                             />
                                             <IconButton
                                                 icon={<ImportOutlined />}
-                                                text="Import Courses"
+                                                text={t('sched_tool.import_courses')}
                                                 onClick={() => { setCourseModalVisible(prev => !prev); }}
                                                 className={`${shouldFlash ? 'flash-highlight' : ''}`}
                                             />
@@ -1084,7 +1093,7 @@ const SchedulingTool = () => {
                                         <Col>
                                             <IconButton
                                             icon={<SaveOutlined />}
-                                            text={'Save Schedule'}
+                                                text={t('sched_tool.save_schedule')}
                                             onClick={handleSaveCalendar}
                                             disabled={generateSchedule.isLoading}
                                             />
@@ -1092,7 +1101,7 @@ const SchedulingTool = () => {
                                         <Col>
                                             <IconButton
                                                 icon={<DownloadOutlined />}
-                                                text={'Download Schedule'}
+                                                text={t('sched_tool.down_schedule')}
                                                 onClick={handleDownloadPdf}
                                              
                                             />
