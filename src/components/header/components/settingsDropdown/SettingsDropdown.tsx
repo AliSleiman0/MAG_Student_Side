@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SettingOutlined } from '@ant-design/icons';
+import { GlobalOutlined, SettingOutlined } from '@ant-design/icons';
 import { BaseButton } from '@app/components/common/BaseButton/BaseButton';
 import { HeaderActionWrapper } from '@app/components/header/Header.styles';
 import { SettingsOverlay } from './settingsOverlay/SettingsOverlay/SettingsOverlay';
@@ -11,8 +11,8 @@ export const SettingsDropdown: React.FC = () => {
   return (
     <BasePopover content={<SettingsOverlay />} trigger="click" onOpenChange={setOpened}>
       <HeaderActionWrapper>
-        <BaseButton type={isOpened ? 'ghost' : 'text'} icon={<SettingOutlined />} />
+              <BaseButton type={isOpened ? 'ghost' : 'text'} icon={<GlobalOutlined />} />
       </HeaderActionWrapper>
     </BasePopover>
   );
-};
+}; 

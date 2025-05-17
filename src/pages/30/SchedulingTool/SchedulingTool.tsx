@@ -41,21 +41,7 @@ export interface CalendarEvent {
  * Defines course structure with multiple section offerings
  * Contains core course information and available sections
  */
-interface Course {
-    id: string;
-    code: string;
-    name: string;
-    credits: number;
-    sections: {
-        id: string;
-        name: string;
-        schedule: string;
-        daysOfWeek: number[];
-        startTime: string;
-        endTime: string;
-        instructor: string;
-    }[];
-}
+
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -167,10 +153,9 @@ const SchedulingTool = () => {
     const {
         mutate,
         data: scheduleData,    // <-- this is CourseScheduleOutput[] | undefined
-        isSuccess,
+       
         isLoading,
-        isError,
-        error,
+       
     } = useMutation<CourseScheduleOutput[], Error, ScheduleRequestInput>(
 
         payload => postCourseSchedule(payload),
@@ -280,8 +265,9 @@ const SchedulingTool = () => {
             type === 'CUS'
                 ? 'coursesRecommendedCustomized'
                 : 'coursesRecommendedDynamic';
-
+       
         const raw = sessionStorage.getItem(key);
+        console.log("coursesRecommendedDynamic", raw);
         if (!raw) return null;
 
         try {

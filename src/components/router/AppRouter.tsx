@@ -62,40 +62,27 @@ export const AppRouter: React.FC = () => {
         <BrowserRouter>
             <UserProvider>
                 <Routes>
-
                     <Route path={NFT_DASHBOARD_PATH} element={protectedLayout}>
                         <Route index element={<Dashboard />} />
                         <Route path={"/CustomizedPOS"} element={<CustomizedPOS />} />
                         <Route path={"/DynamicPOS"} element={<DynamicPOS />} />
                         <Route path="/POS" element={<GraphComponent />} />
-                       
                         <Route path="/Messager/:receiverId" element={<Messager />} />
                         <Route path="/Messager/*" element={<Navigate to="/Messager/1" replace />} />
-
-
                         <Route path="/advisors" element={<AdvisorsList />} />
                         <Route path="/Scheduling_Tool" element={< SchedulingTool />} />/
-
-
-
                         <Route path="server-error" element={<ServerError />} />
                         <Route path="404" element={<Error404 />} />
                         <Route path="profile" element={<ProfileLayout />}>
                             <Route path="personal-info" element={<PersonalInfo />} />
                             <Route path="security-settings" element={<SecuritySettings />} />
-
                         </Route>
-
                     </Route>
                     <Route path="/auth" element={<AuthLayoutFallback />}>
                         <Route path="login" element={<LoginPage />} />
-
-                        
                         <Route path="forgot-password" element={<ForgotPasswordPage />} />
-                       
                     </Route>
                     <Route path="auth/logout" element={<LogoutFallback />} />
-
                 </Routes>
             </UserProvider>
         </BrowserRouter>

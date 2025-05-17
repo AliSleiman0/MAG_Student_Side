@@ -26,3 +26,11 @@
 .rce-mbox-date {
     font-size: 10px !important;
 }
+
+.message-right .rce-mbox {
+    background-color: #dcf8c6 !important; /* WhatsApp light green */
+    border-radius: 16px 16px 0 16px !important;
+    padding: 8px 12px !important;
+    color: #202c33 !important;
+    align-self: flex-end; /* push to the right */
+}

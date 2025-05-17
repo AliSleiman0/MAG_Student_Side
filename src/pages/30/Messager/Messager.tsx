@@ -2,18 +2,17 @@
 // ---------------------------
 // 1. IMPORTS & DEPENDENCIES
 // ---------------------------
-import whatsappImg from 'assets/wtsp5.jpg'; 
+import whatsappImg from 'assets/wtsp3.jpg';
 // React Core
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from 'react-router-dom';
 
 // Third-party Components
 import { ChatList, IChatListProps, MessageBox, SystemMessage } from "react-chat-elements";
-import { Avatar, Badge, Col, List, Row, Space, Tag } from "antd";
+import { Avatar, Col, List, Row, Space, Tag } from "antd";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 
 // Firebase & Types
-import { Timestamp } from "firebase/firestore";
 import {
     subscribeToMessages, updateMessageStatus, sendMessage,
     Message, RoomWithLastMsg, subscribeToUserRooms, resetUnreadCount
@@ -27,8 +26,7 @@ import { useResponsive } from "../../../hooks/useResponsive";
 import { getUserProfile } from "../../../apiMAG/user";
 import "./Messager.styles.css"
 import ChatComposer from "./Input";
-import { EnvironmentOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import image from 'antd/lib/image';
+import { EnvironmentOutlined } from '@ant-design/icons';
 
 import { Typography } from 'antd';
 
@@ -94,7 +92,7 @@ const useReceiverProfile = (receiverId: string) => {
 // ---------------------------
 // 5. MAIN COMPONENT
 // ---------------------------
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId = "1", onSelectRoom }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId, onSelectRoom }) => {
     // ---------------------------
     // 5.1 COMPONENT STATE & REFS
     // ---------------------------
@@ -152,7 +150,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId = "1", onSelec
                     })
                 );
 
-                setChatRooms(ds);
+                const filteredDs = ds.filter(room => room.id !== 1);
+                setChatRooms(filteredDs);
             }
         );
 
@@ -296,9 +295,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId = "1", onSelec
 
     return (
 
-        <Row  style={{  padding: 0, marginTop:"-30px" } }>
+        <Row style={{ padding: 0, marginTop: "-30px", backgroundColor: "#f0fffd" }}>
             {/* Chat List Column */}
-            <Col xs={0} sm={0} md={24} lg={6} xl={6} style={{ backgroundColor: "#ffffff", padding: "8px" }}>
+            <Col xs={0} sm={0} md={24} lg={6} xl={6} style={{ backgroundColor: "#f0fffd", padding: "8px" }}>
                 <ChatList
                     lazyLoadingImage="adas"
                     id={432}
@@ -318,52 +317,53 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId = "1", onSelec
             {/* Chat Messages Column */}
             <Col xs={24} sm={24} md={24} lg={18} xl={18}>
                 <Row>
-                    <Col md={24} lg={24} style={{ width: "100%", paddingInline: "8px", paddingTop: "8px", borderRadius:"8px" }}>
-                        
-                        <Row
-                            align="middle"
-                            gutter={16}
-                            style={{
-                                backgroundColor: '#fff',
-                                padding: '6px 12px',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                borderRadius: '8px 8px 0 0',
-                            }}
-                        >
-                            {/* Avatar */}
-                            <Col>
-                                <Avatar
-                                    size={64}
-                                    src={receiverProfile?.image}
-                                    shape="circle"
-                                    style={{ border: '2px solid #fafafa' }}
-                                />
-                            </Col>
+                    {(receiverId && receiverId !== "1" && receiverProfile) ? (
+                        <Col md={24} lg={24} style={{ width: "100%", paddingInline: "8px", paddingTop: "8px", borderRadius: "8px" }}>
 
-                            {/* Name & Email */}
-                            <Col flex="auto">
-                                <Space direction="vertical" size={0}>
-                                    <Typography.Title level={5} style={{ margin: 0 }}>
-                                        {receiverProfile?.fullname}
-                                    </Typography.Title>
-                                    <Typography.Text>{receiverProfile?.email}</Typography.Text>
-                                </Space>
-                            </Col>
+                            <Row
+                                align="middle"
+                                gutter={16}
+                                style={{
+                                    backgroundColor: '#fff',
+                                    padding: '6px 12px',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                    borderRadius: '8px 8px 0 0',
+                                }}
+                            >
+                                {/* Avatar */}
+                                <Col>
+                                    <Avatar
+                                        size={64}
+                                        src={receiverProfile?.image}
+                                        shape="circle"
+                                        style={{ border: '2px solid #fafafa' }}
+                                    />
+                                </Col>
 
-                            {/* User Type & Campus */}
-                            <Col>
-                                <Space direction="vertical" align="end">
-                                    <Tag style={{ backgroundColor: "#ccfff3", color:"#169173"} }>{receiverProfile?.usertype}</Tag>
-                                    <Typography.Text>
-                                        <EnvironmentOutlined style={{ marginRight: 4 }} />
-                                        {receiverProfile?.campusname}
-                                    </Typography.Text>
-                                </Space>
-                            </Col>
-                        </Row>
-                     
+                                {/* Name & Email */}
+                                <Col flex="auto">
+                                    <Space direction="vertical" size={0}>
+                                        <Typography.Title level={5} style={{ margin: 0 }}>
+                                            {receiverProfile?.fullname}
+                                        </Typography.Title>
+                                        <Typography.Text>{receiverProfile?.email}</Typography.Text>
+                                    </Space>
+                                </Col>
 
-                    </Col>
+                                {/* User Type & Campus */}
+                                <Col>
+                                    <Space direction="vertical" align="end">
+                                        <Tag style={{ backgroundColor: "#ccfff3", color: "#169173" }}>{receiverProfile?.usertype}</Tag>
+                                        <Typography.Text>
+                                            <EnvironmentOutlined style={{ marginRight: 4 }} />
+                                            {receiverProfile?.campusname}
+                                        </Typography.Text>
+                                    </Space>
+                                </Col>
+                            </Row>
+
+
+                        </Col>) : null}
                     <Col md={24} lg={24}>
                         <div style={{
                             display: 'flex',
@@ -371,8 +371,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId = "1", onSelec
                             height: mobileOnly ? '90vh' : '70vh',
                             width: '100%',
                             backgroundImage: `url(${whatsappImg})`,
-                            backgroundSize: 'cover',          // scale to cover the container
-                            backgroundPosition: 'center',     // center the image
+                            // scale to cover the container
+                            // center the image
                         }}>
                             {/* Messages Container */}
                             <div ref={listRef} style={{
@@ -381,47 +381,57 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId = "1", onSelec
                                 padding: 8,
                                 scrollBehavior: 'smooth',
                                 minHeight: mobileOnly ? '60vh' : 'auto',
-                               
-                            }}>
-                                <List
-                                    split={false}
-                                    locale={{ emptyText: <SystemMessage text="Start a conversation" /> }}
-                                    style={{ width: "100%", }}
-                                    bordered={false}
-                                    dataSource={messages}
 
-                                    renderItem={(item) => (
-                                        <List.Item
-                                            key={item.id}
-                                            style={{
-                                                width: "100%",
-                                                display: 'flex',
-                                                justifyContent: item.position === 'right'
-                                                    ? 'flex-end'
-                                                    : 'flex-start',
-                                                padding: '8px 0'
-                                            }}
-                                        >
-                                            {
-                                                item.position === 'right'
-                                                    ? <MessageBox
-                                                        {...item}
-                                                        title="You"
-                                                        notch
-                                                        retracted={false}
-                                                        onTitleClick={() => { }}
-                                                        status={item.status} // always defined
-                                                    />
-                                                    : <MessageBox
-                                                        {...item}
-                                                        title={`Advisor ${receiverProfile?.fullname}`}
-                                                        retracted={false}
-                                                        onTitleClick={() => { }}
-                                                    />
-                                            }
-                                        </List.Item>
-                                    )}
-                                />
+                            }}>
+                                {receiverId && receiverId !== "1" && receiverProfile ? (
+                                    <List
+                                        split={false}
+                                        locale={{ emptyText: <SystemMessage text="Start a conversation" /> }}
+                                        style={{ width: "100%", }}
+                                        bordered={false}
+                                        dataSource={messages}
+
+                                        renderItem={(item) => (
+                                            <List.Item
+                                                key={item.id}
+                                                style={{
+                                                    width: "100%",
+                                                    display: 'flex',
+                                                    justifyContent: item.position === 'right'
+                                                        ? 'flex-end'
+                                                        : 'flex-start',
+                                                    padding: '8px 0'
+                                                }}
+                                            >
+                                                {
+                                                    item.position === 'right'
+                                                        ? <MessageBox
+                                                            {...item}
+                                                            className="message-right"
+                                                            title="You"
+                                                            notch
+                                                            retracted={false}
+                                                            onTitleClick={() => { }}
+                                                            status={item.status} // always defined
+                                                        />
+                                                        : <MessageBox
+                                                            {...item}
+                                                            title={`Advisor ${receiverProfile?.fullname}`}
+                                                            retracted={false}
+                                                            onTitleClick={() => { }}
+                                                            status={undefined}
+                                                        />
+                                                }
+                                            </List.Item>
+                                        )}
+                                    />
+                                ) :
+                                    <SystemMessage
+                                        text="Please select a chat to begin messaging."
+
+                                    />
+                                }
+
                             </div>
 
                             {/* Composer */}

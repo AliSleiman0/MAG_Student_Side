@@ -170,6 +170,7 @@ const DynamicPOS: React.FC = () => {
         setTimeout(() => {
             setIsLoadingGenerate(false);
             setIsGeneratedSemesters(true);
+            
             setShowConfirmation(false);
             setShouldFlash(true);
             setTimeout(() => setShouldFlash(false), 3000);
@@ -196,9 +197,10 @@ const DynamicPOS: React.FC = () => {
             setShouldFlash(false);
 
             // Store in sessionStorage instead
+            console.log("data.recommendedforRegestration[0].courses",data.recommendedforRegestration[0].courses);
             sessionStorage.setItem(
                 "coursesRecommendedDynamic",
-                JSON.stringify(data.offeredCourses[0])
+                JSON.stringify(data.recommendedforRegestration[0])
             );
 
         }
@@ -208,8 +210,12 @@ const DynamicPOS: React.FC = () => {
      * Derived Data Calculations
      *************************/
     const dataWithPrioirities = useMemo(() => {
-        if (!data?.recommendedforRegestration?.[0]?.courses) return [];
 
+        if (!data?.recommendedforRegestration?.[0]?.courses) return [];
+        sessionStorage.setItem(
+            "coursesRecommendedDynamic",
+            JSON.stringify(data.recommendedforRegestration[0])
+        );
         return calculatePriorities(data.offeredCourses[0].courses)?.map((course: Course) => ({ ...course, key: course.courseid }));
     }, [data?.recommendedforRegestration]); // <-- Only recalculates when courses change
     

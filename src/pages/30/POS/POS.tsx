@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useRef, useState } from 'react';
 import { Graph, Edge, Node } from '@antv/x6';
 import { register } from '@antv/x6-react-shape';
-import { Alert, Col, Row, Space, Spin, Switch, Typography } from 'antd';
+import {  Col, Row, Space, Spin, Switch, Typography } from 'antd';
 import { CheckOutlined, CloseOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useResponsive } from '../../../hooks/useResponsive';
@@ -12,7 +12,7 @@ import {
     FlowchartContainer,
     CourseNodeContainer,
     CourseCode,
-    LegendContainer,
+  
     LegendItem,
     ColorSwatch,
     SolidLine,
