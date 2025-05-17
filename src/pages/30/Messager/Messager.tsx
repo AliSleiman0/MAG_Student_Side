@@ -4,12 +4,12 @@
 // ---------------------------
 import whatsappImg from 'assets/wtsp3.jpg';
 // React Core
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useParams, useNavigate } from 'react-router-dom';
 
 // Third-party Components
 import { ChatList, IChatListProps, MessageBox, SystemMessage } from "react-chat-elements";
-import { Avatar, Col, List, Row, Space, Tag } from "antd";
+import { Avatar, Button, Col, List, Row, Space, Tag } from "antd";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 
 // Firebase & Types
@@ -26,9 +26,11 @@ import { useResponsive } from "../../../hooks/useResponsive";
 import { getUserProfile } from "../../../apiMAG/user";
 import "./Messager.styles.css"
 import ChatComposer from "./Input";
-import { EnvironmentOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, ArrowRightOutlined, EnvironmentOutlined } from '@ant-design/icons';
 
 import { Typography } from 'antd';
+import Spin from 'antd/es/spin';
+import { useTranslation } from 'react-i18next';
 
 
 
@@ -96,19 +98,22 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId, onSelectRoom 
     // ---------------------------
     // 5.1 COMPONENT STATE & REFS
     // ---------------------------
-    const { mobileOnly } = useResponsive();
+    const { t } = useTranslation();
     const listRef = useRef<HTMLDivElement>(null);  // Reference to messages container
-    const { profile, usertype } = useUser();       // User context data
+
     const [messages, setMessages] = useState<ChatMessage[]>([]);//messages
     const [isSending, setIsSending] = useState(false); //message is sending?
     const currentUserId = localStorage.getItem('userId') ?? ''; //Current userid
-    const [chatRooms, setChatRooms] = useState<IChatListProps['dataSource']>([]); // rooms associated with the current user
-    const { data: receiverProfile, isLoading, error } = useReceiverProfile(receiverId); //gets the receiver profile from its id
+    const [chatRooms, setChatRooms] = useState<IChatListProps['dataSource'] | null>(null); // rooms associated with the current user
+
+    const { data: receiverProfile } = useReceiverProfile(receiverId); //gets the receiver profile from its id
 
     // ---------------------------
     // 5.2 CHAT ROOM SUBSCRIPTION
     // ---------------------------
+
     useEffect(() => {
+
         if (!currentUserId) return;
 
         const unsub = subscribeToUserRooms(
@@ -152,6 +157,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId, onSelectRoom 
 
                 const filteredDs = ds.filter(room => room.id !== 1);
                 setChatRooms(filteredDs);
+
             }
         );
 
@@ -233,7 +239,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId, onSelectRoom 
         } catch (error) {
             // Rollback optimistic update on error
             setMessages(prev => prev.filter(msg => msg.id !== tempId));
-            alert('Failed to send message. Please try again.');
+           
         } finally {
             setIsSending(false);
         }
@@ -248,7 +254,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId, onSelectRoom 
         type: 'text',
         text,
         date: new Date(),
-        title: 'You',
+        title: t("chats.you") ,
         status: 'waiting',
         notch: false,
         retracted: false,
@@ -291,41 +297,159 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId, onSelectRoom 
         };
     };
 
-
-
+    const [isChatListVisible, setIsChatListVisible] = useState(false);
+    const { mobileOnly, isTablet, isDesktop, tabletOnly } = useResponsive();
     return (
+        <Row style={{
+            padding: 0,
+            marginTop: "0px",
+            backgroundColor: "#f0f7f7",
+            ...(isTablet && {
+                borderLeft: "24px solid #ebeded",
+                borderTop: "24px solid #ebeded",
+            }),
+            borderRadius: "12px",
+            minHeight: mobileOnly ? "70vh" : "auto",
+            position: "relative"
+        }}>
+            {mobileOnly &&
+                <>
+                    <Button
+                        style={{
+                            zIndex:  556,
+                            position: "absolute",
+                            top: isChatListVisible ? -10 : 80,
+                            color: "#014a2f",
+                            right: isChatListVisible ? 0 : ''
+                        }}
+                        onClick={() => setIsChatListVisible(prev => !prev)}
+                    icon={isChatListVisible ? <ArrowLeftOutlined /> : <ArrowRightOutlined /> }
+                    >
+                    {t("chats.chats") }
+                    </Button >
+                    {isChatListVisible &&
+                        <Col
+                            xs={24}
+                            sm={24}
+                            md={24}
+                            lg={6}
+                            xl={6}
+                            style={{
+                                zIndex: 555,
+                                position: "absolute",
+                                top: 0,
+                                backgroundColor: "#f0f7f7",
+                                width: "100%",
+                                padding: mobileOnly ? "4px" : "8px",
 
-        <Row style={{ padding: 0, marginTop: "-30px", backgroundColor: "#f0fffd" }}>
-            {/* Chat List Column */}
-            <Col xs={0} sm={0} md={24} lg={6} xl={6} style={{ backgroundColor: "#f0fffd", padding: "8px" }}>
-                <ChatList
-                    lazyLoadingImage="adas"
-                    id={432}
-                    className='chat-list'
-                    dataSource={chatRooms.map(room => ({
-                        ...room,
-                        className: String(room.id) === receiverId ? "chat-room-selected" : ""
-                    }))}
-                    onClick={(item: any) => {
-                        if (item && item.onClick) {
-                            item.onClick(); //Explicitly invoking onclick on each item
-                        }
-                    }}
-                />
-            </Col>
+                                height: mobileOnly ? '100%' : "100%",
+
+                            }}
+                        >
+                            {chatRooms === null ? (
+                                <Row justify="center" align="middle">
+                                <Spin tip={t("commmon.loading")} />
+                                </Row>
+                            ) : (
+                                <>
+                                    <Row justify="start">
+                                        <Typography.Text style={{
+                                            padding: mobileOnly ? "8px" : "10px",
+                                            fontWeight: "bold",
+                                            fontSize: mobileOnly ? 14 : 16
+                                        }}>
+                                            {t("chats.chats_h")}
+                                        </Typography.Text>
+                                    </Row>
+                                    <Row style={{ width: "100%", backgroundColor: "#f0f7f7" }}>
+                                        <ChatList
+                                            lazyLoadingImage="adas"
+                                            id={432}
+                                            className='chat-list'
+                                            dataSource={(chatRooms ?? []).map(room => ({
+                                                ...room,
+                                                className: String(room.id) === receiverId ? "chat-room-selected" : ""
+                                            }))}
+                                            onClick={(item: any) => item?.onClick?.()}
+                                        />
+                                    </Row>
+                                </>
+                            )}
+                        </Col>
+                    }
+                </>
+            }
+            {isTablet && (<Col
+                xs={24}
+                sm={24}
+                md={24}
+                lg={6}
+                xl={6}
+                style={{
+                    backgroundColor: "#f0f7f7",
+                    padding: mobileOnly ? "4px" : "8px",
+                    borderTopLeftRadius: "12px",
+                    borderBottomLeftRadius: "12px",
+                    height: mobileOnly ? 'auto' : "70vh",
+
+                }}
+            >
+                {chatRooms === null ? (
+                    <Row justify="center" align="middle">
+                        <Spin tip={t("common.loading")} />
+                    </Row>
+                ) : (
+                    <>
+                        <Row justify="start">
+                            <Typography.Text style={{
+                                padding: mobileOnly ? "4px" : "10px",
+                                fontWeight: "bold",
+                                fontSize: mobileOnly ? 14 : 16
+                            }}>
+                                    {t("chats.chats_h")}
+                            </Typography.Text>
+                        </Row>
+                        <Row style={{ width: "100%", backgroundColor: "#f0f7f7" }}>
+                            <ChatList
+                                lazyLoadingImage="adas"
+                                id={432}
+                                className='chat-list'
+                                dataSource={(chatRooms ?? []).map(room => ({
+                                    ...room,
+                                    className: String(room.id) === receiverId ? "chat-room-selected" : ""
+                                }))}
+                                onClick={(item: any) => item?.onClick?.()}
+                            />
+                        </Row>
+                    </>
+                )}
+            </Col>)}
+
+
 
             {/* Chat Messages Column */}
-            <Col xs={24} sm={24} md={24} lg={18} xl={18}>
+            <Col
+                xs={24}
+                sm={24}
+                md={24}
+                lg={18}
+                xl={18}
+                style={{
+                    overflow: "hidden",
+                    backgroundColor: "#ffffff",
+                    height: mobileOnly ? '80vh' : 'auto'
+                }}
+            >
                 <Row>
-                    {(receiverId && receiverId !== "1" && receiverProfile) ? (
-                        <Col md={24} lg={24} style={{ width: "100%", paddingInline: "8px", paddingTop: "8px", borderRadius: "8px" }}>
-
+                    {(receiverId && receiverId !== "1" && receiverProfile) && (
+                        <Col md={24} lg={24} style={{ width: "100%", borderRadius: "8px" }}>
                             <Row
                                 align="middle"
-                                gutter={16}
+                                gutter={[mobileOnly ? 8 : 16, mobileOnly ? 8 : 16]}
                                 style={{
+                                    maxWidth: "100%",
                                     backgroundColor: '#fff',
-                                    padding: '6px 12px',
+                                    padding: mobileOnly ? '6px' : '6px 18px',
                                     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                                     borderRadius: '8px 8px 0 0',
                                 }}
@@ -333,7 +457,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId, onSelectRoom 
                                 {/* Avatar */}
                                 <Col>
                                     <Avatar
-                                        size={64}
+                                        size={mobileOnly ? 40 : 64}
                                         src={receiverProfile?.image}
                                         shape="circle"
                                         style={{ border: '2px solid #fafafa' }}
@@ -343,115 +467,119 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId, onSelectRoom 
                                 {/* Name & Email */}
                                 <Col flex="auto">
                                     <Space direction="vertical" size={0}>
-                                        <Typography.Title level={5} style={{ margin: 0 }}>
+                                        <Typography.Title
+                                            level={mobileOnly ? 5 : 4}
+                                            style={{ margin: 0, fontSize: mobileOnly ? 14 : 16 }}
+                                        >
                                             {receiverProfile?.fullname}
                                         </Typography.Title>
-                                        <Typography.Text>{receiverProfile?.email}</Typography.Text>
+                                        <Typography.Text style={{ fontSize: mobileOnly ? 12 : 14 }}>
+                                            {receiverProfile?.email}
+                                        </Typography.Text>
                                     </Space>
                                 </Col>
 
                                 {/* User Type & Campus */}
                                 <Col>
                                     <Space direction="vertical" align="end">
-                                        <Tag style={{ backgroundColor: "#ccfff3", color: "#169173" }}>{receiverProfile?.usertype}</Tag>
-                                        <Typography.Text>
+                                        <Tag style={{
+                                            backgroundColor: "#dcf8c6",
+                                            color: "black",
+                                            padding: "3px",
+                                            fontSize: mobileOnly ? 12 : 14
+                                        }}>
+                                            {receiverProfile?.usertype}
+                                        </Tag>
+                                        <Typography.Text style={{ fontSize: mobileOnly ? 12 : 14 }}>
                                             <EnvironmentOutlined style={{ marginRight: 4 }} />
                                             {receiverProfile?.campusname}
                                         </Typography.Text>
                                     </Space>
                                 </Col>
                             </Row>
+                        </Col>
+                    )}
 
-
-                        </Col>) : null}
-                    <Col md={24} lg={24}>
+                    <Col md={24} lg={24} style={{ minWidth: "100%" }}>
                         <div style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            height: mobileOnly ? '90vh' : '70vh',
+                            height: mobileOnly ? 'calc(100vh - 120px)' : isDesktop ? '80vh' : '70vh',
                             width: '100%',
                             backgroundImage: `url(${whatsappImg})`,
-                            // scale to cover the container
-                            // center the image
+                         
                         }}>
                             {/* Messages Container */}
                             <div ref={listRef} style={{
                                 flex: 1,
                                 overflowY: 'auto',
-                                padding: 8,
-                                scrollBehavior: 'smooth',
-                                minHeight: mobileOnly ? '60vh' : 'auto',
-
+                                padding: mobileOnly ? 4 : 8,
+                                scrollBehavior: 'smooth'
                             }}>
                                 {receiverId && receiverId !== "1" && receiverProfile ? (
                                     <List
                                         split={false}
                                         locale={{ emptyText: <SystemMessage text="Start a conversation" /> }}
-                                        style={{ width: "100%", }}
+                                        style={{ width: "100%" }}
                                         bordered={false}
                                         dataSource={messages}
-
                                         renderItem={(item) => (
                                             <List.Item
                                                 key={item.id}
                                                 style={{
                                                     width: "100%",
                                                     display: 'flex',
-                                                    justifyContent: item.position === 'right'
-                                                        ? 'flex-end'
-                                                        : 'flex-start',
-                                                    padding: '8px 0'
+                                                    justifyContent: item.position === 'right' ? 'flex-end' : 'flex-start',
+                                                    padding: mobileOnly ? '4px 0' : '8px 0'
                                                 }}
                                             >
-                                                {
-                                                    item.position === 'right'
-                                                        ? <MessageBox
-                                                            {...item}
-                                                            className="message-right"
-                                                            title="You"
-                                                            notch
-                                                            retracted={false}
-                                                            onTitleClick={() => { }}
-                                                            status={item.status} // always defined
-                                                        />
-                                                        : <MessageBox
-                                                            {...item}
-                                                            title={`Advisor ${receiverProfile?.fullname}`}
-                                                            retracted={false}
-                                                            onTitleClick={() => { }}
-                                                            status={undefined}
-                                                        />
-                                                }
+                                                {item.position === 'right' ? (
+                                                    <MessageBox
+                                                        {...item}
+                                                        className="message-right"
+                                                        title={ t("chats.you")}
+                                                        notch
+                                                        retracted={false}
+                                                        onTitleClick={() => { }}
+                                                        status={item.status}
+                                                       
+                                                    />
+                                                ) : (
+                                                    <MessageBox
+                                                        {...item}
+                                                        className="message-left"
+                                                            title={`${t("chats.advisor")} ${receiverProfile?.fullname}`}
+                                                        retracted={false}
+                                                        onTitleClick={() => { }}
+                                                        status={undefined}
+                                                        style={{ maxWidth: mobileOnly ? '80%' : '60%' }}
+                                                    />
+                                                )}
                                             </List.Item>
                                         )}
                                     />
-                                ) :
-                                    <SystemMessage
-                                        text="Please select a chat to begin messaging."
-
-                                    />
-                                }
-
+                                ) : (
+                                        <SystemMessage text={t("chats.please")} />
+                                )}
                             </div>
 
                             {/* Composer */}
                             <div style={{
-                                padding: 16,
+                                padding: mobileOnly ? 8 : 16,
                                 borderTop: '1px solid #f0f0f0',
-                                position: mobileOnly ? 'fixed' : 'relative',
+                                position: mobileOnly ? 'sticky' : 'relative',
                                 bottom: 0,
                                 width: '100%',
-                                background: 'white'
+                                background: 'white',
+                                zIndex: 1
                             }}>
                                 <ChatComposer onSend={handleSend} />
                             </div>
                         </div>
                     </Col>
                 </Row>
-
             </Col>
         </Row>
-
     );
 };
 

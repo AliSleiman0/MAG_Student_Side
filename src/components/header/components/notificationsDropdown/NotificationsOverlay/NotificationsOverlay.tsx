@@ -1,85 +1,96 @@
-import React, { useMemo, ReactNode } from 'react';
-import { Trans } from 'react-i18next';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-import { BaseNotification } from '@app/components/common/BaseNotification/BaseNotification';
-import { capitalize } from '@app/utils/utils';
-import { Mention, Notification as NotificationType } from 'api/notifications.api';
-import { notificationsSeverities } from 'constants/notificationsSeverities';
+import { useState, useEffect } from 'react';
+
 import * as S from './NotificationsOverlay.styles';
 import { BaseRow } from '@app/components/common/BaseRow/BaseRow';
 import { BaseCol } from '@app/components/common/BaseCol/BaseCol';
-import { BaseSpace } from '@app/components/common/BaseSpace/BaseSpace';
+import { ChatList, IChatListProps } from 'react-chat-elements';
+import { RoomWithLastMsg, subscribeToUserRooms } from '../../../../../firebase/firebase';
+import { getUserProfile } from '../../../../../apiMAG/user';
+import Empty from 'antd/lib/empty';
 
-interface NotificationsOverlayProps {
-  notifications: NotificationType[];
-  setNotifications: (state: NotificationType[]) => void;
-}
+import "../../../../../pages/30/Messager/Messager.styles.css";
 
-export const NotificationsOverlay: React.FC<NotificationsOverlayProps> = ({
-  notifications,
-  setNotifications,
-  ...props
+export const NotificationsOverlay= ({
+
 }) => {
-  const { t } = useTranslation();
 
-  const noticesList = useMemo(
-    () =>
-      notifications.map((notification, index) => {
-        const type = notificationsSeverities.find((dbSeverity) => dbSeverity.id === notification.id)?.name;
+    const [chatRooms, setChatRooms] = useState<IChatListProps['dataSource'] | null>(null); // rooms associated with the current user
+    const currentUserId = localStorage.getItem('userId') ?? '';
+    useEffect(() => {
 
-        return (
-          <BaseNotification
-            key={index}
-            type={type || 'warning'}
-            title={capitalize(type || 'warning')}
-            description={t(notification.description)}
-            {...(type === 'mention' && {
-              mentionIconSrc: (notification as Mention).userIcon,
-              title: (notification as Mention).userName,
-              description: (
-                <Trans i18nKey={(notification as Mention).description}>
-                  <S.LinkBtn type="link" href={(notification as Mention).href}>
-                    {
-                      { place: t((notification as Mention).place) } as unknown as ReactNode // todo: remove casting
-                    }
-                  </S.LinkBtn>
-                </Trans>
-              ),
-            })}
-          />
+        if (!currentUserId) return;
+
+        const unsub = subscribeToUserRooms(
+            String(currentUserId),
+            async (rooms: RoomWithLastMsg[]) => {
+                const ds = await Promise.all(
+                    rooms.map(async (room) => {
+                        // find the “other” participant
+                        const otherId = room.participants.find(
+                            (id) => id !== String(currentUserId)
+                        )!;
+
+                        // load their profile
+                        const other = await getUserProfile(Number(otherId));
+
+                        // determine slots A/B for this room
+                        const [userA, userB] = [...room.participants].sort();
+
+                        // pick the right unread count for currentUser
+                        const unread =
+                            String(currentUserId) === userA
+                                ? room.unreadCountA
+                                : room.unreadCountB;
+
+                        return {
+                            id: other.userid,
+                            avatar: other.image,
+                            alt: other.fullname,
+                            title: other.fullname,
+                            subtitle: room.lastMessage.content || "New chat",
+                            date: room.lastMessageAt?.toDate() || new Date(),
+                            unread,
+                            statusColorType: "badge",
+                          
+                        };
+                    })
+                );
+                const filteredDs = ds
+                    .filter(room => room.unread > 0)       // keep only rooms with unread > 0
+                    .filter(room => room.id !== 1);   
+                setChatRooms(filteredDs);
+
+            }
         );
-      }),
-    [notifications, t],
-  );
+
+        return () => unsub();
+    }, [currentUserId]);
 
   return (
-    <S.NoticesOverlayMenu {...props}>
-      <BaseRow gutter={[20, 20]}>
-        <BaseCol span={24}>
-          {notifications.length > 0 ? (
-            <BaseSpace direction="vertical" size={10} split={<S.SplitDivider />}>
-              {noticesList}
-            </BaseSpace>
-          ) : (
-            <S.Text>{t('header.notifications.noNotifications')}</S.Text>
-          )}
-        </BaseCol>
-        <BaseCol span={24}>
-          <BaseRow gutter={[10, 10]}>
-            {notifications.length > 0 && (
-              <BaseCol span={24}>
-                <S.Btn type="ghost" onClick={() => setNotifications([])}>
-                  {t('header.notifications.readAll')}
-                </S.Btn>
-              </BaseCol>
-            )}
-            <BaseCol span={24}>
-              <S.Btn type="link">
-                <Link to="/">{t('header.notifications.viewAll')}</Link>
-              </S.Btn>
-            </BaseCol>
-          </BaseRow>
+    <S.NoticesOverlayMenu>
+      <BaseRow>
+      
+              <BaseCol span={24} style={{width:"100%"} }>
+                  {(chatRooms && chatRooms.length > 0)
+                      ? (
+                          <ChatList
+                              lazyLoadingImage="adas"
+                              id={432}
+                              className="chat-list"
+                              dataSource={(chatRooms ?? []).map(room => ({
+                                  ...room,
+                                  className:  "chat-room-notifcation" 
+                              }))}
+                             
+                          />
+                      )
+                      : (
+                          <Empty
+                              image={Empty.PRESENTED_IMAGE_SIMPLE}
+                              description="No notifications"
+                              style={{ margin: '24px 0' }}
+                          />
+                      )}
         </BaseCol>
       </BaseRow>
     </S.NoticesOverlayMenu>

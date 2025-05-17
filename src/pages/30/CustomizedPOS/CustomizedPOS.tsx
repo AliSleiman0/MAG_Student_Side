@@ -73,12 +73,7 @@ function parseCourse(input: string) {
         name: name
     };
 }
-const DEFAULT_SEM_INFO: SemesterInfo = {
-    semester: "",
-    year: "",
-    courses: [],
-    totalCredits: 0,
-};
+
 const CustomizedPOS: React.FC = () => {
     const { t } = useTranslation();
    
@@ -492,11 +487,7 @@ const CustomizedPOS: React.FC = () => {
                             </div>
                         ) : (
                             (() => {
-                                // 1. Derive once, use strict equality:
-
-                                const translateCourseType = (courseType: string) => {
-                                    return t(`course_types.${courseType}` as any) as string;
-                                };
+                        
                                 return (
 
                                     <Row gutter={[16, 16]}>
@@ -544,7 +535,7 @@ const CustomizedPOS: React.FC = () => {
                                                         title={`${t("customised_pos.title")} ${getSemesterTranslation(selectedSemester?.semester ?? "")} | ${selectedSemester?.semester}`}
                                                         credits={totalCreditsSelected}
                                                         courseList={selectedCourses}
-                                                        Upcoming={t("customised_pos.upcoming")}
+                                                    
                                                         extraInfo={
                                                             <div style={{ color: totalCreditsSelected > 20 ? 'red' : 'inherit' }}>
                                                                 {totalCreditsSelected}/20 {t("customised_pos.credits_selected")}

@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useMemo, useState } from 'react';
-import { AppstoreOutlined, LaptopOutlined, MailOutlined, MenuFoldOutlined, MenuUnfoldOutlined, NotificationOutlined, ScheduleOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, CloudOutlined, LaptopOutlined, MailOutlined, MenuFoldOutlined, MenuUnfoldOutlined, NotificationOutlined, ScheduleOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuProps, TableColumnsType } from 'antd';
 import { Alert, Button, Card, Col, ConfigProvider, Layout, Menu, Row, Table } from 'antd';
 import SubMenu from 'antd/lib/menu/SubMenu';
@@ -37,7 +37,7 @@ const queryClient = new QueryClient({
  * @returns Courses with priority assignments
  */
 const calculatePriorities = (courses: Course[] | undefined): Course[] | undefined => {
-    if (!courses) return 
+    if (!courses) return
     // Clone and sort by score (descending) and courseid (ascending)
     const sorted = [...courses].sort((a, b) => {
         // Primary sort by score
@@ -170,7 +170,7 @@ const DynamicPOS: React.FC = () => {
         setTimeout(() => {
             setIsLoadingGenerate(false);
             setIsGeneratedSemesters(true);
-            
+
             setShowConfirmation(false);
             setShouldFlash(true);
             setTimeout(() => setShouldFlash(false), 3000);
@@ -197,7 +197,7 @@ const DynamicPOS: React.FC = () => {
             setShouldFlash(false);
 
             // Store in sessionStorage instead
-            console.log("data.recommendedforRegestration[0].courses",data.recommendedforRegestration[0].courses);
+            console.log("data.recommendedforRegestration[0].courses", data.recommendedforRegestration[0].courses);
             sessionStorage.setItem(
                 "coursesRecommendedDynamic",
                 JSON.stringify(data.recommendedforRegestration[0])
@@ -218,7 +218,7 @@ const DynamicPOS: React.FC = () => {
         );
         return calculatePriorities(data.offeredCourses[0].courses)?.map((course: Course) => ({ ...course, key: course.courseid }));
     }, [data?.recommendedforRegestration]); // <-- Only recalculates when courses change
-    
+
     const processedData = useMemo(() => {
         return dataWithPrioirities?.map((course: Course) =>
         ({
@@ -268,7 +268,7 @@ const DynamicPOS: React.FC = () => {
     return (
         // <pre>{JSON.stringify(data, null, 2)}</pre>
         <>  <Layout style={{ background: '#e7f2f3' }}>
-           
+
             <Modal
                 title={t("customised_pos.modal_title_generate")}
                 style={{ marginTop: "50px" }}
@@ -292,7 +292,7 @@ const DynamicPOS: React.FC = () => {
                     {isLoadingGenerate ? (
                         <p>{t("customised_pos.creating_your_optimal_semester_plan")}</p>
                     ) : (
-                            <p>{t("customised_pos.modal_text_generate_dynamic")}</p>
+                        <p>{t("customised_pos.modal_text_generate_dynamic")}</p>
                     )}
                 </div>
             </Modal>
@@ -336,9 +336,9 @@ const DynamicPOS: React.FC = () => {
                                     <Menu.Item
                                         key={`generated-semester-${index}`}
                                         onClick={() => handleSemesterSelect(sem)}
-                                        icon={<ScheduleOutlined style={{ fontSize:"0.85rem"}} />}
+                                        icon={<ScheduleOutlined style={{ fontSize: "0.85rem" }} />}
                                         className="generated-semester-item"
-                                        style={{ fontSize: "0.85rem"}}
+                                        style={{ fontSize: "0.85rem" }}
                                     >
                                         {sem.semester == "Fall" ? t("welcome.semester_fall") : sem.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} {sem.year}
                                     </Menu.Item>
@@ -372,7 +372,7 @@ const DynamicPOS: React.FC = () => {
                     {isGeneratedSemesters && (
                         <Button
                             style={{
-                             
+
                                 width: mobileOnly ? '190px' : '30%',
                                 marginRight: "10px",
                                 marginTop: "10px",
@@ -390,9 +390,9 @@ const DynamicPOS: React.FC = () => {
                             style={{
                                 background: '#038b94',
                                 color: 'white',
-                            
+
                                 width: mobileOnly ? '190px' : '30%',
-                              
+
                                 flexWrap: "wrap",
                                 fontSize: mobileOnly ? '0.6rem' : '1rem',
 
@@ -440,9 +440,9 @@ const DynamicPOS: React.FC = () => {
                         (() => {
                             // 1. Derive once, use strict equality:
 
-                                const translateCourseType = (courseType: string) => {
-                                    return t(`course_types.${courseType}` as any) as string;
-                                };
+                            const translateCourseType = (courseType: string) => {
+                                return t(`course_types.${courseType}` as any) as string;
+                            };
                             return (
                                 <Row gutter={[16, 16]}>
                                     {isFirstSemester ? (
@@ -488,13 +488,26 @@ const DynamicPOS: React.FC = () => {
                                             </Col>
                                         </>
                                     ) : (
-                                        <Col xs={24} md={24} lg={16} style={{ height: "100%", width: "100%" }}>
-                                            <SemesterDetailView
-                                                    title={`${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} – ${selectedSemester.year}`}
-                                                credits={totalCredits}
-                                                courseList={selectedSemester.courses}
-                                            />
-                                        </Col>
+                                        <>
+                                            <Col xs={24} md={24} lg={16} style={{ height: "100%", width: "100%" }}>
+                                                <SemesterDetailView
+                                                    title={`${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} `}
+                                                    credits={totalCredits}
+                                                    courseList={selectedSemester.courses}
+                                                />
+                                            </Col>
+                                            {isTablet && (
+                                                <Col xs={24} md={24} lg={8} style={{ height: "100%", width: "100%" }}>
+                                                        <Row align="top" style={{marginLeft:"40px"} } >
+                                                        <Col>
+                                                                <p className="ahmadRequest">{`${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")}`}</p>
+                                                               
+                                                        </Col>
+                                                    </Row>
+                                                </Col>
+                                            )}
+
+                                        </>
                                     )}
                                 </Row>
                             );

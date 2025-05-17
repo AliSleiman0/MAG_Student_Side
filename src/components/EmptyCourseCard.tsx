@@ -1,13 +1,15 @@
 import React from 'react';
 import { Row, Col } from 'antd';
 import { ReadOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 interface EmptyCourseCardProps {
     onClick: () => void;
 }
 
-const EmptyCourseCard: React.FC<EmptyCourseCardProps> = ({ onClick }) => (
-    <Row onClick={onClick} style={{ cursor: 'pointer' }}>
+const EmptyCourseCard: React.FC<EmptyCourseCardProps> = ({ onClick }) => {
+    const { t } = useTranslation();
+    return (<Row onClick={onClick} style={{ cursor: 'pointer' }}>
         <Col
             style={{
                 width: '100%',
@@ -23,15 +25,15 @@ const EmptyCourseCard: React.FC<EmptyCourseCardProps> = ({ onClick }) => (
                 </Col>
             </Row>
             <Row justify="center" style={{ color: '#4a8f94' }}>
-                <Col style={{ padding: '8px' }}>No courses added</Col>
+                <Col style={{ padding: '8px' }}>{t("sched_tool.no_courses")}</Col>
             </Row>
             <Row justify="center" style={{ color: '#4a8f94' }}>
                 <Col style={{ padding: '8px', fontSize: '12px', paddingBottom: '15px' }}>
-                    Click "Import Courses" to start building your schedule
+                    {t("sched_tool.no_courses_desc")}
                 </Col>
             </Row>
         </Col>
-    </Row>
-);
+    </Row>)
+}
 
 export default EmptyCourseCard;

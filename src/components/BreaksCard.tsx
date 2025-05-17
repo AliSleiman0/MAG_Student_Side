@@ -4,7 +4,15 @@ import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import IconButton from './IconButton'; // adjust path
 import EventButton from './EventButton'; // adjust path
-
+import { useTranslation } from 'react-i18next';
+export const dayNumberToKey: Record<number,string> = {
+    1: 'mon', // Monday
+    2: 'tue', // Tuesday
+    3: 'wed', // Wednesday
+    4: 'thu', // Thursday
+    5: 'fri', // Friday
+    
+};
 interface BreakItem {
     title: string;
     startTime: string;
@@ -20,6 +28,7 @@ interface BreaksCardProps {
 }
 
 const BreaksCard: React.FC<BreaksCardProps> = ({ breaks, onAddBreak, onDeleteBreak, onQuickConstraint }) => {
+    const { t } = useTranslation();
     return (
         <Row style={{ marginBottom: "15px" }}>
             <Col style={{ width: "100%" }}>
@@ -27,10 +36,10 @@ const BreaksCard: React.FC<BreaksCardProps> = ({ breaks, onAddBreak, onDeleteBre
                     title={
                         <Row justify="space-between">
                             <Col>
-                                <Typography.Text>Time Constraints</Typography.Text>
+                                <Typography.Text>{t('sched_tool.time_constraint')}</Typography.Text>
                             </Col>
                             <Col>
-                                <IconButton icon={<PlusOutlined />} text="Add Break" onClick={onAddBreak} />
+                                <IconButton icon={<PlusOutlined />} text={t('sched_tool.add_break')} onClick={onAddBreak} />
                             </Col>
                         </Row>
                     }
@@ -38,7 +47,7 @@ const BreaksCard: React.FC<BreaksCardProps> = ({ breaks, onAddBreak, onDeleteBre
                 >
                     <Row justify="center" style={{ color: "#4a8f94", marginBlock: "20px" }}>
                         {breaks.length === 0 ? (
-                            "No time constraint added"
+                            t('sched_tool.no_constraint') 
                         ) : (
                             <Space direction="vertical" style={{ width: '100%', maxWidth: '600px' }}>
                                 {breaks.map((breakItem, index) => (
@@ -57,9 +66,9 @@ const BreaksCard: React.FC<BreaksCardProps> = ({ breaks, onAddBreak, onDeleteBre
                                             <Typography.Text strong>{breakItem.title}</Typography.Text>
                                             <Typography.Text type="secondary" style={{ marginLeft: 16 }}>
                                                 {`${breakItem.startTime} - ${breakItem.endTime} (${[1, 2, 3, 4, 5].every(d => breakItem.daysOfWeek.includes(d))
-                                                        ? 'All Week'
+                                                    ? t('days.all_week') // Add this key to your translations
                                                         : breakItem.daysOfWeek
-                                                            .map(day => moment().day(day).format('ddd'))
+                                                        .map(day => t(`days.${dayNumberToKey[day]}`))
                                                             .join(', ')
                                                     })`}
                                             </Typography.Text>
@@ -83,13 +92,13 @@ const BreaksCard: React.FC<BreaksCardProps> = ({ breaks, onAddBreak, onDeleteBre
                         )}
                     </Row>
 
-                    <Row>Quick Restrictions</Row>
+                    <Row>{t('sched_tool.quick_restrictions')}</Row>
                     <Row gutter={[16, 8]} style={{ marginTop: "10px" }}>
-                        <Col><EventButton text="No Evening Classes (3-5 PM)" onClick={() => onQuickConstraint('15:00', '17:00', 'No Evening Classes', [1, 2, 3, 4, 5])} /></Col>
-                        <Col><EventButton text="No Morning Classes (8-10 AM)" onClick={() => onQuickConstraint('08:00', '10:45', 'No Morning Classes', [1, 2, 3, 4, 5])} /></Col>
-                        <Col><EventButton text="Lunch Break (12-1 PM)" onClick={() => onQuickConstraint('12:00', '13:00', 'Lunch Break', [1, 2, 3, 4, 5])} /></Col>
-                        <Col><EventButton text="No Wednesday Classes" onClick={() => onQuickConstraint('08:00', '17:00', 'No Wednesday Classes', [3])} /></Col>
-                        <Col><EventButton text="No Friday Classes" onClick={() => onQuickConstraint('08:00', '17:00', 'No Friday Classes', [5])} /></Col>
+                        <Col><EventButton text={t('sched_tool.evening_classes')} onClick={() => onQuickConstraint('15:00', '17:00', t('sched_tool.evening_classes') , [1, 2, 3, 4, 5])} /></Col>
+                        <Col><EventButton text={t('sched_tool.morning_classes')} onClick={() => onQuickConstraint('08:00', '10:45', t('sched_tool.morning_classes'), [1, 2, 3, 4, 5])} /></Col>
+                        <Col><EventButton text={t('sched_tool.lunch_break')} onClick={() => onQuickConstraint('12:00', '13:00', t('sched_tool.lunch_break'), [1, 2, 3, 4, 5])} /></Col>
+                        <Col><EventButton text={t('sched_tool.wed_classes')} onClick={() => onQuickConstraint('08:00', '17:00', t('sched_tool.wed_classes'), [3])} /></Col>
+                        <Col><EventButton text={t('sched_tool.fri_classes')} onClick={() => onQuickConstraint('08:00', '17:00', t('sched_tool.fri_classes'), [5])} /></Col>
                     </Row>
                 </Card>
             </Col>
