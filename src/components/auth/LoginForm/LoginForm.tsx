@@ -10,11 +10,13 @@ import { useUser } from '../../../Context/UserContext';
 interface LoginFormData {
     userid: number;
     password: string;
+    rememberMe: boolean;
 }
 
 export const initValues: Partial<LoginFormData> = {
     userid: 8,
     password: 'password',
+    rememberMe: false,
 };
 
 export const LoginForm: React.FC = () => {
@@ -27,10 +29,8 @@ export const LoginForm: React.FC = () => {
     const handleSubmit = async (values: LoginFormData) => {
         setLoading(true);
         try {
-            const loginResponse = await loginUser({ userid: values.userid, password: values.password });
-            console.log("loginResponse", loginResponse);
-            loginResponse.usertype === "Professor" ? navigate('/Messager') : navigate('/')
-
+            const loginResponse = await loginUser({ userid: values.userid, password: values.password, rememberMe: values.rememberMe });
+            loginResponse.usertype === "Student" && navigate('/');
         } catch (err: any) {
             notificationController.error({ message: err.message });
         } finally {
@@ -46,42 +46,40 @@ export const LoginForm: React.FC = () => {
                 requiredMark="optional"
                 initialValues={initValues}
             >
-                <Auth.FormTitle>{t('common.login')}</Auth.FormTitle>
-                <S.LoginDescription>{t('login.loginInfo')}</S.LoginDescription>
+                <Auth.FormTitle>{t('login')}</Auth.FormTitle>
+                <S.LoginDescription>{t('loginInfo')}</S.LoginDescription>
 
                 <Auth.FormItem
                     name="userid"
-                    label={t('common.id')}
-                    rules={[{ required: true, message: t('common.requiredField') }]}
+                    label={t('id')}
+                    rules={[{ required: true, message: t('requiredField') }]}
                 >
                     <Auth.FormInput
                         type="number"
-                        placeholder={t('common.id')}
+                        placeholder={t('id')}
                     />
                 </Auth.FormItem>
 
                 <Auth.FormItem
                     name="password"
-                    label={t('common.password')}
-                    rules={[{ required: true, message: t('common.requiredField') }]}
+                    label={t('password')}
+                    rules={[{ required: true, message: t('requiredField') }]}
                 >
-                    <Auth.FormInputPassword placeholder={t('common.password')} />
+                    <Auth.FormInputPassword placeholder={t('password')} />
                 </Auth.FormItem>
 
                 <Auth.ActionsWrapper>
                     <BaseForm.Item name="rememberMe" valuePropName="checked" noStyle>
                         <Auth.FormCheckbox>
-                            <S.RememberMeText>{t('login.rememberMe')}</S.RememberMeText>
+                            <S.RememberMeText>{t('rememberMe')}</S.RememberMeText>
                         </Auth.FormCheckbox>
                     </BaseForm.Item>
-                    <Link to="/auth/forgot-password">
-                        <S.ForgotPasswordText>{t('common.forgotPass')}</S.ForgotPasswordText>
-                    </Link>
+                
                 </Auth.ActionsWrapper>
 
                 <BaseForm.Item noStyle>
                     <Auth.SubmitButton type="primary" htmlType="submit" loading={isLoading}>
-                        {t('common.login')}
+                        {t('login')}
                     </Auth.SubmitButton>
                 </BaseForm.Item>
             </BaseForm>

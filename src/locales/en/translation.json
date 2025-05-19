@@ -6,7 +6,9 @@
     "change_lang": "Change Language",
     "confirm": "Confirm",
     "error": "Error",
-    "back": "Back"
+    "back": "Back",
+    "success": "Success"
+
   },
   "sider": {
     "plan_of_study": "Plan of Study",
@@ -278,12 +280,19 @@
 
     "mon_tue_wed_thu_fri": "Mon–Fri"
   },
-  "chats":{
+  "chats": {
     "please": "Please select a chat to begin messaging.",
     "type": "Type your message...",
     "chats_h": "Chats History",
     "chats": "chats",
     "you": "You",
     "advisor": "Advisor"
-  }
+  },
+  "login": "Login",
+  "id": "User ID",
+  "requiredField": "This field is required",
+  "password": "Password",
+  "forgotPass": "Forgot password?",
+  "loginInfo": "Enter your credentials to log in.",
+  "rememberMe": "Remember me"
 }

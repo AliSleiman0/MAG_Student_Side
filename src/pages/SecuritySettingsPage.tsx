@@ -8,7 +8,7 @@ const SecuritySettingsPage: React.FC = () => {
 
   return (
     <>
-      <PageTitle>{t('profile.nav.securitySettings.title')}</PageTitle>
+          <PageTitle>{t('profile.profile')}</PageTitle>
       <SecuritySettings />
     </>
   );

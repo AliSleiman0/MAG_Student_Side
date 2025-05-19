@@ -31,6 +31,7 @@ import { ArrowLeftOutlined, ArrowRightOutlined, EnvironmentOutlined } from '@ant
 import { Typography } from 'antd';
 import Spin from 'antd/es/spin';
 import { useTranslation } from 'react-i18next';
+import { PageTitle } from '../../../components/common/PageTitle/PageTitle';
 
 
 
@@ -312,6 +313,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId, onSelectRoom 
             minHeight: mobileOnly ? "70vh" : "auto",
             position: "relative"
         }}>
+            <PageTitle>{t('sider.chat')}</PageTitle>
             {mobileOnly &&
                 <>
                     <Button

@@ -15,11 +15,11 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
         );
     }
 
-    // 2) Once init + loading are done, redirect if no token
+
     if (!token) {
         return <Navigate to="/auth/login" replace />;
     }
 
-  // 4) You’re good to go
+
   return <>{children}</>;
 };

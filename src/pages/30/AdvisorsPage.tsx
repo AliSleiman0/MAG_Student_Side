@@ -6,6 +6,7 @@ import { Advisor, getRespectiveAdvisors } from '../../apiMAG/advisor';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { PageTitle } from '../../components/common/PageTitle/PageTitle';
 
 const { Title, Text } = Typography;
 
@@ -162,6 +163,7 @@ const AdvisorsGrid = () => {
 
     return (
         <PageContainer>
+            <PageTitle>{t('sider.advisor')}</PageTitle>
             <StyledHeader>
                 <Title level={2} style={{ color: 'inherit', marginBottom: 8 }}>
                     {t("sider.advisor_text1")}

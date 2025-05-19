@@ -1,19 +1,17 @@
-﻿
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-import { LoginInput, UpdatePasswordInput, AddImageInput, logout, showProfile,  addImage, deleteImage, resetPassword, LoginResponse, login, UserProfile } from '../apiMAG/user';
+﻿import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import {  UpdatePasswordInput, AddImageInput, logout, showProfile, addImage, deleteImage, resetPassword, LoginResponse, login, UserProfile } from '../apiMAG/user';
 import { setAuthToken } from '../apiMAG/api';
+import { LoginFormData } from '../components/auth/LoginForm/LoginForm';
 
-
-// ----- Context Types -----
 interface UserContextState {
     token: string | null;
     usertype: string | null;
+    department:string | null
     profile: UserProfile | null;
     loading: boolean;
     error: string | null;
     initialized: boolean;
-    loginUser: (credentials: LoginInput) => Promise<LoginResponse>;
+    loginUser: (credentials: LoginFormData) => Promise<LoginResponse>;
     logoutUser: () => Promise<void>;
     refreshProfile: () => Promise<void>;
     updatePassword: (input: UpdatePasswordInput) => Promise<string>;
@@ -23,43 +21,50 @@ interface UserContextState {
 
 const UserContext = createContext<UserContextState | undefined>(undefined);
 
-// ----- Provider Props -----
 interface UserProviderProps {
     children: ReactNode;
 }
 
-// ----- Provider Component -----
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const [token, setToken] = useState<string | null>(null);
     const [usertype, setUsertype] = useState<string | null>(null);
+    const [department, setDepartment] = useState<string | null>(null);
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const [initialized, setInitialized] = useState(false);  // ← new
-    const [userId, setuserId] = useState<string | null>(null);
-    
-    // Perform login and load profile
-   
-
-    const loginUser = async (credentials: LoginInput): Promise<LoginResponse> => {
+    const [initialized, setInitialized] = useState(false);
+    const [userId, setUserId] = useState<string | null>(null);
+    const [rememberMe, setRememberMe] = useState<boolean>(false);
+    const loginUser = async (credentials: LoginFormData): Promise<LoginResponse> => {
         setLoading(true);
         setError(null);
         try {
-            const data: LoginResponse = await login(credentials);
+            const data: LoginResponse = await login({
+                userid: credentials.userid,
+                password: credentials.password
+            });
 
-            // Update React state
-            setuserId(String(credentials.userid));
+            // Update state
+            setUserId(String(credentials.userid));
             setToken(data.token);
             setUsertype(data.usertype);
-
-            // Sync token with Axios instance
-            setAuthToken(data.token); // Critical: Update api.ts's token
-
-            // Fetch profile immediately after login
-            if (data.usertype === "Student") {
-                await refreshProfile(); // No token needed—uses api.ts's authToken
+            setAuthToken(data.token);
+            setRememberMe(credentials.rememberMe);
+           
+            // Persist credentials and rememberMe choice
+            if (credentials.rememberMe) {
+                localStorage.setItem('rememberMe', 'true');
+                localStorage.setItem('authToken', data.token);
+                localStorage.setItem('userId', String(credentials.userid));
+                localStorage.setItem('authUsertype', data.usertype);
+            } else {
+                sessionStorage.setItem('rememberMe', 'false');
+                sessionStorage.setItem('authToken', data.token);
+                sessionStorage.setItem('userId', String(credentials.userid));
+                sessionStorage.setItem('authUsertype', data.usertype);
             }
 
+            await refreshProfile();
             return data;
         } catch (err: any) {
             setError(err.message);
@@ -69,18 +74,28 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         }
     };
 
-    // Logout and clear state
     const logoutUser = async () => {
         setLoading(true);
         setError(null);
         try {
             await logout();
+            // Clear all storage
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('authUsertype');
+            localStorage.removeItem('rememberMe');
+            sessionStorage.removeItem('authToken');
+            sessionStorage.removeItem('userId');
+            sessionStorage.removeItem('authUsertype');
+            sessionStorage.removeItem('rememberMe');
+
+            // Reset state
             setAuthToken(null);
             setToken(null);
             setProfile(null);
-           
             setUsertype(null);
-           
+            setUserId(null);
+            setRememberMe(false);
         } catch (err: any) {
             setError(err.message);
             throw err;
@@ -89,13 +104,14 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         }
     };
 
-    // Fetch profile
+
     const refreshProfile = async () => {
         setLoading(true);
         setError(null);
         try {
-            const data: UserProfile = await showProfile(); // Uses api.ts's token via Axios
+            const data: UserProfile = await showProfile();
             setProfile(data);
+            setDepartment(data.department)
         } catch (err: any) {
             setError(err.message);
             throw err;
@@ -104,7 +120,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         }
     };
 
-    // Reset password
     const updatePassword = async (input: UpdatePasswordInput): Promise<string> => {
         setLoading(true);
         setError(null);
@@ -119,12 +134,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         }
     };
 
-    // Add profile image
     const uploadImage = async (input: string): Promise<string> => {
         setLoading(true);
         setError(null);
         try {
-            const res = await addImage({ image: input },Number(userId));
+            const res = await addImage({ image: input }, Number(userId));
             await refreshProfile();
             return res ?? 'Error';
         } catch (err: any) {
@@ -135,7 +149,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         }
     };
 
-    // Delete profile image
     const removeImage = async (): Promise<string> => {
         setLoading(true);
         setError(null);
@@ -151,38 +164,44 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         }
     };
 
-    // Effect: Optionally, load token from localStorage on mount and fetch profile
     useEffect(() => {
-        const storedToken = localStorage.getItem('authToken');
-        const userid = localStorage.getItem('userId');
-        const storedUsertype = localStorage.getItem('authUsertype');
-        if (storedToken) {
-            setAuthToken(storedToken);
-            setuserId(userid);
-            setToken(storedToken);
-            setUsertype(storedUsertype);
-            refreshProfile().catch(() => { });
-        }
-        setInitialized(true);  // ← mark that we’re done restoring
+        const loadFromStorage = () => {
+            const remember = localStorage.getItem('rememberMe') === 'true';
+            setRememberMe(remember);
+
+            const storage = remember ? localStorage : sessionStorage;
+            const storedToken = storage.getItem('authToken');
+            const storedUserId = storage.getItem('userId');
+            const storedUsertype = storage.getItem('authUsertype');
+
+            if (storedToken) {
+                setAuthToken(storedToken);
+                setUserId(storedUserId);
+                setToken(storedToken);
+                setUsertype(storedUsertype);
+                refreshProfile().catch(() => { });
+            }
+            setInitialized(true);
+        };
+
+        loadFromStorage();
     }, []);
 
-    // Persist token to storage when it changes
+    // Persist state changes to storage
     useEffect(() => {
-        if (token) {
-            localStorage.setItem('authToken', token);
-            if (usertype) localStorage.setItem('authUsertype', usertype);
-            // api.setAuthHeader(token);
-            if (userId)  localStorage.setItem('userId', userId);
-        } else {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('authUsertype');
-        }
-    }, [token, usertype]);
+        if (!token) return;
+
+        const storage = rememberMe ? localStorage : sessionStorage;
+        storage.setItem('authToken', token);
+        if (userId) storage.setItem('userId', userId);
+        if (usertype) storage.setItem('authUsertype', usertype);
+    }, [token, userId, usertype, rememberMe]);
 
     return (
         <UserContext.Provider
             value={{
                 token,
+                department,
                 usertype,
                 profile,
                 loading,
@@ -201,7 +220,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     );
 };
 
-// ----- Custom Hook -----
 export const useUser = (): UserContextState => {
     const context = useContext(UserContext);
     if (!context) {

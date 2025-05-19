@@ -16,6 +16,7 @@ import { QueryClient, QueryClientProvider, useMutation, useQuery } from 'react-q
 import { ChosenCourse, Course, submitSelectedCourses } from '../../../apiMAG/customized_pos';
 import { RegistrationData, SemesterInfo, getDynamicPOS } from '../../../apiMAG/automated_pos';
 import Banner from '../../../components/Banner';
+import { PageTitle } from '../../../components/common/PageTitle/PageTitle';
 const { Content, Sider } = Layout;
 /*****************************
  * Query Client Configuration
@@ -306,6 +307,7 @@ const CustomizedPOS: React.FC = () => {
 
     return (
         <> 
+            <PageTitle>{t('sider.customized_pos')}</PageTitle>
             <Layout style={{ background: '#e7f2f3' }}>
 
                 <Modal
