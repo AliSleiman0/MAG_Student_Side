@@ -6,7 +6,8 @@
     "change_lang": "Sprache ändern",
     "confirm": "Bestätigen",
     "error": "Fehler",
-    "back": "Zurück"
+    "back": "Zurück",
+    "success": "Erfolg"
   },
   "sider": {
     "plan_of_study": "POS",
@@ -280,5 +281,12 @@
     "chats": "Chats",
     "you": "Sie",
     "advisor": "Berater"
-  }
+  },
+  "login": "Anmelden",
+  "id": "Benutzer‑ID",
+  "requiredField": "Dieses Feld ist erforderlich",
+  "password": "Passwort",
+  "forgotPass": "Passwort vergessen?",
+  "loginInfo": "Geben Sie Ihre Anmeldedaten ein.",
+  "rememberMe": "Angemeldet bleiben"
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { notification } from 'antd';
 import styled from 'styled-components';
 import { CheckCircleFilled, ExclamationCircleFilled, InfoCircleFilled, StopFilled } from '@ant-design/icons';

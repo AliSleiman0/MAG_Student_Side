@@ -37,6 +37,7 @@ const AcademicCalendar = forwardRef<HTMLDivElement, AcademicCalendarProps>(
 
             <FullCalendar
                 plugins={[timeGridPlugin]}
+                stickyHeaderDates={false}
                 initialView="timeGridWeek"
                 headerToolbar={false}
                 allDaySlot={false}

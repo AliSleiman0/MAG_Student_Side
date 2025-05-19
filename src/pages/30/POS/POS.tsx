@@ -18,6 +18,8 @@ import {
     SolidLine,
     DashedLine,
 } from './flowchartStyles';
+import { PageTitle } from '../../../components/common/PageTitle/PageTitle';
+import { useUser } from '../../../Context/UserContext';
 function parseCourse(input: string) {
     // Split the string at the colon
     const [code, name] = input.split(':').map(str => str.trim());
@@ -470,10 +472,11 @@ export const Flowchart = () => {
     // === Query & Responsive Hooks ===
     const { mobileOnly } = useResponsive();               // Detect mobile view
 
-
+    const { department } = useUser();
     //<pre>{JSON.stringify(data, null, 2)}</pre>
     return (
         <>
+            <PageTitle>{t('sider.plan_of_study')}</PageTitle>
             {isLoading ? (<div style={{ textAlign: 'center', padding: '64px' }}>
                 <Spin size="large" tip="Loading Data..." />
             </div>) : (
@@ -490,7 +493,7 @@ export const Flowchart = () => {
                                     <Typography.Text
                                         style={{ ...bannerStyles.text, ...bannerStyles.responsiveText }}
                                     >
-                                        {t("pos.text")} [Computer and Commmunication Engineering]
+                                            {t("pos.text")} {department}
 
                                     </Typography.Text>
                                 </Space>

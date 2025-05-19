@@ -13,6 +13,7 @@ import MobileSiderMenu from '../../../components/sider_DPOS_xs';
 import { useTranslation } from 'react-i18next';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
 import { Course, SemesterInfo, getDynamicPOS } from '../../../apiMAG/automated_pos';
+import { PageTitle } from '../../../components/common/PageTitle/PageTitle';
 const { Content, Sider } = Layout;
 
 /*****************************
@@ -267,7 +268,9 @@ const DynamicPOS: React.FC = () => {
     console.log(data);
     return (
         // <pre>{JSON.stringify(data, null, 2)}</pre>
-        <>  <Layout style={{ background: '#e7f2f3' }}>
+        <>
+            <PageTitle>{t('sider.dynamic_pos')}</PageTitle>
+            <Layout style={{ background: '#e7f2f3' }}>
 
             <Modal
                 title={t("customised_pos.modal_title_generate")}

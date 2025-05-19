@@ -25,7 +25,7 @@ const MobileSiderMenu = ({
     title
 }: SiderProps) => {
     const [isSiderCollapsed, setIsSiderCollapsed] = useState(false);
-    const { mobileOnly, tabletOnly } = useResponsive();
+    const { mobileOnly } = useResponsive();
 
     const handleMenuToggle = () => {
         setIsSiderCollapsed(prev => !prev);

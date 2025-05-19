@@ -6,7 +6,9 @@
     "change_lang": "Changer de langue",
     "confirm": "Confirmer",
     "error": "Erreur",
-    "back": "Retour"
+    "back": "Retour",
+    "success": "Succès"
+
   },
   "sider": {
     "plan_of_study": "POS",
@@ -284,5 +286,12 @@
     "chats": "discussions",
     "you": "Vous",
     "advisor": "Conseiller"
-  }
+  },
+  "login": "Connexion",
+  "id": "ID utilisateur",
+  "requiredField": "Ce champ est requis",
+  "password": "Mot de passe",
+  "forgotPass": "Mot de passe oublié ?",
+  "loginInfo": "Entrez vos identifiants pour vous connecter.",
+  "rememberMe": "Se souvenir de moi"
 }
