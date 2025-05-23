@@ -104,7 +104,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ receiverId, onSelectRoom 
 
     const [messages, setMessages] = useState<ChatMessage[]>([]);//messages
     const [isSending, setIsSending] = useState(false); //message is sending?
-    const currentUserId = localStorage.getItem('userId') ?? ''; //Current userid
+
+    const {profile } = useUser();
+    const currentUserId = String(profile?.userid); //Current userid
     const [chatRooms, setChatRooms] = useState<IChatListProps['dataSource'] | null>(null); // rooms associated with the current user
 
     const { data: receiverProfile } = useReceiverProfile(receiverId); //gets the receiver profile from its id
