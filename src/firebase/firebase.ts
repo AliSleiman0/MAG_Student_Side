@@ -246,6 +246,9 @@ export function subscribeToMessages(// creates a real time message listener
     });
 }
 
+
+
+
 /**
  * Real-time listener for user's chat rooms
  * @param userId - User ID to monitor rooms for
@@ -269,8 +272,7 @@ export function subscribeToUserRooms(
         const rooms: RoomWithLastMsg[] = snap.docs.map((doc) => {
             const data = doc.data() as DocumentData;
             const participants = data.participants as string[];
-            const [userA, userB] = participants.sort();
-
+            
             return {
                 id: doc.id,
                 participants,
@@ -313,3 +315,5 @@ export async function resetUnreadCount(
         [resetField]: 0,
     });
 }
+
+

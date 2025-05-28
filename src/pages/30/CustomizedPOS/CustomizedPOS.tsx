@@ -439,10 +439,11 @@ const CustomizedPOS: React.FC = () => {
                             <Button
                                 onClick={() => setShowConfirmation(true)}
                                 style={{
+                                    paddingTop:"10px",
                                     background: '#038b94',
                                     color: 'white',
                                     zIndex: 444,
-                                    width: mobileOnly ? '190px' : '30%',
+                                    width: mobileOnly ? '190px' : '20%',
                                     position: "absolute",
                                     flexWrap: "wrap",
                                     fontSize: mobileOnly ? '0.6rem' : '1rem',
@@ -547,6 +548,8 @@ const CustomizedPOS: React.FC = () => {
                                                 </Col>
                                             </>
                                         ) : (
+                                                <>
+
                                             <Col xs={24} md={24} lg={16} style={{ height: "100%", width: "100%" }}>
                                                 <SemesterDetailView
 
@@ -554,8 +557,21 @@ const CustomizedPOS: React.FC = () => {
                                                     credits={totalCredits}
                                                     courseList={selectedSemester?.courses}
                                                 />
-                                            </Col>
+                                                    </Col>
+                                                    {isTablet && (
+                                                        <Col xs={24} md={24} lg={8} style={{ height: "100%", width: "100%" }}>
+                                                            <Row align="top" style={{ marginLeft: "40px" }} >
+                                                                <Col>
+                                                                    <p className="ahmadRequest">{`${selectedSemester?.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester?.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")}`}</p>
+
+                                                                </Col>
+                                                            </Row>
+                                                        </Col>
+                                                    )}
+                                                </>
+
                                         )}
+
                                     </Row>
                                 );
                             })()
