@@ -34,21 +34,22 @@ const MobileSiderMenu = ({
     return (
         <>
             {/* Mobile Toggle Button */}
-
-            <Button
-                type="text"
-                className={shouldFlash ? 'flash-highlight' : ''}
-                icon={isSiderCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                onClick={handleMenuToggle}
-                aria-label={isSiderCollapsed ? "Open menu" : "Close menu"}
-                style={{
-                    position: 'fixed',
-                    right: 8,
-                    top: 85,
-                    zIndex: 1004,
-                    background: '#daf3f5'
-                }}
-            />
+            {isGeneratedSemesters && (
+                <Button
+                    type="text"
+                    className={shouldFlash ? 'flash-highlight' : ''}
+                    icon={isSiderCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                    onClick={handleMenuToggle}
+                    aria-label={isSiderCollapsed ? "Open menu" : "Close menu"}
+                    style={{
+                        position: 'fixed',
+                        right: 8,
+                        top: 85,
+                        zIndex: 1004,
+                        background: '#daf3f5'
+                    }}
+                />
+            )}
 
 
             <Sider

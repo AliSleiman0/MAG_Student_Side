@@ -387,40 +387,48 @@ const DynamicPOS: React.FC = () => {
                             {isFullViewSemesters ? t("customised_pos.collapse_view") : t("customised_pos.show_full_timeline")}
                         </Button>
                     )}
-                    {!isGeneratedSemesters && (
-                        <Button
-                            onClick={() => setShowConfirmation(true)}
-                            style={{
-                                background: '#038b94',
-                                color: 'white',
-
-                                width: mobileOnly ? '190px' : '30%',
-
-                                flexWrap: "wrap",
-                                fontSize: mobileOnly ? '0.6rem' : '1rem',
-
-                            }}
-                        >
-                            {t("customised_pos.generate_remaining_semesters")}
-                        </Button>
-                    )}
+                   
                 </div>
 
-                <Content style={{ padding: '12px', margin: 0, marginTop: mobileOnly ? "36px" : "" }}>
-                    {(!isFullViewSemesters && isFirstSemester) &&
-                        <Typography
-                            style={{
-                                fontSize: '20px',
-                                fontWeight: 600,
-                                marginBottom: "10px",
-                                color: '#084C61',
-                                letterSpacing: '0.5px',
+                    <Content style={{ padding: '12px', margin: 0, marginTop: mobileOnly ? "36px" : "" }}>
+                        <Row justify="space-between" style={{ width: "100%", paddingTop: "10px"}}>
+                            <Col md={12} lg={12} style={{ width: "100%" }}>
+                                {(!isFullViewSemesters && isFirstSemester) &&
+                                    <Typography
+                                        style={{
+                                            fontSize: '20px',
+                                            fontWeight: 600,
+                                            marginBottom: "10px",
+                                            color: '#084C61',
+                                            letterSpacing: '0.5px',
 
-                            }}
-                        >
-                            {t("customised_pos.courses_eligible_for_registration_below")}
-                        </Typography>
-                    }
+                                        }}
+                                    >
+                                        {t("customised_pos.courses_eligible_for_registration_below")}
+                                    </Typography>
+                                }
+                            </Col>
+                            <Col style={{ width: "100%", display: "flex", justifyContent: "end", alignContent: "end", paddingBottom: "10px" }} md={12} lg={12} >
+                                {!isGeneratedSemesters && (
+                                    <Button
+                                        onClick={() => setShowConfirmation(true)}
+                                        style={{
+                                            background: '#038b94',
+                                            color: 'white',
+
+                                            width: "fit-content",
+                                         
+                                            flexWrap: "wrap",
+                                            fontSize: mobileOnly ? '0.6rem' : '1rem',
+                                           
+                                        }}
+                                    >
+                                        {t("customised_pos.generate_remaining_semesters")}
+                                    </Button>
+                                )}
+                            </Col>
+                        </Row>
+                   
                     {isFullViewSemesters ? (
                         <div style={{ margin: '0 auto' }}>
                             <Row gutter={[50, 48]}>
