@@ -77,21 +77,21 @@ function parseCourse(input: string) {
 
 const CustomizedPOS: React.FC = () => {
     const { t } = useTranslation();
-   
+
     const { data } = useQuery(
         'Dynamic POS',
         getDynamicPOS,
         {
             useErrorBoundary: true,
-           
+
             onSuccess: (apiData) => {
-               
+
             }
         }
     );
     const parsedCourses = useMemo(() => {
         return data?.offeredCourses[0]?.courses || [];
-    }, [ data]);
+    }, [data]);
 
 
 
@@ -115,14 +115,14 @@ const CustomizedPOS: React.FC = () => {
             submitSelectedCourses({ chosenCoursesIds: selectedCourses }),
         {
             onSuccess: (data: RegistrationData) => {
-               
+
                 setSemesters(data.recommendedforRegestration);
                 setIsGeneratedSemesters(true);
                 setShouldFlash(true);
                 setTimeout(() => setShouldFlash(false), 3000);
             },
             onError: (error: Error) => {
-               
+
             }
         }
     );
@@ -238,7 +238,7 @@ const CustomizedPOS: React.FC = () => {
         // Start loading state
         setIsLoadingGenerate(true);
         const sanitizedCourses = selectedCourses.map(({ key, priority, ...rest }) => rest);
-      
+
         // Execute the mutation
         mutate(sanitizedCourses, {
             onSuccess: (generatedSemesters) => {
@@ -279,7 +279,7 @@ const CustomizedPOS: React.FC = () => {
 
 
     const handleSemesterSelect = (semester: SemesterInfo) => {
-       
+
         setSelectedSemester(semester);
         const totalCredits = semester.courses.reduce((sum, c) => sum + c.credits, 0);
         setIsFullViewSemesters(false);
@@ -306,7 +306,7 @@ const CustomizedPOS: React.FC = () => {
 
 
     return (
-        <> 
+        <>
             <PageTitle>{t('sider.customized_pos')}</PageTitle>
             <Layout style={{ background: '#e7f2f3' }}>
 
@@ -435,41 +435,47 @@ const CustomizedPOS: React.FC = () => {
                                 {isFullViewSemesters ? t("customised_pos.collapse_view") : t("customised_pos.show_full_timeline")}
                             </Button>
                         )}
-                        {!isGeneratedSemesters && (
-                            <Button
-                                onClick={() => setShowConfirmation(true)}
-                                style={{
-                                    paddingTop:"10px",
-                                    background: '#038b94',
-                                    color: 'white',
-                                    zIndex: 444,
-                                    width: mobileOnly ? '190px' : '20%',
-                                    position: "absolute",
-                                    flexWrap: "wrap",
-                                    fontSize: mobileOnly ? '0.6rem' : '1rem',
 
-                                }}
-                            >
-                                {t("customised_pos.generate_remaining_semesters")}
-                            </Button>
-                        )}
                     </div>
 
                     <Content style={{ padding: '24px', margin: 0, marginTop: mobileOnly ? "36px" : "" }}>
-                        {(!isFullViewSemesters && isFirstSemester) &&
-                            <Typography
-                                style={{
-                                    fontSize: '20px',
-                                    fontWeight: 600,
-                                    marginBottom: "10px",
-                                    color: '#084C61',
-                                    letterSpacing: '0.5px',
+                        <Row justify="space-between" style={{ width: "100%", paddingTop: "10px" }}>
+                            <Col md={12} lg={12} style={{ width: "100%" }}>
+                                {(!isFullViewSemesters && isFirstSemester) &&
+                                    <Typography
+                                        style={{
+                                            fontSize: '20px',
+                                            fontWeight: 600,
+                                            marginBottom: "10px",
+                                            color: '#084C61',
+                                            letterSpacing: '0.5px',
 
-                                }}
-                            >
-                                {t("customised_pos.courses_eligible_for_registration_below")}
-                            </Typography>
-                        }
+                                        }}
+                                    >
+                                        {t("customised_pos.courses_eligible_for_registration_below")}
+                                    </Typography>
+                                }
+                            </Col>
+                            <Col style={{ width: "100%", display: "flex", justifyContent: "end", alignContent: "end", paddingBottom: "10px" }} md={12} lg={12} >
+                                {!isGeneratedSemesters && (
+                                    <Button
+                                        onClick={() => setShowConfirmation(true)}
+                                        style={{
+                                            background: '#038b94',
+                                            color: 'white',
+
+                                            width: "fit-content",
+
+                                            flexWrap: "wrap",
+                                            fontSize: mobileOnly ? '0.6rem' : '1rem',
+
+                                        }}
+                                    >
+                                        {t("customised_pos.generate_remaining_semesters")}
+                                    </Button>
+                                )}
+                            </Col>
+                        </Row>
                         {isFullViewSemesters ? (
                             <div style={{ margin: '0 auto' }}>
                                 <Row gutter={[75, 48]}>
@@ -490,7 +496,7 @@ const CustomizedPOS: React.FC = () => {
                             </div>
                         ) : (
                             (() => {
-                        
+
                                 return (
 
                                     <Row gutter={[16, 16]}>
@@ -538,7 +544,7 @@ const CustomizedPOS: React.FC = () => {
                                                         title={`${t("customised_pos.title")} ${getSemesterTranslation(selectedSemester?.semester ?? "")} | ${selectedSemester?.semester}`}
                                                         credits={totalCreditsSelected}
                                                         courseList={selectedCourses}
-                                                    
+
                                                         extraInfo={
                                                             <div style={{ color: totalCreditsSelected > 20 ? 'red' : 'inherit' }}>
                                                                 {totalCreditsSelected}/20 {t("customised_pos.credits_selected")}
@@ -548,27 +554,27 @@ const CustomizedPOS: React.FC = () => {
                                                 </Col>
                                             </>
                                         ) : (
-                                                <>
+                                            <>
 
-                                            <Col xs={24} md={24} lg={16} style={{ height: "100%", width: "100%" }}>
-                                                <SemesterDetailView
+                                                <Col xs={24} md={24} lg={16} style={{ height: "100%", width: "100%" }}>
+                                                    <SemesterDetailView
 
-                                                    title={`${selectedSemester?.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester?.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} - ${selectedSemester?.year}`}
-                                                    credits={totalCredits}
-                                                    courseList={selectedSemester?.courses}
-                                                />
+                                                        title={`${selectedSemester?.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester?.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} - ${selectedSemester?.year}`}
+                                                        credits={totalCredits}
+                                                        courseList={selectedSemester?.courses}
+                                                    />
+                                                </Col>
+                                                {isTablet && (
+                                                    <Col xs={24} md={24} lg={8} style={{ height: "100%", width: "100%" }}>
+                                                        <Row align="top" style={{ marginLeft: "40px" }} >
+                                                            <Col>
+                                                                <p className="ahmadRequest">{`${selectedSemester?.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester?.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")}`}</p>
+
+                                                            </Col>
+                                                        </Row>
                                                     </Col>
-                                                    {isTablet && (
-                                                        <Col xs={24} md={24} lg={8} style={{ height: "100%", width: "100%" }}>
-                                                            <Row align="top" style={{ marginLeft: "40px" }} >
-                                                                <Col>
-                                                                    <p className="ahmadRequest">{`${selectedSemester?.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester?.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")}`}</p>
-
-                                                                </Col>
-                                                            </Row>
-                                                        </Col>
-                                                    )}
-                                                </>
+                                                )}
+                                            </>
 
                                         )}
 
