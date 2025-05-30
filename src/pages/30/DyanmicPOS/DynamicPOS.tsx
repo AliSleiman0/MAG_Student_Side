@@ -432,12 +432,13 @@ const DynamicPOS: React.FC = () => {
                     {isFullViewSemesters ? (
                         <div style={{ margin: '0 auto' }}>
                             <Row gutter={[50, 48]}>
-                                {semesters?.map((semester, index) => {
+                                    {semesters?.map((semester, index) => {
+                         
                                     const totalCredits = semester.courses.reduce((sum, c) => sum + c.credits, 0);
                                     return (
                                         <Col key={index} xs={24} md={12} lg={12}>
                                             <SemesterDetailView
-                                                title={`Best Plan for ${selectedSemester?.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester?.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} - ${semester.year}`}
+                                                title={`Best Plan for ${semester?.semester == "Fall" ? t("welcome.semester_fall") : semester?.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} - ${semester.year}`}
                                                 credits={totalCredits}
                                                 courseList={semester.courses}
                                                 Upcoming={index === 0 ? t("customised_pos.upcoming") : ""}
