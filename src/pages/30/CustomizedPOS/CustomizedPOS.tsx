@@ -541,7 +541,7 @@ const CustomizedPOS: React.FC = () => {
                                                 <Col span={8} xs={24} md={24} lg={24} xl={8}>
 
                                                     <SemesterDetailView
-                                                        title={`${t("customised_pos.title")} ${getSemesterTranslation(selectedSemester?.semester ?? "")} | ${selectedSemester?.semester}`}
+                                                        title={`${t("customised_pos.title")} ${getSemesterTranslation(selectedSemester?.semester ?? "")} | ${selectedSemester?.semester ?? 'Summer 2025-2026'}`}
                                                         credits={totalCreditsSelected}
                                                         courseList={selectedCourses}
 
