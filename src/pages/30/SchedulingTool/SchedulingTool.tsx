@@ -594,7 +594,7 @@ const SchedulingTool = () => {
         const coursePrefs = coursesOfferingsInput.map(course => ({
             courseid: Number(course.id.replace(/\D+/g, '')) || 0, // ✅ Fixed bracket here
             coursecode: course.code.split(" ").join("").toUpperCase(),
-            coursename: `${course.code}: ${course.name}`,
+            coursename: `${parseCourse(course.name).name }`,
             coursetype: course.type || "Major",
             credits: course.credits,
             sections: (selectedSectionsSmart[course.id] ?? []).map(sectionId => {

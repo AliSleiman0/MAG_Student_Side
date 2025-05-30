@@ -9,9 +9,9 @@ import { useAppSelector } from '@app/hooks/reduxHooks';
 import * as S from './SettingsOverlay.styles';
 
 export const SettingsOverlay: React.FC = ({ ...props }) => {
-  const { t } = useTranslation();
+  useTranslation();
 
-  const { isPWASupported, event } = useAppSelector((state) => state.pwa);
+  useAppSelector((state) => state.pwa);
 
   return (
     <S.SettingsOverlayMenu {...props}>
