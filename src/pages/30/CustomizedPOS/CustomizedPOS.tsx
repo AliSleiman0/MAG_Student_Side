@@ -484,7 +484,7 @@ const CustomizedPOS: React.FC = () => {
                                         return (
                                             <Col key={index} xs={24} md={12} lg={12}>
                                                 <SemesterDetailView
-                                                    title={`${selectedSemester?.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester?.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} - ${semester.year}`}
+                                                    title={`${semester?.semester == "Fall" ? t("welcome.semester_fall") : semester?.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} - ${semester.year}`}
                                                     credits={totalCredits}
                                                     courseList={semester.courses}
                                                     Upcoming={index === 0 ? t("customised_pos.upcoming") : ""}
