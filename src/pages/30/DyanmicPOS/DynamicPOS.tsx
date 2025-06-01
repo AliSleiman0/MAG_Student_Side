@@ -452,9 +452,7 @@ const DynamicPOS: React.FC = () => {
                         (() => {
                             // 1. Derive once, use strict equality:
 
-                            const translateCourseType = (courseType: string) => {
-                                return t(`course_types.${courseType}` as any) as string;
-                            };
+                            
                             return (
                                 <Row gutter={[16, 16]}>
                                     {isFirstSemester ? (
@@ -491,7 +489,7 @@ const DynamicPOS: React.FC = () => {
                                             </Col>
                                             <Col span={8} xs={24} md={24} lg={24} xl={8}>
                                                 <SemesterDetailView
-                                                    title={`${t("customised_pos.Best_title")} ${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")}  | ${selectedSemester.year}`}
+                                                    title={`${t("customised_pos.Best_title")} ${semesters[0].semester == "Fall" ? t("welcome.semester_fall") : semesters[0].semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")}  | ${semesters[0].year}`}
                                                     credits={totalCredits}
                                                     courseList={selectedSemester.courses}
                                                     Upcoming={t("customised_pos.upcoming")}
@@ -503,7 +501,7 @@ const DynamicPOS: React.FC = () => {
                                         <>
                                             <Col xs={24} md={24} lg={16} style={{ height: "100%", width: "100%" }}>
                                                 <SemesterDetailView
-                                                    title={`${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} `}
+                                                        title={`${selectedSemester.semester == "Fall" ? t("welcome.semester_fall") : selectedSemester.semester == "Spring" ? t("welcome.semester_spring") : t("welcome.semester_summer")} - ${selectedSemester?.year}`}
                                                     credits={totalCredits}
                                                     courseList={selectedSemester.courses}
                                                 />

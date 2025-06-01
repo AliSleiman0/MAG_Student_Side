@@ -95,7 +95,7 @@ const CourseLists: React.FC<CoursesListProps> = ({ data }) => {
                             }
                         >
                             <div style={{
-                                maxHeight: '686px',  // Adjust this value based on your card height (4 cards * card height)
+                                height: '640px',  // Adjust this value based on your card height (4 cards * card height)
                                 overflowY: 'auto',
                                 paddingRight: '8px'  // Prevents scrollbar from overlapping content
                             }}>
@@ -193,7 +193,7 @@ const CourseLists: React.FC<CoursesListProps> = ({ data }) => {
                         >
                             <Divider orientation="left" style={{ borderColor: '#038b94' }}>{t("courses.credits.remaining")}</Divider>
                             <div style={{
-                                maxHeight: '300px',  // Adjust this value based on your card height (4 cards * card height)
+                                height: '470px', // Adjust this value based on your card height (4 cards * card height)
                                 overflowY: 'auto',
                                 paddingRight: '8px', // Prevents scrollbar from overlapping content
                                 marginBottom: "20px"
