@@ -439,9 +439,9 @@ const CustomizedPOS: React.FC = () => {
                     </div>
 
                     <Content style={{ padding: '24px', margin: 0, marginTop: mobileOnly ? "36px" : "" }}>
-                        <Row justify="space-between" style={{ width: "100%", paddingTop: "10px" }}>
+                        <Row justify="space-between" style={{ width: "100%" }}>
                             <Col md={12} lg={12} style={{ width: "100%" }}>
-                                {(!isFullViewSemesters && isFirstSemester) &&
+                                {(!isFullViewSemesters && isFirstSemester && !isGeneratedSemesters) &&
                                     <Typography
                                         style={{
                                             fontSize: '20px',
@@ -541,7 +541,7 @@ const CustomizedPOS: React.FC = () => {
                                                 <Col span={8} xs={24} md={24} lg={24} xl={8}>
 
                                                     <SemesterDetailView
-                                                        title={`${t("customised_pos.title")} ${getSemesterTranslation(selectedSemester?.semester ?? "")} | ${selectedSemester?.semester ?? 'Summer 2025-2026'}`}
+                                                        title={`${t("customised_pos.title")} ${getSemesterTranslation(selectedSemester?.semester ?? "")} | ${selectedSemester?.semester ?? 'Fall 2025-2026'}`}
                                                         credits={totalCreditsSelected}
                                                         courseList={selectedCourses}
 

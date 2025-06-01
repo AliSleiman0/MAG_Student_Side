@@ -116,9 +116,6 @@ export const Semester_AutoPOS = ({ courseData }: { courseData: CourseData }) => 
                 borderLeft: "4px solid #038b94",
                 margin: "0px 0px",
                 width: "100%",
-                
-               
-              
             }}
         >
             <Collapse.Panel
@@ -127,7 +124,7 @@ export const Semester_AutoPOS = ({ courseData }: { courseData: CourseData }) => 
                 style={{
                     borderBottom: '1px solid #038b94',
                     padding:'16px',
-                    height: courseData.height ? "fit-content" : "800px"
+                    height: courseData.height ? "fit-content" : "700px"
                 }}
             >
                 {( courseData.credits == 0 && courseData.courseList?.length == 0) && (
